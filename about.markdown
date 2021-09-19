@@ -16,3 +16,14 @@ You can find the source code for Jekyll at GitHub:
 
 
 [jekyll-organization]: https://github.com/jekyll
+
+# Just checking
+What this actually does:
+- Hello 
+- World
+- why 
+- do
+- *you*
+- never 
+- __greet__
+- back
