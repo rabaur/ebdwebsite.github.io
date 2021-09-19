@@ -2,7 +2,7 @@
 layout: default
 ---
 
-[Software]({% link software.md %})
+[Software]({{ site.baseurl }}{% link software.md %})
 [Exercises]({% link exercises.md %})
 [Final Project]({% link final_project.md %})
 [Guest Talks]({% link guest_talks.md %})
