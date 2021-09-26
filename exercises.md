@@ -54,6 +54,8 @@ You can see two screenshots from the Miroboard below.
 * Yi, L., & Seo, H. B. (2012). The effect of hospital unit layout on nurse walking behavior. HERD: Health Environments Research & Design Journal, 6(1), 66-82. [PDF](https://polybox.ethz.ch/index.php/s/9AUBzLIGR2Yd6V0)
 * Seo, H. B., Choi, Y. S., & Zimring, C. (2011). Impact of hospital unit design for patient-centered care on nurses’ behavior. Environment and Behavior, 43(4), 443-468.[PDF](https://polybox.ethz.ch/index.php/s/dObPtSGV57LwEgn)
 * Bosch, S. J., Apple, M., Hiltonen, B., Worden, E., Lu, Y., Nanda, U., & Kim, D. (2016). To see or not to see: Investigating the links between patient visibility and potential moderators affecting the patient experience. Journal of Environmental Psychology, 47, 33-43. [PDF](https://polybox.ethz.ch/index.php/s/eClwKt7Zv2esnz4)
+* Pachilova, R., & Sailer, K. (2020). Providing care quality by design: a new measure to assess hospital ward layouts. The Journal of Architecture, 25(2), 186-202.[PDF](https://polybox.ethz.ch/index.php/s/cyQj7vlPZCopdU6)
+* 
 
 ## Exercise 2
 ## Exercise 3
