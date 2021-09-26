@@ -7,7 +7,7 @@ layout: default
 [Final Project]({{ site.baseurl }}{% link final_project.md %})
 
 
-
+![Logo](Logo.JPG)
 # Course Lecturers
 ## Michal Gath-Morad, michal.gath@gess.ethz.ch
 ## Christoph Hölscher 
@@ -27,4 +27,4 @@ layout: default
 
 Our teaching this semester is generously funded by an ETH Innovedum grant.
 
-![Logo](Logo.JPG)
+
