@@ -18,9 +18,9 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: "Evidence-Based Design in Architecture: Linking Cognition and Architecture to Design Resilience Healthcare Architecture" 
+title: "Evidence-Based Design in Architecture: Linking Cognition and Architecture to Design Resilience Healthcare Architecture"
+logo: /Logo.JPG
 email: michal.gath@gess.ethz.ch
-logo: LOGO.JPG
 description: >- # this means to ignore newlines until "baseurl:"
   Evidence-based design in architecture, a science-in-perspective course,
   ETH Zurich. 
@@ -54,7 +54,3 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
-
-site.show_download: False
-site.github.is_project_page: False
-site.github.is_user_page: False
