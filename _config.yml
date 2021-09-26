@@ -17,13 +17,13 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-![Logo](Logo.JPG)
 
 title: "Evidence-Based Design in Architecture: Linking Cognition and Architecture to Design Resilience Healthcare Architecture" 
 email: your-michal.gath@gess.ethz.ch
 description: >- # this means to ignore newlines until "baseurl:"
-  Evidence-based design in architecture, science-in-perspective course,
+  Evidence-based design in architecture, a science-in-perspective course,
   ETH Zurich. 
+![Logo](Logo.JPG)
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "www.ebdarch.ethz.ch" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
