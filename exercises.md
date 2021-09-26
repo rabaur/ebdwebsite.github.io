@@ -27,7 +27,7 @@ permalink: /exercises/
 
 Choose one of the papers in the list, read it and answer the following questions:
 
-**IMPORTANT: Each paper can be selected once. Please mark your choice in this Doodle.**
+**IMPORTANT: submissions are individual , one paper can be chosen by two students at most, please register your choice here: [Reading List](https://docs.google.com/spreadsheets/d/1rc-Cqsg77d6jgiE8nTF9AUOyNM0h71KzvZEkXmHIEQo/edit?usp=sharing) .**
 
   * Who is the author?
 
