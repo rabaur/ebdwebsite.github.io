@@ -36,7 +36,8 @@ IMPORTANT: Each paper can be selected once. Please mark your choice in this Dood
 
 ## Evidence-Based Design Cards (on Miro)
 
-![My helpful screenshot](/posts/ExampleCard.jpg)
+![An example pair of cards](/ExampleCard.jpg)
+![An empty template for a pair of cards](/TemplateCard.jpg)
 
 
 ## List of papers: 
