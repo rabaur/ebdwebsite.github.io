@@ -23,7 +23,7 @@ email: your-michal.gath@gess.ethz.ch
 description: >- # this means to ignore newlines until "baseurl:"
   Evidence-based design in architecture, science-in-perspective course,
   ETH Zurich. 
-baseurl: "/" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "www.ebdarch.ethz.ch" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 # github_username:  jekyll
