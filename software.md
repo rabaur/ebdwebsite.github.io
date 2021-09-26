@@ -3,6 +3,7 @@ layout: default
 title: Software
 permalink: /software/
 ---
+<<<<<<< HEAD
 [Exercises]({{ site.baseurl }}{% link exercises.md %})
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})
 [Software]({{ site.baseurl }}{% link software.md %})
