@@ -27,13 +27,13 @@ layout: default
 Our teaching this semester is generously funded by an ETH Innovedum grant.
 
 # Course Schedule 
-| C# 	| Date,  Friday 10-12 	| Description 	|
+| C 	| Date,  Friday 10-12 	| Description 	|
 |---	|---	|---	|
-| 1 	| 24.09. 	| **Introduction class**<br>Exercise Handout: Exercise 1, Reading Exercise 	|
+| 1 	| 24.09. 	| **Introduction class** Exercise Handout: Exercise 1, Reading Exercise 	|
 | 2 	| 01.10. 	| Students presentations' of Exercise 1  	|
-| 3 	| 08.10. 	| **Methods#1: Analyzing hospital typologies (spatial simulations)**<br>Handout: Exercise 2: Analyzing hospital typologies 	|
-| 4 	| 15.10. 	| Caregivers panel USZ: the lived experiences of hospital users, <br>Presenting the case study - designing a new Emergency Department (ED)/program requirements, <br>Methods#2: Analyzing users’ experience in hospitals using VR, <br>Submission: Exercise 2: Analyzing hospital typologies, <br>Handout:Exercise 3: Analyzing Users Experience in the Emergency Department at the University Hospital 	|
-| 5 	| 22.10. 	| Guest Lecture#1, <br>Students presentations of Exercise 3 	|
+| 3 	| 08.10. 	| **Methods#1: Analyzing hospital typologies (spatial simulations)** Handout: Exercise 2: Analyzing hospital typologies 	|
+| 4 	| 15.10. 	| Caregivers panel USZ: the lived experiences of hospital users,  Presenting the case study - designing a new Emergency Department (ED)/program requirements,  Methods#2: Analyzing users’ experience in hospitals using VR,  Submission: Exercise 2: Analyzing hospital typologies,  Handout:Exercise 3: Analyzing Users Experience in the Emergency Department at the University Hospital 	|
+| 5 	| 22.10. 	| Guest Lecture#1,  Students presentations of Exercise 3 	|
 | 6 	| 29.10. 	| ETH- Seminar week (25 - 29 Oct, 2021) / **no class** 	|
 | 7 	| 05.11. 	| Guest Lecture#2: Christian Veddeler (HPP Architects)  +Crits 	|
 | 8 	| 12.11. 	| Guest Lecture#3: Laura Narvaez Zertuche Foster + Partners) + Crits 	|
