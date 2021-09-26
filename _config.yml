@@ -24,7 +24,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Evidence-based design in architecture, science-in-perspective course,
   ETH Zurich. 
 baseurl: "/" # the subpath of your site, e.g. /blog
-url: "http://ebdarch.ethz.ch" # the base hostname & protocol for your site, e.g. http://example.com
+url: "www.ebdarch.ethz.ch" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 # github_username:  jekyll
 
@@ -53,3 +53,7 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+site.show_download: False
+site.github.is_project_page: False
+site.github.is_user_page: False
