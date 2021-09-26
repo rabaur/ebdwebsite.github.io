@@ -5,7 +5,7 @@ permalink: /exercises/
 ---
 
 [Exercises]({{ site.baseurl }}{% link exercises.md %})\
-[Software]({{ site.baseurl }}{% link software.md %})\
+[Software]({{ site.baseurl }}{% link software.md %})
 
 # Exercises
 
