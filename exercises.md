@@ -10,7 +10,7 @@ permalink: /exercises/
 
 # Exercises
 
-## Exercise 1: Reading on Evidence-Based Design for Healthcare  
+# Exercise 1: Reading on Evidence-Based Design for Healthcare  
 
 ## Submission Details 
 **Submission date**: 30.10.2021 (00:00 Zurich time)
@@ -68,5 +68,5 @@ You can see two screenshots from the Miroboard below.
 * Lu, Y., Peponis, J., & Zimring, C. (2009). Targeted Visibility Analysis in Buildings. Correlating targeted visibility analysis with distribution of people and their interactions within an intensive care unit. In Proceedings of the 7th International Space Syntax Symposium [PDF](https://polybox.ethz.ch/index.php/s/qVWs9D0AMGqvubt)
 * 
 
-## Exercise 2
-## Exercise 3
+# Exercise 2
+# Exercise 3
