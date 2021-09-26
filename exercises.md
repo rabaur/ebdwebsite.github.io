@@ -68,6 +68,8 @@ You can see two screenshots from the Miroboard below.
 * Rashid, M., Boyle, D. K., & Crosser, M. (2014). Network of spaces and interaction-related behaviors in adult intensive care units. Behavioral sciences, 4(4), 487-510. [PDF](https://polybox.ethz.ch/index.php/s/dfrO8Jg0KothW1M)
 * Lu, Y., & Zimring, C. (2012). Can intensive care staff see their patients? An improved visibility analysis methodology. Environment and Behavior, 44(6), 861-876.[PDF](https://polybox.ethz.ch/index.php/s/u79LxASwFeXEV8c)
 * Haq, S., & Luo, Y. (2012). Space syntax in healthcare facilities research: A review. HERD: Health Environments Research & Design Journal, 5(4), 98-117.[PDF](https://polybox.ethz.ch/index.php/s/wvGnkFrSzVlGniN)
+* Rashid, M. (2015). Research on nursing unit layouts: an integrative review. Facilities. [PDF](https://polybox.ethz.ch/index.php/s/ak0ko2b8SdIpQAm)
+* Fay, L., Carll-White, A., Schadler, A., Isaacs, K. B., & Real, K. (2017). Shifting landscapes: The impact of centralized and decentralized nursing station models on the efficiency of care. HERD: Health Environments Research & Design Journal, 10(5), 80-94.[PDF](https://polybox.ethz.ch/index.php/s/O7fVUC2cHBA323j)
 
 # Exercise 2
 # Exercise 3
