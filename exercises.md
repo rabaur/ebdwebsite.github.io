@@ -55,6 +55,7 @@ You can see two screenshots from the Miroboard below.
 * Seo, H. B., Choi, Y. S., & Zimring, C. (2011). Impact of hospital unit design for patient-centered care on nurses’ behavior. Environment and Behavior, 43(4), 443-468.[PDF](https://polybox.ethz.ch/index.php/s/dObPtSGV57LwEgn)
 * Bosch, S. J., Apple, M., Hiltonen, B., Worden, E., Lu, Y., Nanda, U., & Kim, D. (2016). To see or not to see: Investigating the links between patient visibility and potential moderators affecting the patient experience. Journal of Environmental Psychology, 47, 33-43. [PDF](https://polybox.ethz.ch/index.php/s/eClwKt7Zv2esnz4)
 * Pachilova, R., & Sailer, K. (2020). Providing care quality by design: a new measure to assess hospital ward layouts. The Journal of Architecture, 25(2), 186-202.[PDF](https://polybox.ethz.ch/index.php/s/cyQj7vlPZCopdU6)
+* Brambilla, A., Rebecchi, A., & Capolongo, S. (2019). Evidence based hospital design. A literature review of the recent publications about the EBD impact of built environment on hospital occupants' and organizational outcomes.[PDF] (https://polybox.ethz.ch/index.php/s/oo5JOpfKgXgpqcL)
 * 
 
 ## Exercise 2
