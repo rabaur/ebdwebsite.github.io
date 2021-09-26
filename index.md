@@ -27,4 +27,4 @@ layout: default
 
 Our teaching this semester is generously funded by an ETH Innovedum grant.
 
-![Logo](Logo.jpg)
+![Logo](Logo.JPG)
