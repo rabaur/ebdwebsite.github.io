@@ -11,7 +11,7 @@ permalink: /exercises/
 ### Submission Details 
 Submission date: 30.10.2021 (00:00 Zurich time)
 
-Submission format: One-page report(A4), Evidence-Based Design cards (template provided on Miro) 
+Submission format: One-pagereport(A4), Evidence-Based Design cards (template provided on Miro, link provided in email) 
 
 Presentation date: 1.10 in class, 5 minutes per student
 
@@ -33,6 +33,11 @@ IMPORTANT: Each paper can be selected once. Please mark your choice in this Dood
 ? What are the key design take away messages from this paper? 
 
 ? Be critical! What arguments in the paper require more evidence?  Do you agree with the interpretation of the results, do you find the paper relevant for architectural design?
+
+## Evidence-Based Design Cards (on Miro)
+
+![My helpful screenshot](/posts/ExampleCard.jpg)
+
 
 ## List of papers: 
 
