@@ -51,27 +51,9 @@ You can see two screenshots from the Miroboard below.
 
 ## List of papers: 
 
-H. Seo, Y. Choi, C. Zimring. Impact of Hospital Unit Design for Patient-Centered Care on Nurses’ Behavior. 2011.
-
-Sheila J. Bosch, Michael Apple, Beth Hiltonen, Elisa Worden, Yi Lu, Upali Nanda, Daejin Kim. To see or not to see: Investigating the links between patient visibility and potential moderators affecting the patient experience. 2010.
-
-D. Kirk Hamilton. Is This a Good Time to Rethink Everything? 2020.
-
-Naomi Sachs. Access to Nature Has Always Been Important; With COVID-19, It Is Essential. 2020.
-
-Jeanette Lindahl, Hans Thulesius, Mikael Rask, Helle Wijk, David Edvardsson, Carina Elmqvist. Assessing the Supportiveness of Healthcare Environments’ Light and Color: Development and Validation of the Light and Color Questionnaire (LCQ). 2020.
-
-Arsalan Gharaveis, D. Kirk Hamilton, Mardelle Shepley, Debajyoti Pati, Susan Rodiek. Design suggestions for greater teamwork, communication and security in hospital emergency departments. 2019.
-
-Rosica Pachilova, Kerstin Sailer. Providing care quality by design: a new measure to assess hospital ward layouts. 2020.
-
-Lu Yi, Hyun-Bo Seo. The Effect of Hospital Unit Layout on Nurse Walking Behavior. 2012.
-
-Cai, H., Zimring, C. Out of Sight, Out of Reach: Correlating spatial metrics of nurse station typology with nurses’ communication and co-awareness in an intensive Evidence-Based Design: Methods and Tools For Evaluating Architectural Design. 2012
-
-Lawson, B. Healing architecture. 2010
-
-Ulrich, R. S., Zimring, C., Zhu, X., DuBose, J., Seo, H. B., Choi, Y. S., Joseph, A. A review of the research literature on evidence-based healthcare design. 2008
+* Yi, L., & Seo, H. B. (2012). The effect of hospital unit layout on nurse walking behavior. HERD: Health Environments Research & Design Journal, 6(1), 66-82. [PDF](https://polybox.ethz.ch/index.php/s/9AUBzLIGR2Yd6V0)
+* Seo, H. B., Choi, Y. S., & Zimring, C. (2011). Impact of hospital unit design for patient-centered care on nurses’ behavior. Environment and Behavior, 43(4), 443-468.[PDF](https://polybox.ethz.ch/index.php/s/dObPtSGV57LwEgn)
+* Bosch, S. J., Apple, M., Hiltonen, B., Worden, E., Lu, Y., Nanda, U., & Kim, D. (2016). To see or not to see: Investigating the links between patient visibility and potential moderators affecting the patient experience. Journal of Environmental Psychology, 47, 33-43. [PDF](https://polybox.ethz.ch/index.php/s/eClwKt7Zv2esnz4)
 
 ## Exercise 2
 ## Exercise 3
