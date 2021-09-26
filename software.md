@@ -7,20 +7,14 @@ permalink: /software/
 # Software
 
 Please follow these steps to get all the software needed for the course.
-
-1. What operating system is my computer running?
-
+## 1. What operating system is my computer running?
 Windows: Proceed to step 2.
-
 macOS: Some of the software required for the course runs on Windows only. Consider the following software solutions to get Windows on your mac:
-
 Boot Camp: https://support.apple.com/de-ch/HT201468 
-
 Parallels Desktop (available on ETH IT-shop): https://itshop.ethz.ch 
-
 Other: Consider a virtual-machine for your system or a dual-boot.
 
-2. Installing Unity3D
+## 2. Installing Unity3D
 
 Unity3D is available for a wide range of platforms (Windows, macOS, Ubuntu, …). It is best to install Unity3D on your native operating system (the one you are usually running) to have the most performance. 
 
@@ -32,7 +26,7 @@ Once completed, you will be able to create a new project with the Unity version 
 
 It might be that you will not be able to open the project due to a license issue. In that case, click “manage licenses” on the bottom of the UnityHub window, create an account, and choose the licencing-option “personal”. After that, you will be able to use Unity3D without restrictions.
 
-3. Installing Rhino 7
+## 3. Installing Rhino 7
 
 If you already have Rhino 7 (or Rhino 6), you can skip this part. In contrary to Unity3D, it is important to install Rhino on your Windows solution that you have determined in step 1.
 
@@ -40,7 +34,7 @@ Visit https://www.rhino3d.com/download/ and choose “Rhino 7 for Windows - Tria
 
 You will receive an email from support@mcneel.com with the download link and a registration key (for a 90 day trial). Download, install and register the software.
 
-4. Installing DecodingSpaces
+## 4. Installing DecodingSpaces
 
 DecodingSpaces is a plugin for Grasshopper (which is a plugin for Rhino).
 
@@ -48,7 +42,7 @@ Visit https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/ and do
 
 Follow the instructions of this blog https://www.giancadm.com/plugins-install/ to install the plugin.
 
-5. Installing VisualArq
+## 5. Installing VisualArq
 
 VisualArq is a plugin for Rhino. Make sure step 3 is completed before installing VisualArq.
 
