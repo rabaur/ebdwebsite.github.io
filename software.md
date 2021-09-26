@@ -6,4 +6,58 @@ permalink: /software/
 
 # Software
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+Please follow these steps to get all the software needed for the course.
+
+1. What operating system is my computer running?
+
+Windows: Proceed to step 2.
+
+macOS: Some of the software required for the course runs on Windows only. Consider the following software solutions to get Windows on your mac:
+
+Boot Camp: https://support.apple.com/de-ch/HT201468 
+
+Parallels Desktop (available on ETH IT-shop): https://itshop.ethz.ch 
+
+Other: Consider a virtual-machine for your system or a dual-boot.
+
+2. Installing Unity3D
+
+Unity3D is available for a wide range of platforms (Windows, macOS, Ubuntu, …). It is best to install Unity3D on your native operating system (the one you are usually running) to have the most performance. 
+
+Visit https://unity3d.com/de/get-unity/download and choose “Download Unity Hub”. Unity Hub is a central hub that can manage all your Unity versions and projects.
+
+Once Unity Hub is installed, open and choose: “Installs” → “Add” → 2019.4.**** LTS. It is important to add this version. It will now begin to download the Unity version.
+
+Once completed, you will be able to create a new project with the Unity version you have just downloaded.
+
+It might be that you will not be able to open the project due to a license issue. In that case, click “manage licenses” on the bottom of the UnityHub window, create an account, and choose the licencing-option “personal”. After that, you will be able to use Unity3D without restrictions.
+
+3. Installing Rhino 7
+
+If you already have Rhino 7 (or Rhino 6), you can skip this part. In contrary to Unity3D, it is important to install Rhino on your Windows solution that you have determined in step 1.
+
+Visit https://www.rhino3d.com/download/ and choose “Rhino 7 for Windows - Trial Version”. You will need to give some email address you have access to.
+
+You will receive an email from support@mcneel.com with the download link and a registration key (for a 90 day trial). Download, install and register the software.
+
+4. Installing DecodingSpaces
+
+DecodingSpaces is a plugin for Grasshopper (which is a plugin for Rhino).
+
+Visit https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/ and download the .zip file. Make sure you have made the plugin runnable by following the steps on this website.
+
+Follow the instructions of this blog https://www.giancadm.com/plugins-install/ to install the plugin.
+
+5. Installing VisualArq
+
+VisualArq is a plugin for Rhino. Make sure step 3 is completed before installing VisualArq.
+
+Visit https://www.visualarq.com/download/ and choose “Download Evaluation”. You will have to create an account and associate it with the email address associated with you Rhino account (step 3).
+
+You will receive an email with a download link. Download and install the software.
+
+Send an email to rabaur@student.ethz.ch indicating the email address associated with your install. You will subsequently be invited to a license pool, enabling you to use the full functionality of VisualArq.
+
+You will need to choose the option “Cloud” when prompted for the license type that you want to use for VisualArq.
+
+Do not hesitate to contact rabaur@student.ethz.ch in case of any issues.
