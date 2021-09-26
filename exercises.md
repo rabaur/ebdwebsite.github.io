@@ -55,7 +55,13 @@ You can see two screenshots from the Miroboard below.
 * Seo, H. B., Choi, Y. S., & Zimring, C. (2011). Impact of hospital unit design for patient-centered care on nurses’ behavior. Environment and Behavior, 43(4), 443-468.[PDF](https://polybox.ethz.ch/index.php/s/dObPtSGV57LwEgn)
 * Bosch, S. J., Apple, M., Hiltonen, B., Worden, E., Lu, Y., Nanda, U., & Kim, D. (2016). To see or not to see: Investigating the links between patient visibility and potential moderators affecting the patient experience. Journal of Environmental Psychology, 47, 33-43. [PDF](https://polybox.ethz.ch/index.php/s/eClwKt7Zv2esnz4)
 * Pachilova, R., & Sailer, K. (2020). Providing care quality by design: a new measure to assess hospital ward layouts. The Journal of Architecture, 25(2), 186-202.[PDF](https://polybox.ethz.ch/index.php/s/cyQj7vlPZCopdU6)
-* Brambilla, A., Rebecchi, A., & Capolongo, S. (2019). Evidence based hospital design. A literature review of the recent publications about the EBD impact of built environment on hospital occupants' and organizational outcomes.[PDF] (https://polybox.ethz.ch/index.php/s/oo5JOpfKgXgpqcL)
+* Brambilla, A., Rebecchi, A., & Capolongo, S. (2019). Evidence based hospital design. A literature review of the recent publications about the EBD impact of built environment on hospital occupants' and organizational outcomes.[PDF](https://polybox.ethz.ch/index.php/s/oo5JOpfKgXgpqcL)
+* Chaudhury, H., Mahmood, A., & Valente, M. (2009). The effect of environmental design on reducing nursing errors and increasing efficiency in acute care settings: A review and analysis of the literature. Environment and Behavior, 41(6), 755-786. 
+[PDF](https://polybox.ethz.ch/index.php/s/Sf264jobIxny5s1)
+* Cai, H., & Zimring, C. (2012, January). Out of Sight, Out of Reach: Correlating spatial metrics of nurse station typology with nurses’ communication and co-awareness in an intensive care unit. In Proceedings of the 8th International Space Syntax Symposium, Santiago, Chile (Vol. 36, pp. 381-391).[PDF](https://polybox.ethz.ch/index.php/s/tK6MbFLk9W0vud4)
+* Lawson, B. (2010). Healing architecture. Arts & Health, 2(2), 95-108.[PDF](https://polybox.ethz.ch/index.php/s/Wx4sbefHZE5IgHL)
+* Choudhary, R., Bafna, S., Heo, Y., Hendrich, A., & Chow, M. (2010). A predictive model for computing the influence of space layouts on nurses' movement in hospital units. Journal of Building Performance Simulation, 3(3), 171-184. [PDF](https://polybox.ethz.ch/index.php/s/UkVV2VIVppWmuKW)
+* Lu, Y., Peponis, J., & Zimring, C. (2009). Targeted Visibility Analysis in Buildings. Correlating targeted visibility analysis with distribution of people and their interactions within an intensive care unit. In Proceedings of the 7th International Space Syntax Symposium [PDF](https://polybox.ethz.ch/index.php/s/qVWs9D0AMGqvubt)
 * 
 
 ## Exercise 2
