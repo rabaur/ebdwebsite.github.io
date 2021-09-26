@@ -14,8 +14,7 @@ Christoph Hölscher
 ## Guest Lecturers
 Christian Veddeler,
 Laura Narvaez Zertuche,
-Panos Mavros,
-Jascha Grübel
+Panos Mavros
 ## Teaching Assistant 
 Raphaël Baur, rabaur@student.ethz.ch
 
