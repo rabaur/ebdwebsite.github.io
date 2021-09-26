@@ -21,22 +21,20 @@ Submission link: https://polybox.ethz.ch/index.php/s/8L6Oba4HrxWXaKe
 
 Choose one of the papers in the list, read it and answer the following questions:
 IMPORTANT: Each paper can be selected once. Please mark your choice in this Doodle. 
-Who is the author?
 
-What questions does the paper try to answer? 
+? Who is the author?
 
-What methods are used to answer the question?
+? What questions does the paper try to answer? 
 
-What results are presented? How does it address the initial question?
+? What methods are used to answer the question?
 
-What are the key take away messages from this paper? 
+? What results are presented? How does it address the initial question?
 
-Be critical! What arguments in the paper require more evidence?  Do you agree with the interpretation of the results, do you find the paper relevant for architectural design?
+? What are the key design take away messages from this paper? 
 
-Resources (Evidence-Based Design) 
-List of papers: 
+? Be critical! What arguments in the paper require more evidence?  Do you agree with the interpretation of the results, do you find the paper relevant for architectural design?
 
-Healthcare
+## List of papers: 
 
 H. Seo, Y. Choi, C. Zimring. Impact of Hospital Unit Design for Patient-Centered Care on Nurses’ Behavior. 2011.
 
