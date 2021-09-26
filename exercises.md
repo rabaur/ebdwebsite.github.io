@@ -70,6 +70,7 @@ You can see two screenshots from the Miroboard below.
 * Haq, S., & Luo, Y. (2012). Space syntax in healthcare facilities research: A review. HERD: Health Environments Research & Design Journal, 5(4), 98-117.[PDF](https://polybox.ethz.ch/index.php/s/wvGnkFrSzVlGniN)
 * Rashid, M. (2015). Research on nursing unit layouts: an integrative review. Facilities. [PDF](https://polybox.ethz.ch/index.php/s/ak0ko2b8SdIpQAm)
 * Fay, L., Carll-White, A., Schadler, A., Isaacs, K. B., & Real, K. (2017). Shifting landscapes: The impact of centralized and decentralized nursing station models on the efficiency of care. HERD: Health Environments Research & Design Journal, 10(5), 80-94.[PDF](https://polybox.ethz.ch/index.php/s/O7fVUC2cHBA323j)
-
+* Geng, S., Chau, H. W., Yan, S., Zhang, W., & Zhang, C. (2020). Comparative analysis of hospital environments in Australia and China using the space syntax approach. International Journal of Building Pathology and Adaptation.[PDF](https://polybox.ethz.ch/index.php/s/fn1I4IZPHCnpDhh)
+Harris, D. D., Shepley, M. M., White, R. D., Kolberg, K. J., & Harrell, J. W. (2006). The impact of single family room design on patients and caregivers: executive summary. Journal of Perinatology, 26(3), S38-S48.[PDF](https://polybox.ethz.ch/index.php/s/f1bgdZwZ7qYlUfD)
 # Exercise 2
 # Exercise 3
