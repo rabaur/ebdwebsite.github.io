@@ -26,3 +26,5 @@ layout: default
 ## At the same time, the field of cognitive science, supported by empirical methods and innovative advancements in AI-supported virtual reality simulations, offers novel and more precise ways of forecasting human behavior. Our aim is to take a step towards bridging the disconnect between these two fields and integrate cognitive science methods into architectural design education to equip students with tools to become better practitioners, able to leverage scientific and analytical skills to design more humane and sustainable environments.
 
 Our teaching this semester is generously funded by an ETH Innovedum grant.
+
+![Logo](Logo.jpg)
