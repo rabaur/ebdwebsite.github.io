@@ -6,39 +6,48 @@ permalink: /exercises/
 
 # Exercises
 
-## Exercise 1: Reading on Evidence-Based Design for Healtcare 
+## Exercise 1: Reading on Evidence-Based Design for Healthcare  
 
-### Submission Details 
-Submission date: 30.10.2021 (00:00 Zurich time)
+## Submission Details 
+**Submission date**: 30.10.2021 (00:00 Zurich time)
 
-Submission format: One-pagereport(A4), Evidence-Based Design cards (template provided on Miro, link provided in email) 
+**Submission format**: One-page report(A4), Evidence-Based Design cards (template provided on Miro, link provided in email) 
 
-Presentation date: 1.10 in class, 5 minutes per student
+**Presentation date**: 1.10 in class, 5 minutes per student
 
-Submission link: https://polybox.ethz.ch/index.php/s/8L6Oba4HrxWXaKe
+**Submission link (for the one page report)**: https://polybox.ethz.ch/index.php/s/8L6Oba4HrxWXaKe
 
-### Reading Assignment Instructions 
+**Miro link (for the cards)**: provided via email
+
+
+## Reading Assignment Instructions 
 
 Choose one of the papers in the list, read it and answer the following questions:
-IMPORTANT: Each paper can be selected once. Please mark your choice in this Doodle. 
 
-? Who is the author?
+**IMPORTANT: Each paper can be selected once. Please mark your choice in this Doodle.**
 
-? What questions does the paper try to answer? 
+  * Who is the author?
 
-? What methods are used to answer the question?
+  * What **questions** does the paper try to answer? 
 
-? What results are presented? How does it address the initial question?
+  * Which **methods** are used to answer the question?
 
-? What are the key design take away messages from this paper? 
+  * What are the **key results** reported? How does it address the initial question?
 
-? Be critical! What arguments in the paper require more evidence?  Do you agree with the interpretation of the results, do you find the paper relevant for architectural design?
+  * What are the **key design take away messages** from this paper? 
+
+  * **Be critical! What arguments in the paper require more evidence?  Do you agree with the interpretation of the results, do you find the paper    relevant for architectural design?** 
 
 ## Evidence-Based Design Cards (on Miro)
+Based on your reading, prepare two pairs of cards for our **Evidence-Based Design for Healthcare Card Deck**. 
+The instructions and template for making the card (as well as an example of two cards) are in the Miro board (link provided via email).
+You can see two screenshots from the Miroboard below. 
 
 ![An example pair of cards](/ExampleCard.jpg)
-![An empty template for a pair of cards](/TemplateCard.jpg)
+*An example pair of cards*
 
+![An empty template for a pair of cards](/TemplateCard.jpg)
+*An empty template for a pair of cards*
 
 ## List of papers: 
 
