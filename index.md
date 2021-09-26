@@ -3,7 +3,7 @@ layout: default
 ---
 
 [Exercises]({{ site.baseurl }}{% link exercises.md %})\
-[Software]({{ site.baseurl }}{% link software.md %})\
+[Software]({{ site.baseurl }}{% link software.md %})
 
 
 ![Logo](Logo.JPG)
