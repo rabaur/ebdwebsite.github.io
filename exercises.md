@@ -65,6 +65,8 @@ You can see two screenshots from the Miroboard below.
 * Lawson, B. (2010). Healing architecture. Arts & Health, 2(2), 95-108.[PDF](https://polybox.ethz.ch/index.php/s/Wx4sbefHZE5IgHL)
 * Choudhary, R., Bafna, S., Heo, Y., Hendrich, A., & Chow, M. (2010). A predictive model for computing the influence of space layouts on nurses' movement in hospital units. Journal of Building Performance Simulation, 3(3), 171-184. [PDF](https://polybox.ethz.ch/index.php/s/UkVV2VIVppWmuKW)
 * Lu, Y., Peponis, J., & Zimring, C. (2009). Targeted Visibility Analysis in Buildings. Correlating targeted visibility analysis with distribution of people and their interactions within an intensive care unit. In Proceedings of the 7th International Space Syntax Symposium [PDF](https://polybox.ethz.ch/index.php/s/qVWs9D0AMGqvubt)
+* Rashid, M., Boyle, D. K., & Crosser, M. (2014). Network of spaces and interaction-related behaviors in adult intensive care units. Behavioral sciences, 4(4), 487-510. [PDF](https://polybox.ethz.ch/index.php/s/dfrO8Jg0KothW1M)
+* Lu, Y., & Zimring, C. (2012). Can intensive care staff see their patients? An improved visibility analysis methodology. Environment and Behavior, 44(6), 861-876.[PDF](https://polybox.ethz.ch/index.php/s/u79LxASwFeXEV8c)
 * 
 
 # Exercise 2
