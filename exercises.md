@@ -73,7 +73,8 @@ You can see two screenshots from the Miroboard below.
 * Geng, S., Chau, H. W., Yan, S., Zhang, W., & Zhang, C. (2020). Comparative analysis of hospital environments in Australia and China using the space syntax approach. International Journal of Building Pathology and Adaptation.[PDF](https://polybox.ethz.ch/index.php/s/fn1I4IZPHCnpDhh)
 * Harris, D. D., Shepley, M. M., White, R. D., Kolberg, K. J., & Harrell, J. W. (2006). The impact of single family room design on patients and caregivers: executive summary. Journal of Perinatology, 26(3), S38-S48.[PDF](https://polybox.ethz.ch/index.php/s/f1bgdZwZ7qYlUfD)
 * Bardram, J. E., & Bossen, C. (2005). Mobility work: The spatial dimension of collaboration at a hospital. Computer supported cooperative work (CSCW), 14(2), 131-160.[PDF](https://polybox.ethz.ch/index.php/s/w5vy6bhqpfx5xJR)
-* Ulrich, R. S. (2008). Biophilic theory and research for healthcare design. Biophilic design: The theory, science, and practice of bringing buildings to life, 1, 87-106.[PDF] (https://polybox.ethz.ch/index.php/s/zP8IhvAZqrLp1Dy)
+* Ulrich, R. S. (2008). Biophilic theory and research for healthcare design. Biophilic design: The theory, science, and practice of bringing buildings to life, 1, 87-106.[PDF](https://polybox.ethz.ch/index.php/s/zP8IhvAZqrLp1Dy)
+* 
 
 # Exercise 2
 # Exercise 3
