@@ -6,7 +6,6 @@ layout: default
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
-**Fall 2021, Friday 10-12, ONLINE, ETH Zurich** 
 
 ## Course Lecturers
 Michal Gath-Morad, michal.gath@gess.ethz.ch, 
