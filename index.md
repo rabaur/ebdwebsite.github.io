@@ -27,6 +27,14 @@ layout: default
 Our teaching this semester is generously funded by an ETH Innovedum grant.
 
 # Course Schedule 
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+
+
+
 | C# 	| Date,  Friday 10-12 	| Description                                                                                                                                                                                                                                                                                                                                                                               	|
 |----	|---------------------	|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
 | 1  	| 24.09.              	| **Introduction class** Exercise Handout: Exercise 1, Reading Exercise                                                                                                                                                                                                                                                                                                                     	|
