@@ -15,8 +15,8 @@ Please follow these steps to get all the software needed for the course.
 ## 1. Installing Windows
 * **Windows**: Proceed to step 2.
 * **macOS**: Some of the software required for the course runs on Windows only. Consider the following software solutions to get Windows on your mac:
-    * **Boot Camp**: [https://support.apple.com/de-ch/HT201468](#)
-    * **Parallels Desktop** (available on ETH IT-shop): [https://itshop.ethz.ch](#)
+    * **Boot Camp**: [https://support.apple.com/de-ch/HT201468](https://support.apple.com/de-ch/HT201468)
+    * **Parallels Desktop** (available on ETH IT-shop): [https://itshop.ethz.ch](https://itshop.ethz.ch)
     * **Other**: Consider a virtual-machine for your system or a dual-boot.
 
 * * *
@@ -25,7 +25,7 @@ Please follow these steps to get all the software needed for the course.
 
 _Unity3D_ is available for a wide range of platforms (Windows, macOS, Ubuntu, …). It is best to install Unity3D on your native operating system (the one you are usually running) to have the most performance. 
 
-Visit [https://unity3d.com/de/get-unity/download](#) and choose _Download Unity Hub_. _Unity Hub_ is a program that can manage all your Unity versions and projects.
+Visit [https://unity3d.com/de/get-unity/download](https://unity3d.com/de/get-unity/download) and choose _Download Unity Hub_. _Unity Hub_ is a program that can manage all your Unity versions and projects.
 
 Once Unity Hub is installed, open and choose: _Installs_ → _Add_ → _2019.4.** LTS_. **It is important to install this exact version**. It will now begin to download the Unity version.
 
@@ -40,7 +40,7 @@ In that case, click “manage licenses” on the bottom of the UnityHub window, 
 
 If you already have Rhino 7 (or Rhino 6), you can skip this part. In contrary to Unity3D, it is important to install Rhino on Windows (which you have obtained in step 1).
 
-Visit [https://www.rhino3d.com/download/](#) and choose _Rhino 7 for Windows - Trial Version_.
+Visit [https://www.rhino3d.com/download/](https://www.rhino3d.com/download/) and choose _Rhino 7 for Windows - Trial Version_.
 
 You will receive an email from _support@mcneel.com_ with the download link and a registration key (for a 90 day trial). Download, install and register the software.
 
@@ -50,9 +50,9 @@ You will receive an email from _support@mcneel.com_ with the download link and a
 
 _DecodingSpaces_ is a plugin for Grasshopper.
 
-Visit [https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/](#) and download the .zip file. Make sure you have made the plugin runnable by following the steps on this website.
+Visit [https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/](https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/) and download the .zip file. Make sure you have made the plugin runnable by following the steps on this website.
 
-Follow the instructions of this blog [https://www.giancadm.com/plugins-install/](#) to install the plugin.
+Follow the instructions of this blog [https://www.giancadm.com/plugins-install/](https://www.giancadm.com/plugins-install/) to install the plugin.
 
 * * *
 
@@ -60,7 +60,7 @@ Follow the instructions of this blog [https://www.giancadm.com/plugins-install/]
 
 _Shortest Walk GH_ is a plugin for Grasshopper.
 
-Visit [https://www.food4rhino.com/en/app/shortest-walk-gh](#) and download the newest version (Grasshopper 0.9.0014). 
+Visit [https://www.food4rhino.com/en/app/shortest-walk-gh](https://www.food4rhino.com/en/app/shortest-walk-gh) and download the newest version (Grasshopper 0.9.0014). 
 
 To install the plugin, open Rhino and then open Grasshopper by typing "Grasshopper" in the command-line of Rhino. In Grasshopper, choose _File_ - _Special Folders_ - _Components Folder_ and drag and drop the downloaded file into the folder that just opened. 
 
@@ -72,7 +72,7 @@ Finally, restart Rhino and Grasshopper to activate the plugin.
 
 _VisualArq_ is a plugin for Rhino. Make sure step 3 is completed before installing VisualArq.
 
-Visit [https://www.visualarq.com/download/](#) and choose _Download Evaluation_. You will have to create an account and associate it with the email address associated with you Rhino account (step 3).
+Visit [https://www.visualarq.com/download/](https://www.visualarq.com/download/) and choose _Download Evaluation_. You will have to create an account and associate it with the email address associated with you Rhino account (step 3).
 
 You will receive an email with a download link. Download and install the software.
 
