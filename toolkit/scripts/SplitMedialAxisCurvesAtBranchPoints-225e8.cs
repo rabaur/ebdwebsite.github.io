@@ -45,6 +45,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
   /// Any subsequent call within the same solution will increment the Iteration count.
   /// </summary>
   private readonly int Iteration;
+
   #endregion
   /// <summary>
   /// This procedure contains the user code. Input parameters are provided as regular arguments,
@@ -98,9 +99,15 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       splitAtBranchPoints.AddRange(splitCurves);
     }
     splitMedialAxisCurvesList = splitAtBranchPoints;
+    JoinIllFormedCurves(splitAtBranchPoints, branchpointsList);
   }
   #endregion
   #region Additional
+
+  /// <summary>
+  /// Default tolerance when comparing distances.
+  /// </summary>
+  private const double DIST_TOL = RhinoMath.DefaultDistanceToleranceMillimeters;
 
   /// <summary>
   /// Constructs curves whose endpoints are branchpoints from potentially ill-formed curves.
@@ -108,7 +115,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
   /// <remarks>A curve is ill-formed if it is adjacent to only 1 or 0 branchpoints.</remarks>
   /// <param name="inputCurves">All curves, including well formed ones, from the initial splitting step.</param>
   /// <returns></returns>
-  private Curve[] JoinIllFormedCurves(Curve[] inputCurves, List<Point3d> branchPoints)
+  private Curve[] JoinIllFormedCurves(List<Curve> inputCurves, List<Point3d> branchPoints)
   {
     // Identify ill-formed curves.
     List<Curve> illFormedCurves = new List<Curve>();
@@ -117,15 +124,16 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
     {
       List<Point3d> adjacentBranchPoints = new List<Point3d>();
       Point3d curveStartPoint = curve.PointAtStart;
-      Point3d curveEndPoint = curve.PointAtStart;
+      Point3d curveEndPoint = curve.PointAtEnd;
       foreach (Point3d branchPoint in branchPoints)
       {
-        if (branchPoint.DistanceTo(curveStartPoint) < RhinoMath.SqrtEpsilon || branchPoint.DistanceTo(curveEndPoint) < RhinoMath.SqrtEpsilon)
+        if (branchPoint.DistanceTo(curveStartPoint) <= DIST_TOL || branchPoint.DistanceTo(curveEndPoint) <= DIST_TOL)
         {
           adjacentBranchPoints.Add(branchPoint);
         }
         if (adjacentBranchPoints.Count == 2)
         {
+          Print("Well formed curve found.");
           break;
         }
       }
@@ -150,8 +158,49 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       }
     }
 
-    // Assemble curves.
-    
+    // Create graph from ill-formed curves.
+    IllFormedCurveGraph graph = new IllFormedCurveGraph();
+
+    // Create all nodes.
+    for (int i = 0; i < illFormedCurves.Count; i++)
+    {
+      try
+      {
+        graph.AddNode(illFormedCurves[i], allAdjacentBranchPoints[i]);
+      }
+      catch
+      {
+        Print("Duplicate curve was attempted to add.");
+        continue;
+      }
+    }
+
+    // Create edges between nodes. Since we want a undirected graph, we have to create both directions of edges.
+    for (int i = 0; i < graph.GetNumNodes(); i++)
+    {
+      for (int j = 0; j < graph.GetNumNodes(); j++)
+      {
+        // No self-loops.
+        if (i == j)
+        {
+          continue;
+        }
+
+        // Create edge.
+        Curve curve1 = graph.nodes[i].curve;
+        Curve curve2 = graph.nodes[j].curve;
+        if (AreCurvesAdjacentAtNonBranchPoint(curve1, curve2, branchPoints))
+        {
+          graph.AddEdge(curve1, curve2);
+        }
+      }
+    }
+
+    // TODO: Remove after testing.
+    Print("Created graph of ill-formed segments with " + graph.GetNumNodes().ToString() + " nodes and " + graph.GetNumEdges().ToString() + " edges.");
+    Print(graph.GetNumNodesAtBranchPoint() + " of these nodes are adjacent to a branch-point.");
+
+    return new Curve[1];
   }
 
   /// <summary>
@@ -166,227 +215,390 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
     // Test for intersections.
     Rhino.Geometry.Intersect.CurveIntersections intersections = Rhino.Geometry.Intersect.Intersection.CurveCurve(curve1, curve2, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon);
 
-    // We only consider cases where we have exactly one point where the curves intersect.
-    if (intersections.Count != 1)
+    // Filter all non-point intersections.
+    List<Rhino.Geometry.Intersect.IntersectionEvent> pointIntersections = new List<Rhino.Geometry.Intersect.IntersectionEvent>();
+    foreach (Rhino.Geometry.Intersect.IntersectionEvent intersection in intersections)
+    {
+      if (intersection.IsPoint)
+      {
+        pointIntersections.Add(intersection);
+      }
+    }
+
+    // If we only have overlaps (no point-intersections), we return false.
+    if (pointIntersections.Count == 0)
     {
       return false;
     }
 
-    Rhino.Geometry.Intersect.IntersectionEvent intersection = intersections[0];
-    
-    // Only consider point-intersections (overlapping curves cannot be joined easily).
-    if (intersection.IsOverlap)
-    {
-      return false;
-    }
-
-    // Check if the point of overlap is a branchpoint, since curves should be joined in between branchpoints, but not at branchpoints.
-    Point3d intersectionPoint = intersection.PointA;
+    // For each point-intersection check if the intersecting point is a branch point.
     foreach (Point3d branchPoint in branchPoints)
     {
-      if (intersectionPoint.DistanceTo(branchPoint) < RhinoMath.SqrtEpsilon)
+      foreach (Rhino.Geometry.Intersect.IntersectionEvent intersection in pointIntersections)
       {
-        return false;
+        if (intersection.PointA.DistanceTo(branchPoint) < DIST_TOL)
+        {
+          return false;
+        }
       }
     }
     return true;
   }
-  #endregion
-}
 
-/// <summary>
-/// A node in the graph of ill-formed segments. A node corresponds to an ill-formed segment.
-/// </summary>
-public class IllFormedCurveNode : IEquatable<IllFormedCurveNode>
-{
-  private Curve _curve;
-
-  public Curve curve
+  /// <summary>
+  /// Models the connectivity of ill-formed segments.
+  /// </summary>
+  public class IllFormedCurveGraph
   {
-    get
+    private List<IllFormedCurveNode> _nodes;
+
+    public List<IllFormedCurveNode> nodes
     {
-      return _curve;
+      get
+      {
+        return _nodes;
+      }
     }
-  }
 
-  private bool _adjacentToBranchPoint;
+    private List<List<IllFormedCurveNode>> _adjacencyList;
 
-  public bool adjacentToBranchPoint
-  {
-    get
+    public List<List<IllFormedCurveNode>> adjacencyList
     {
-      return _adjacentToBranchPoint;
+      get
+      {
+        return _adjacencyList;
+      }
     }
-  }
 
-  private Point3d _branchPoint;
-
-  public Point3d branchPoint
-  {
-    get
+    public IllFormedCurveGraph()
     {
-      return _branchPoint;
+      _nodes = new List<IllFormedCurveNode>();
+      _adjacencyList = new List<List<IllFormedCurveNode>>();
+    }
+
+    /// <summary>
+    /// Adds a node to the graph.
+    /// </summary>
+    /// <exception>Exception will be thrown if (1) the curve is not ill-formed (determined by the number of adjacent branch points) or (2) the node was already added.</exception>
+    /// <param name="curve">Curve this node corresponds to.</param>
+    /// <param name="branchPoints">List of branchpoints this curve is adjacent to. Since IllFormedNodes only correspond to curves which have only 1 or 0 adjacent branchpoints, length of this list can at most be 1.</param>
+    public void AddNode(Curve curve, List<Point3d> branchPoints)
+    {
+
+      // Create node.
+      IllFormedCurveNode node;
+      if (branchPoints.Count == 0)
+      {
+        node = new IllFormedCurveNode(curve);
+      }
+      else if (branchPoints.Count == 1)
+      {
+        node = new IllFormedCurveNode(curve, branchPoints[0]);
+      }
+      else
+      {
+        throw new Exception("Attempted to construct IllFormedCurveNode, but branchPoint.Count: " + branchPoints.Count.ToString() + ". This curve is either not ill-formed or there are too many branchpoints.");
+      }
+
+      // Check if node is unique.
+      if (_nodes.Contains(node))
+      {
+        throw new Exception("Tried to add node " + node.ToString() + " but node was already added at index " + GetNodeIndex(node.curve) + " in the form " + _nodes[GetNodeIndex(node.curve)] + ".");
+      }
+
+      // Add node.
+      _nodes.Add(node);
+      _adjacencyList.Add(new List<IllFormedCurveNode>());
+    }
+
+    /// <summary>
+    /// Adds directed edge from node corresponding to curve1 to node corresponding to curve2.
+    /// </summary>
+    /// <remarks>To model undirected graph, symmetric edge (from node corresponding to curve2 to node corresponding to node1) must be added as well.</remarks>
+    /// <exception>Throws exception if (1) either of the nodes are not present in the graph or (2) the edge has already been added or (3) the nodes are equal (self-loop not allowed).</exception>
+    /// <param name="curve1">The node corresponding </param>
+    /// <param name="curve2"></param>
+    public void AddEdge(Curve curve1, Curve curve2)
+    {
+      // Get indices of nodes.
+      int index1 = GetNodeIndex(curve1);
+      int index2 = GetNodeIndex(curve2);
+      if (index1 == -1 || index2 == -1)
+      {
+        throw new Exception("Attempted to get nodes when creating edge, but nodes are not in graph.");
+      }
+
+      IllFormedCurveNode node1 = _nodes[index1];
+      IllFormedCurveNode node2 = _nodes[index2];
+
+      // Check nodes for equality.
+      if (node1 == node2)
+      {
+        throw new Exception("Node corresponding to curve1 and curve2 are equivalent, but self-loops are not allowed.");
+      }
+
+      // Check if edge has already been added.
+      if (_adjacencyList[index1].Contains(node2))
+      {
+        throw new Exception("Attempted to add edge, but node " + node2.ToString() + " was already added as neighbor at index " + _adjacencyList[index1].IndexOf(node2) + " in the form " + _adjacencyList[index1][_adjacencyList[index1].IndexOf(node2)] + ".");
+      }
+
+      // Add edge.
+      _adjacencyList[index1].Add(node2);
+    }
+
+
+    /// <summary>
+    /// Gets a node by its curve.
+    /// </summary>
+    /// <param name="curve">The curve that corresponds to the node.</param>
+    /// <exception>Throws exception if node is not in graph.</exception>
+    /// <returns>Node if exists.</returns>
+    private IllFormedCurveNode GetNode(Curve curve)
+    {
+      int index = GetNodeIndex(curve);
+      if (index == -1)
+      {
+        throw new Exception("Attempted to get node, but node is not in graph.");
+      }
+      return _nodes[index];
+    }
+
+    /// <summary>
+    /// Gets neighbors of node identified by curve.
+    /// </summary>
+    /// <param name="curve">Curve that corresponds to node.</param>
+    /// <exception>Throws exception if node is not in graph.</exception>
+    /// <returns>Neighbors if node is found.</returns>
+    private List<IllFormedCurveNode> GetNeighbors(Curve curve)
+    {
+      int index = GetNodeIndex(curve);
+      if (index == -1)
+      {
+        throw new Exception("Attempted to get neighbors of node, but node is not in graph.");
+      }
+      return adjacencyList[index];
+    }
+
+    /// <summary>
+    /// Gets the index of a node.
+    /// </summary>
+    /// <param name="curve">Curve that corresponds to the node.</param>
+    /// <returns>The index of the node in the nodes list if present, otherwise -1.</returns>
+    private int GetNodeIndex(Curve curve)
+    {
+      // Create mock node for comparison.
+      IllFormedCurveNode mockNode = new IllFormedCurveNode(curve);
+
+      // Get index.
+      return nodes.IndexOf(mockNode);
+    }
+
+    /// <summary>
+    /// Creates as many distinct, non-overlapping branchpoint-bounded medial segment from the current nodes as possible.
+    /// </summary>
+    /// <returns>Array of medial-axis curves from ill-formed curves represented by the currently added nodes and their edges.</returns>
+    public Curve[] GetJoinedCurves()
+    {
+      // Get all nodes that are adjacent to one branchpoint, as these are the starting points for curves that can be joined.
+      List<IllFormedCurveNode> adjToBranchPointNodes = new List<IllFormedCurveNode>();
+      foreach (IllFormedCurveNode node in _nodes)
+      {
+        if (node.adjacentToBranchPoint)
+        {
+          adjToBranchPointNodes.Add(node);
+        }
+      }
+
+      // Start new run of BFS for each node that is adjacent to a branch node.
+      foreach (IllFormedCurveNode startNode in adjToBranchPointNodes)
+      {
+        // List to keep track of the nodes already visited.
+        List<IllFormedCurveNode> visited = new List<IllFormedCurveNode>();
+        List<IllFormedCurveNode>[] predecessor = new List<IllFormedCurveNode>[_nodes.Count];
+        List<IllFormedCurveNode> queue = new List<IllFormedCurveNode>();
+        queue.Add(startNode);
+
+        while (queue.Count > 0)
+        {
+          IllFormedCurveNode currNode = queue[0];
+          queue.RemoveAt(0);
+          List<IllFormedCurveNode> neighbors = GetNeighbors(currNode.curve);
+
+        }
+
+      }
+
+      return new Curve[1];
+    }
+
+    /// <summary>
+    /// Gets the number of currently added nodes.
+    /// </summary>
+    /// <returns>The number of currently added nodes.</returns>
+    public int GetNumNodes()
+    {
+      return _nodes.Count;
+    }
+
+    /// <summary>
+    /// Gets the number of currently added edges.
+    /// </summary>
+    /// <remarks>This gives the number of directed edges, if you are modelling an undirected graph, the number needs to be divided by 2.</remarks>
+    /// <returns>The number of currently added edges.</returns>
+    public int GetNumEdges()
+    {
+      int numEdges = 0;
+      foreach (List<IllFormedCurveNode> neighbors in _adjacencyList)
+      {
+        numEdges += neighbors.Count;
+      }
+      return numEdges;
+    }
+
+    public int GetNumNodesAtBranchPoint()
+    {
+      int num = 0;
+      for (int i = 0; i < _nodes.Count; i++)
+      {
+        if (_nodes[i].adjacentToBranchPoint)
+        {
+          num += 1;
+        }
+      }
+      return num;
     }
   }
 
   /// <summary>
-  /// Constructor if curve is not adjacent to branchpoint.
+  /// A node in the graph of ill-formed segments. A node corresponds to an ill-formed segment.
   /// </summary>
-  /// <param name="curve">The curve this node corresponds to.</param>
-  public IllFormedCurveNode(Curve curve)
+  public class IllFormedCurveNode : IEquatable<IllFormedCurveNode>
   {
-    _curve = curve;
-    _adjacentToBranchPoint = false;
-    _branchPoint = Point3d.Origin;
-  }
+    private Curve _curve;
 
-  /// <summary>
-  /// Constructor if curve is adjacent to branchpoint.
-  /// </summary>
-  /// <param name="curve">The curve this node corresponds to.</param>
-  /// <param name="branchPoint">The branchpoint the curve this node represents is adjacent to.</param>
-  public IllFormedCurveNode(Curve curve, Point3d branchPoint)
-  {
-    _curve = curve;
-    _adjacentToBranchPoint = true;
-    _branchPoint = branchPoint;
-  }
-
-  /// <summary>
-  /// Tests for equality. IllFormedCurveNode are equal if the end points of their curves are equal (by some tolerance).
-  /// </summary>
-  /// <remarks>This comparison only works in this very restricted use-case.</remarks>
-  /// <exception>Throws an exception if the curves are equal (by the definition given previously), but nodes are not adjacent to the same branchpoints.</exception>
-  /// <param name="other">The other node to compare to.</param>
-  /// <returns>true if nodes are </returns>
-  public bool Equals(IllFormedCurveNode other)
-  {
-    // Compare distances between endpoints - if they are smaller than some tolerance, nodes are considered equal.
-    Point3d thisStart = _curve.PointAtStart;
-    Point3d thisEnd = _curve.PointAtEnd;
-    Point3d otherStart = other.curve.PointAtStart;
-    Point3d otherEnd = other.curve.PointAtEnd;
-
-    bool equal = false;
-    if (thisStart.DistanceTo(otherStart) < RhinoMath.SqrtEpsilon && thisEnd.DistanceTo(otherEnd) < RhinoMath.SqrtEpsilon ||
-        thisStart.DistanceTo(otherEnd) < RhinoMath.SqrtEpsilon && thisEnd.DistanceTo(otherStart) < RhinoMath.SqrtEpsilon)
+    public Curve curve
     {
-      equal = true;
+      get
+      {
+        return _curve;
+      }
     }
 
-    // If nodes are equal, they should be adjacent to the same branchpoints. 
-    // TODO: This is not really the responsibility of this method, so future versions should probably offload the responsibility.
-    if (equal && _branchPoint.DistanceTo(other.branchPoint) > RhinoMath.SqrtEpsilon)
+    private bool _adjacentToBranchPoint;
+
+    public bool adjacentToBranchPoint
     {
-      throw new Exception("Nodes have same curves, but not same branchpoints. There is a bug in the node creation.");
+      get
+      {
+        return _adjacentToBranchPoint;
+      }
     }
 
-    return equal;
-  }
+    private Point3d _branchPoint;
 
-
-  /// <summary>
-  /// Tests for equality.
-  /// </summary>
-  /// <param name="otherObject">Object of any type.</param>
-  /// <returns>true if objects are equal, false otherwise.</returns>
-  public override bool Equals(object otherObject)
-  {
-    // Converting to IllFormedCurveNode.
-    IllFormedCurveNode other = otherObject as IllFormedCurveNode;
-
-    // Null-check covering faulty conversion.
-    if (other == null)
+    public Point3d branchPoint
     {
+      get
+      {
+        return _branchPoint;
+      }
+    }
+
+    /// <summary>
+    /// Constructor if curve is not adjacent to branchpoint.
+    /// </summary>
+    /// <param name="curve">The curve this node corresponds to.</param>
+    public IllFormedCurveNode(Curve curve)
+    {
+      _curve = curve;
+      _adjacentToBranchPoint = false;
+      _branchPoint = Point3d.Origin;
+    }
+
+    /// <summary>
+    /// Constructor if curve is adjacent to branchpoint.
+    /// </summary>
+    /// <param name="curve">The curve this node corresponds to.</param>
+    /// <param name="branchPoint">The branchpoint the curve this node represents is adjacent to.</param>
+    public IllFormedCurveNode(Curve curve, Point3d branchPoint)
+    {
+      _curve = curve;
+      _adjacentToBranchPoint = true;
+      _branchPoint = branchPoint;
+    }
+
+    public static bool operator ==(IllFormedCurveNode left, IllFormedCurveNode right)
+    {
+      return left.Equals(right);
+    }
+
+    public static bool operator !=(IllFormedCurveNode left, IllFormedCurveNode right)
+    {
+      return !left.Equals(right);
+    }
+
+    /// <summary>
+    /// Tests for equality. IllFormedCurveNode are equal if the end points of their curves are equal (by some tolerance).
+    /// </summary>
+    /// <remarks>This comparison only works in this very restricted use-case.</remarks>
+    /// <param name="other">The other node to compare to.</param>
+    /// <returns>true if nodes are </returns>
+    public bool Equals(IllFormedCurveNode other)
+    {
+      // Compare distances between endpoints - if they are smaller than some tolerance, nodes are considered equal.
+      Point3d thisStart = _curve.PointAtStart;
+      Point3d thisEnd = _curve.PointAtEnd;
+      Point3d otherStart = other.curve.PointAtStart;
+      Point3d otherEnd = other.curve.PointAtEnd;
+
+      if (thisStart.DistanceTo(otherStart) < RhinoMath.SqrtEpsilon && thisEnd.DistanceTo(otherEnd) < RhinoMath.SqrtEpsilon ||
+          thisStart.DistanceTo(otherEnd) < RhinoMath.SqrtEpsilon && thisEnd.DistanceTo(otherStart) < RhinoMath.SqrtEpsilon)
+      {
+        return true;
+      }
       return false;
     }
 
-    // If conversion was successful (the other object is a IllFormedCurveNode), we can simply call the Equals method from this class.
-    return this.Equals(other);
-  }
 
-
-  /// <summary>
-  /// Override. Probably not a valid override, but will not be used here.
-  /// </summary>
-  /// <returns>Hashcode.</returns>
-  public override int GetHashCode()
-  {
-    return base.GetHashCode();
-  }
-}
-
-/// <summary>
-/// Models the connectivity of ill-formed segments.
-/// </summary>
-public class IllFormedCurveGraph
-{
-  private List<IllFormedCurveNode> _nodes;
-
-  public List<IllFormedCurveNode> nodes
-  {
-    get
+    /// <summary>
+    /// Tests for equality.
+    /// </summary>
+    /// <param name="otherObject">Object of any type.</param>
+    /// <returns>true if objects are equal, false otherwise.</returns>
+    public override bool Equals(object otherObject)
     {
-      return _nodes;
-    }
-  }
+      // Converting to IllFormedCurveNode.
+      IllFormedCurveNode other = otherObject as IllFormedCurveNode;
 
-  private List<List<IllFormedCurveNode>> _adjacencyList;
+      // Null-check covering faulty conversion.
+      if (other == null)
+      {
+        return false;
+      }
 
-  public List<List<IllFormedCurveNode>> adjacencyList
-  {
-    get
-    {
-      return _adjacencyList;
-    }
-  }
-
-  public IllFormedCurveGraph()
-  {
-    _nodes = new List<IllFormedCurveNode>();
-    _adjacencyList = new List<List<IllFormedCurveNode>>();
-  }
-
-  /// <summary>
-  /// Adds a node to the graph.
-  /// </summary>
-  /// <exception>Exception will be thrown if (1) the curve is not ill-formed (determined by the number of adjacent branch points) or (2) the node was already added.</exception>
-  /// <param name="curve">Curve this node corresponds to.</param>
-  /// <param name="branchPoints">List of branchpoints this curve is adjacent to. Since IllFormedNodes only correspond to curves which have only 1 or 0 adjacent branchpoints, length of this list can at most be 1.</param>
-  public void AddNode(Curve curve, List<Point3d> branchPoints)
-  {
-
-    // Create node.
-    IllFormedCurveNode node;
-    if (branchPoints.Count == 0)
-    {
-      node = new IllFormedCurveNode(curve);
-    }
-    else if (branchPoints.Count == 1)
-    {
-      node = new IllFormedCurveNode(curve, branchPoints[0]);
-    }
-    else
-    {
-      throw new Exception("Attempted to construct IllFormedCurveNode, but branchPoint.Count: " + branchPoints.Count.ToString() + ". This curve is either not ill-formed or there are too many branchpoints.");
+      // If conversion was successful (the other object is a IllFormedCurveNode), we can simply call the Equals method from this class.
+      return this.Equals(other);
     }
 
-    // Check if node is unique.
-    if (_nodes.Contains(node))
+
+    /// <summary>
+    /// Override. Probably not a valid override, but will not be used here.
+    /// </summary>
+    /// <returns>Hashcode.</returns>
+    public override int GetHashCode()
     {
-      throw new Exception("Node was already added.");
+      return base.GetHashCode();
     }
 
-    // Add node.
-    _nodes.Add(node);
-    _adjacencyList.Add(new List<IllFormedCurveNode>());
+    /// <summary>
+    /// Overrides to string methods to print the start- and end-points of curve.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+      return "(" + curve.PointAtStart.X.ToString() + ", " + curve.PointAtStart.Y.ToString() + ")";
+    }
   }
-
-  /// <summary>
-  /// Adds directed edge between the nodes corresponding to curve1 and curve2.
-  /// </summary>
-  /// <param name="curve1">The node corresponding </param>
-  /// <param name="curve2"></param>
-  public void AddEdge(Curve curve1, Curve curve2)
-
+  #endregion
 }
