@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\rapha\\Documents\\ebdwebsite.github.io\\toolkit\\scripts\\GrasshopperScripts.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\rapha\\Documents\\ebdwebsite.github.io\\toolkit\\scripts\\GrasshopperScripts.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\rapha\\Documents\\ebdwebsite.github.io\\toolkit\\scripts\\GrasshopperScripts.csproj",
+        "projectName": "GrasshopperScripts",
+        "projectPath": "C:\\Users\\rapha\\Documents\\ebdwebsite.github.io\\toolkit\\scripts\\GrasshopperScripts.csproj",
+        "packagesPath": "C:\\Users\\rapha\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rapha\\Documents\\ebdwebsite.github.io\\toolkit\\scripts\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\rapha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net452"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net452": {
+            "targetAlias": "net452",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net452": {
+          "targetAlias": "net452",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
