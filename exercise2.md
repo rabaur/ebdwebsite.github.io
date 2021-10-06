@@ -41,10 +41,7 @@
 * Check the SCI setting.
 * Render with SCI displayed on the side.
 
-## 2.7 Output 6: VGA Area
-* MGM: Structure
-
-## 3.
+## 3. Your output
 Here we explain how you need to render.
 
 ### 3.1 Viewport definitions
