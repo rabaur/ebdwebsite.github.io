@@ -6,8 +6,8 @@
 * Do & Dont's (with images)
 
 ## 2. Generating the Measures
-______________________________________________________
-| IMPORTANT: In use of these tools ... -> polybox.ch |
+
+> IMPORTANT: In use of these tools ... -> polybox.ch
 
 * Brief overview on Grasshopper:
 
@@ -45,5 +45,14 @@ ______________________________________________________
 * MGM: Structure
 
 ## 3.
+Here we explain how you need to render.
 
+### 3.1 Viewport definitions
+* Align center of viewport with center of floorplan.
+* Rendering mode arctic (-> customize settings with rendering)
 
+### 3.2 Rendering and exporting
+* ViewCaptureToFile
+* Constrain resolution, dpi etc.
+* Upload the images named correctly to polybox.
+* Download this .md file and fill in the details.
