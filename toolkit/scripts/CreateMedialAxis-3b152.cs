@@ -76,7 +76,7 @@ public abstract class Script_Instance_3b152 : GH_ScriptInstance
     bool[] mask = new bool[allSegmentArray.Length];
     System.Threading.Tasks.Parallel.For(0, mask.Length, i =>
     {
-      mask[i] = SegmentApproximatesMedialAxis(allSegmentArray[i], boundaryCurveList, walkableSurfaceBrep);
+      mask[i] = SegmentApproximatesMedialAxis(allSegmentArray[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
     });
     List<Line> result = new List<Line>();
     for (int i = 0; i < allSegmentArray.Length; i++)
@@ -97,11 +97,12 @@ public abstract class Script_Instance_3b152 : GH_ScriptInstance
   /// <param name="segment">The segment for which to check.</param>
   /// <param name="boundaryCurves">The curves describing the boundary for which to find the medial axis.</param>
   /// <returns>true if is medial axis segment, false otherwise.</returns>
-  private bool SegmentApproximatesMedialAxis(Line segment, List<Curve> boundaryCurves, Brep walkableSurfaceBrep)
+  private bool SegmentApproximatesMedialAxis(Line segment, List<Curve> boundaryCurves, Brep walkableSurfaceBrep, double closenessTolerance)
   {
     bool isIntersecting = SegmentIntersectsBoundary(segment, boundaryCurves, RhinoMath.SqrtEpsilon);
     bool isWalkable = SegmentIsOnWalkableSurface(segment, walkableSurfaceBrep, RhinoMath.SqrtEpsilon);
-    return !isIntersecting && isWalkable;
+    bool isTooCloseToBoundary = SegmentIsTooCloseToBoundary(segment, boundaryCurves, closenessTolerance);
+    return !isIntersecting && isWalkable && !isTooCloseToBoundary;
   }
 
   /// <summary>
@@ -139,6 +140,37 @@ public abstract class Script_Instance_3b152 : GH_ScriptInstance
     Point3d[] intersectionPoints;
     Rhino.Geometry.Intersect.Intersection.CurveBrep(segmentCurve, walkableSurfaceBrep, tolerance, out overlapCurves, out intersectionPoints);
     return overlapCurves.Length > 0 || intersectionPoints.Length > 0;
+  }
+
+  /// <summary>
+  /// Checks for a segment if it is too close to the boundary. It does that by comparing the distance of the endpoints of the segment to all boundary curves.
+  /// </summary>
+  /// <param name="segment">The segment to check for.</param>
+  /// <param name="boundaryCurves">The curves that define the boundary.</param>
+  /// <param name="tolerance">If the distance is smaller than this, the segment is considered to be too close.</param>
+  /// <returns>true if is too close, false otherwise.</returns>
+  private bool SegmentIsTooCloseToBoundary(Line segment, List<Curve> boundaryCurves, double tolerance)
+  {
+    Curve segmentCurve = segment.ToNurbsCurve();
+    Point3d startPoint = segmentCurve.PointAtStart;
+    Point3d endPoint = segmentCurve.PointAtEnd;
+    for (int i = 0; i < boundaryCurves.Count; i++)
+    {
+      Curve currCurve = boundaryCurves[i];
+      double startParam = 0.1f;
+      currCurve.ClosestPoint(startPoint, out startParam);
+      if (startPoint.DistanceTo(currCurve.PointAt(startParam)) < tolerance)
+      {
+        return true;
+      }
+      double endParam = 0.1f;
+      currCurve.ClosestPoint(endPoint, out endParam);
+      if (endPoint.DistanceTo(currCurve.PointAt(endParam)) < tolerance)
+      {
+        return true;
+      }
+    }
+    return false;
   }
   #endregion
 }

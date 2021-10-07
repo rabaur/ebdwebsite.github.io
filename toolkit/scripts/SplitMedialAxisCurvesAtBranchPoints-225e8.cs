@@ -45,7 +45,6 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
   /// Any subsequent call within the same solution will increment the Iteration count.
   /// </summary>
   private readonly int Iteration;
-
   #endregion
   /// <summary>
   /// This procedure contains the user code. Input parameters are provided as regular arguments,
@@ -120,6 +119,30 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
     // Identify ill-formed curves.
     List<Curve> illFormedCurves = new List<Curve>();
     List<List<Point3d>> allAdjacentBranchPoints = new List<List<Point3d>>();
+    FindIllFormedCurves(inputCurves, branchPoints, ref illFormedCurves, ref allAdjacentBranchPoints);
+
+    // Create graph from ill-formed curves.
+    IllFormedCurveGraph graph = CreateIllFormedCurveGraph(illFormedCurves, allAdjacentBranchPoints, branchPoints);
+
+    // TODO: Remove after testing.
+    Print("Created graph of ill-formed segments with " + graph.GetNumNodes().ToString() + " nodes and " + graph.GetNumEdges().ToString() + " edges.");
+    Print(graph.GetNumNodesAtBranchPoint() + " of these nodes are adjacent to a branch-point.");
+
+    return new Curve[1];
+  }
+
+  /// <summary>
+  /// For a set of curves created from splitting medial axis curves at branchpoints, find curves that are ill-formed. 
+  /// A curve is ill-formed if it is not adjacent to exactly 2 branchpoints. 
+  /// Such curves have to undergo further merging.
+  /// </summary>
+  /// <exception>Throws exception if there is a curve in inputCurves that is adjacent to more than 2 branchpoints.</exception>
+  /// <param name="inputCurves">The curves resulting from splitting the medial axis curves at branchpoints.</param>
+  /// <param name="branchPoints">The branchpoints at which the curves were split.</param>
+  /// <param name="illFormedCurves">Array which will hold the ill-formed curves.</param>
+  /// <param name="allAdjacentBranchPoints">Element allAdjacentBranchPoints[i] corresponds to illFormedCurves[i]. It holds the branch-points illFormedCurves[i] is adjacent to (either empty list or one element).</param>
+  private void FindIllFormedCurves(List<Curve> inputCurves, List<Point3d> branchPoints, ref List<Curve> illFormedCurves, ref List<List<Point3d>> allAdjacentBranchPoints)
+  {
     foreach (Curve curve in inputCurves)
     {
       List<Point3d> adjacentBranchPoints = new List<Point3d>();
@@ -133,7 +156,6 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
         }
         if (adjacentBranchPoints.Count == 2)
         {
-          Print("Well formed curve found.");
           break;
         }
       }
@@ -157,8 +179,25 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
         throw new Exception("Curve segment was adjacent to " + adjacentBranchPoints.Count.ToString() + " branch points. A medial axis curve should only be adjacent to 0, 1 or 2 branchpoints.");
       }
     }
+  }
 
-    // Create graph from ill-formed curves.
+  /// <summary>
+  /// Creates a graph based on the adjacency of the ill-formed curves.
+  /// Checks whether two curves share an endpoints that does not belong to the set of branchpoints.
+  /// Such an endpoint is exactly a location where the corresponding curves should be merged to form a larger (and possibly complete) medial axis curve,
+  /// which is delimited by two branchpoints.
+  /// </summary>
+  /// <remarks>
+  /// Note that it is sufficient to check whether the enpoints agree in this case, since the input curves are ill-formed,
+  /// so one of the enpoints guaranteed to be a non-branchpoint (the other point is ignored with a proximity check).
+  /// Thus it cannot happen that curves are represented as connected at positions that were correctly split previously.
+  /// </remarks>
+  /// <param name="illFormedCurves">The set of ill-formed curves.</param>
+  /// <param name="allAdjacentBranchPoints">The branchpoints each ill-formed curve is adjacent to.</param>
+  /// <param name="branchPoints">The set of branch points of the medial axis.</param>
+  /// <returns>The graph capturing the connectivity of the ill-formed curves.</returns>
+  private IllFormedCurveGraph CreateIllFormedCurveGraph(List<Curve> illFormedCurves, List<List<Point3d>> allAdjacentBranchPoints, List<Point3d> branchPoints)
+  {
     IllFormedCurveGraph graph = new IllFormedCurveGraph();
 
     // Create all nodes.
@@ -195,12 +234,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
         }
       }
     }
-
-    // TODO: Remove after testing.
-    Print("Created graph of ill-formed segments with " + graph.GetNumNodes().ToString() + " nodes and " + graph.GetNumEdges().ToString() + " edges.");
-    Print(graph.GetNumNodesAtBranchPoint() + " of these nodes are adjacent to a branch-point.");
-
-    return new Curve[1];
+    return graph;
   }
 
   /// <summary>
@@ -381,10 +415,10 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
     }
 
     /// <summary>
-    /// Gets the index of a node.
+    /// Gets the index of a node by curve.
     /// </summary>
     /// <param name="curve">Curve that corresponds to the node.</param>
-    /// <returns>The index of the node in the nodes list if present, otherwise -1.</returns>
+    /// <returns>The index of the node in the _nodes list if present, otherwise -1.</returns>
     private int GetNodeIndex(Curve curve)
     {
       // Create mock node for comparison.
@@ -393,6 +427,18 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       // Get index.
       return nodes.IndexOf(mockNode);
     }
+
+
+    /// <summary>
+    /// Gets the index of a node.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns>The index of the node in the _nodes list if present, otherwise -1.</returns>
+    private int GetNodeIndex(IllFormedCurveNode node)
+    {
+      return GetNodeIndex(node.curve);
+    }
+
 
     /// <summary>
     /// Creates as many distinct, non-overlapping branchpoint-bounded medial segment from the current nodes as possible.
@@ -411,6 +457,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       }
 
       // Start new run of BFS for each node that is adjacent to a branch node.
+      List<Curve> joinedCurves = new List<Curve>();
       foreach (IllFormedCurveNode startNode in adjToBranchPointNodes)
       {
         // List to keep track of the nodes already visited.
@@ -419,18 +466,62 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
         List<IllFormedCurveNode> queue = new List<IllFormedCurveNode>();
         queue.Add(startNode);
 
+        // Run BFS until no more nodes are enqueued.
         while (queue.Count > 0)
         {
+
+          // Pop node from queue.
           IllFormedCurveNode currNode = queue[0];
           queue.RemoveAt(0);
+
+          // Ignore the current node if it has been visited before.
+          if (visited.Contains(currNode))
+          {
+            continue;
+          }
+
+          // Remember that this node has been visited.
+          visited.Add(currNode);
           List<IllFormedCurveNode> neighbors = GetNeighbors(currNode.curve);
 
+          // Add each neighbor to the queue.
+          foreach (IllFormedCurveNode neighbor in neighbors)
+          {
+            // If this neighbor has already been visited, we can ignore it.
+            if (visited.Contains(neighbor))
+            {
+              continue;
+            }
+
+            // Remember the current node as the predecessor.
+            predecessor[GetNodeIndex(neighbor)].Add(currNode);
+
+            // Enqueue the neighbor.
+            queue.Add(neighbor);
+          }
         }
 
+        // After the BFS has been run, we can read out the paths from the predecessor array and try to combine the curves.
       }
 
       return new Curve[1];
     }
+
+    /// <summary>
+    /// Given a list of immediate predecessors per node, this function calculates the leading to each node.
+    /// </summary>
+    /// <param name="allPredecessors">List of immediate predecessor per node in graph.</param>
+    /// <returns>A list of paths per node in the graph.</returns>
+    private List<List<IllFormedCurveNode>>[] ReconstructPredecessorPaths(List<IllFormedCurveNode>[] allPredecessors)
+    {
+      return new List<List<IllFormedCurveNode>>[1];
+    }
+
+    private List<List<IllFormedCurveNode>>[] FollowPath(IllFormedCurveNode thisNode, ref List<List<IllFormedCurveNode>>[] paths)
+    {
+      return new List<List<IllFormedCurveNode>>[1];
+    }
+
 
     /// <summary>
     /// Gets the number of currently added nodes.
