@@ -8,8 +8,6 @@ permalink: /exercises/
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
-![A .gif](/assets/gifs/close_boundary_curves.gif)
-
 # Exercises
 
 # Exercise 1: Reading on Evidence-Based Design for Healthcare  
