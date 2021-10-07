@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-logo: /Logo.JPG
+logo: /assets/images/Logo.JPG
 title: "Evidence-Based Design in Architecture: Linking Cognition and Architecture to Design Resilient Healthcare Architecture"
 email: michal.gath@gess.ethz.ch
 description: >- # this means to ignore newlines until "baseurl:"

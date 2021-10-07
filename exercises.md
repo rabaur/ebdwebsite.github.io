@@ -47,10 +47,10 @@ Based on your reading, prepare two pairs of cards for our **Evidence-Based Desig
 The instructions and template for making the card (as well as an example of two cards) are in the Miro board (link provided via email).
 You can see two screenshots from the Miroboard below. 
 
-![An example pair of cards](/ExampleCard.jpg)
+![An example pair of cards](/assets/images/ExampleCard.jpg)
 *An example pair of cards*
 
-![An empty template for a pair of cards](/TemplateCard.jpg)
+![An empty template for a pair of cards](/assets/images/TemplateCard.jpg)
 *An empty template for a pair of cards*
 
 ## List of papers: 
