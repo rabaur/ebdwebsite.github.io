@@ -75,9 +75,9 @@ public abstract class Script_Instance_3b152 : GH_ScriptInstance
     Line[] allSegmentArray = allSegments.ToArray();
     bool[] mask = new bool[allSegmentArray.Length];
     System.Threading.Tasks.Parallel.For(0, mask.Length, i =>
-    {
+      {
       mask[i] = SegmentApproximatesMedialAxis(allSegmentArray[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
-    });
+      });
     List<Line> result = new List<Line>();
     for (int i = 0; i < allSegmentArray.Length; i++)
     {

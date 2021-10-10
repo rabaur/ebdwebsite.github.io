@@ -52,7 +52,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> medialAxisCurvesList, List<Point3d> branchpointsList, ref object splitMedialAxisCurvesList)
+  private void RunScript(List<Curve> medialAxisCurvesList, List<Point3d> branchpointsList, ref object splitMedialAxisCurvesList, ref object notAdjacent)
   {
     List<Curve> splitAtBranchPoints = new List<Curve>();
 
@@ -64,7 +64,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       double[] closestParameters = new double[branchpointsList.Count];
       for (int i = 0; i < branchpointsList.Count; i++)
       {
-        double param = -1.0;
+        double param;
         curve.ClosestPoint(branchpointsList[i], out param);
         closestParameters[i] = param;
       }
@@ -78,7 +78,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       List<double> splitParameters = new List<double>();
       for (int i = 0; i < branchpointsList.Count; i++)
       {
-        if (closestPoints[i].DistanceTo(branchpointsList[i]) <= 0.01)
+        if (closestPoints[i].DistanceTo(branchpointsList[i]) <= RhinoMath.DefaultDistanceToleranceMillimeters)
         {
           splitParameters.Add(closestParameters[i]);
         }
@@ -97,8 +97,26 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
       // Add new segments to result.
       splitAtBranchPoints.AddRange(splitCurves);
     }
-    splitMedialAxisCurvesList = splitAtBranchPoints;
-    JoinIllFormedCurves(splitAtBranchPoints, branchpointsList);
+
+    // Removing all segments that are not adjacent to branchpoints.
+    List<Curve> final = new List<Curve>();
+    foreach (Curve split in splitAtBranchPoints)
+    {
+      bool isAdjacentToBranchPoint = false;
+      foreach (Point3d branchPoint in branchpointsList)
+      {
+        if (branchPoint.DistanceTo(split.PointAtStart) < RhinoMath.DefaultDistanceToleranceMillimeters || branchPoint.DistanceTo(split.PointAtEnd) < RhinoMath.DefaultDistanceToleranceMillimeters)
+        {
+          isAdjacentToBranchPoint = true;
+          break;
+        }
+      }
+      if (isAdjacentToBranchPoint)
+      {
+        final.Add(split);
+      }
+    }
+    splitMedialAxisCurvesList = final;
   }
   #endregion
   #region Additional
