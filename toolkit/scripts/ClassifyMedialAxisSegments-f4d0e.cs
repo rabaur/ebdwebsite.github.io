@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 using Rhino;
 using Rhino.Geometry;
@@ -11,6 +10,7 @@ using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
+using System.Linq;
 
 
 /// <summary>
@@ -57,27 +57,55 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
   {
     // Find shortest segment on the boundary.
     double shortestSegmentLength = MedialAxisCurveList.Min(medialAxisCurve => medialAxisCurve.GetLength());
-    double initalDelta = shortestSegmentLength / InitialSubdivision;
-
+    double initialDelta = shortestSegmentLength / InitialSubdivision;
+    initialDelta = 50.0f;
     // Generate the initial evaluation points.
     List<double> initialEvaluationParameters = new List<double>();
     List<Curve> replicatedMedialAxisCurves = new List<Curve>();
 
     // In order to keep track where the evaluation points belonging to a single sequence belong.
     List<int> sequenceStarts = new List<int>();
-    List<int> sequenceEnds = new List<int>();
+    List<int> sequenceLengths = new List<int>();
+
+    // Not necessarily all medial axis segments will be be evaluated, so we need to keep track which are.
+    List<Curve> evaluatedMedialAxisCurves = new List<Curve>();
 
     // Subdivide each medialAxis to generate evaluation points.
     foreach (Curve medialAxisCurve in MedialAxisCurveList)
     {
+      double[] parameters = medialAxisCurve.DivideByLength(initialDelta, false);
+      if (parameters == null)
+      {
+        continue;
+      }
+      evaluatedMedialAxisCurves.Add(medialAxisCurve);
       sequenceStarts.Add(initialEvaluationParameters.Count);
-      double[] parameters = medialAxisCurve.DivideByLength(initalDelta, false);
       initialEvaluationParameters.AddRange(parameters);
       replicatedMedialAxisCurves.AddRange(Enumerable.Repeat(medialAxisCurve, parameters.Length));
-      sequenceEnds.Add(initialEvaluationParameters.Count - 1);
+      sequenceLengths.Add(parameters.Length);
     }
 
+    // Array that will hold the point descriptors for each evaluation point.
+    MedialAxisPoint[] medialAxisPointDescriptorArray = new MedialAxisPoint[initialEvaluationParameters.Count];
 
+    // Classify all medial axis points.
+    System.Threading.Tasks.Parallel.For(0, initialEvaluationParameters.Count, i =>
+      {
+      medialAxisPointDescriptorArray[i] = ClassifyMedialAxisPoint(replicatedMedialAxisCurves[i], initialEvaluationParameters[i], BoundaryCurveList, CornerPointList); ;
+      });
+    List<MedialAxisPoint> medialAxisPointDescriptors = medialAxisPointDescriptorArray.ToList();
+
+    // Write out the results.
+    TypeList = medialAxisPointDescriptors.Select(pd => pd.Type).ToList();
+    ClassifiedPointList = medialAxisPointDescriptors.Select(pd => pd.Point).ToList();
+
+    // Select all pairs of point-descriptor between which the medial axis segment type changes.
+    List<List<MedialAxisPointPair>> switchPoints = new List<List<MedialAxisPointPair>>();
+    for (int i = 0; i < evaluatedMedialAxisCurves.Count; i++)
+    {
+      Curve medialAxisCurve = evaluatedMedialAxisCurves[i];
+      List<MedialAxisPoint> medialAxisPoints = medialAxisPointDescriptors.GetRange(sequenceStarts[i], sequenceLengths[i]);
+    }
   }
   #endregion
   #region Additional
@@ -159,7 +187,7 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
     int idxB = 1;
     double minA = measures[idxA];
     double minB = measures[idxB];
-    
+
     // Check if invariant 1 holds.
     if (minB < minA)
     {
@@ -192,6 +220,24 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
     return new List<int>() { idxA, idxB };
   }
 
+  /// <summary>
+  /// A pair of medial axis points, used to determine switch-points.
+  /// </summary>
+  public struct MedialAxisPointPair
+  {
+    MedialAxisPoint PointA;
+    MedialAxisPoint PointB;
+    
+    public MedialAxisPointPair(MedialAxisPoint pointA, MedialAxisPoint pointB)
+    {
+      PointA = pointA;
+      PointB = pointB;
+    }
+  }
+
+  /// <summary>
+  /// A descriptor for a medial axis point.
+  /// </summary>
   public struct MedialAxisPoint
   {
     public Curve MedialAxisCurve;
