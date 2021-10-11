@@ -57,15 +57,23 @@ public abstract class Script_Instance_4402e : GH_ScriptInstance
     List<Curve> result = new List<Curve>();
     foreach (Point3d node in nodePoint3dList)
     {
+      if (node == null)
+      {
+        continue;
+      }
       Point3d closestPoint = new Point3d();
       double minDist = double.MaxValue;
-      double minParam = 0.0;
+      double minParam = -1.0;
       Curve minCurve = medialAxisCurveList[0];
 
       // Find the closest point over all medial axis curves.
       foreach (Curve medialAxisCurve in medialAxisCurveList)
       {
-        double closeParam = RhinoMath.SqrtEpsilon;
+        if (medialAxisCurve == null)
+        {
+          continue;
+        }
+        double closeParam;
         medialAxisCurve.ClosestPoint(node, out closeParam);
         Point3d closePoint = medialAxisCurve.PointAt(closeParam);
         double dist = node.DistanceTo(closePoint);
@@ -80,6 +88,10 @@ public abstract class Script_Instance_4402e : GH_ScriptInstance
 
       // We need to split the curve and add the split segment to the list as well.
       Curve[] splitMedialAxisCurves = minCurve.Split(minParam);
+      if (splitMedialAxisCurves == null)
+      {
+        continue;
+      }
       foreach (Curve splitCurve in splitMedialAxisCurves)
       {
         result.Add(splitCurve);

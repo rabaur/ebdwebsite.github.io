@@ -144,7 +144,7 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
     SwitchPointLocations = switchPointLocations;
     SwitchPointTypes = switchPointTypes;
     Chords = chords;
-    BranchPointBoundaries = CreateNodesAroundBranchPoints(BranchPointList, BoundaryCurveList, 10.0);
+    BranchPointBoundaries = CreateNodesAroundBranchPoints(BranchPointList, BoundaryCurveList, 7.5);
   }
   #endregion
   #region Additional
