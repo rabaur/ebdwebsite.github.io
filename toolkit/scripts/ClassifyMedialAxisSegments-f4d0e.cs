@@ -53,12 +53,13 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> MedialAxisCurveList, int InitialSubdivision, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SideA, ref object SideB, ref object Chords, ref object ChordA)
+  private void RunScript(List<Curve> MedialAxisCurveList, int InitialSubdivision, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries)
   {
     // Find shortest segment on the boundary.
     double shortestSegmentLength = MedialAxisCurveList.Min(medialAxisCurve => medialAxisCurve.GetLength());
     double initialDelta = shortestSegmentLength / InitialSubdivision;
-    initialDelta = 50.0f;
+    // initialDelta = 10.0f;
+
     // Generate the initial evaluation points.
     List<double> initialEvaluationParameters = new List<double>();
     List<Curve> replicatedMedialAxisCurves = new List<Curve>();
@@ -105,7 +106,45 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
     {
       Curve medialAxisCurve = evaluatedMedialAxisCurves[i];
       List<MedialAxisPoint> medialAxisPoints = medialAxisPointDescriptors.GetRange(sequenceStarts[i], sequenceLengths[i]);
+      List<MedialAxisPointPair> currSwitchPoints = new List<MedialAxisPointPair>();
+      int currType = medialAxisPoints[0].Type;
+      for (int j = 1; j < medialAxisPoints.Count; j++)
+      {
+        if (medialAxisPoints[j].Type != currType)
+        {
+          currSwitchPoints.Add(new MedialAxisPointPair(medialAxisPoints[j - 1], medialAxisPoints[j]));
+          currType = medialAxisPoints[j].Type;
+        }
+      }
+      switchPoints.Add(currSwitchPoints);
     }
+
+    int numSwitchPoints = switchPoints.Select(l => l.Count).ToList().Sum();
+    Print("Number of switch-points: " + numSwitchPoints.ToString());
+    double numSwitchPointsPercent = ((double)numSwitchPoints) / medialAxisPointDescriptors.Count * 100.0;
+    Print("That's only " + numSwitchPointsPercent.ToString() + " percent of all evaluated points.");
+
+    // Extract switchpoint-locations and types for debugging.
+    List<Point3d> switchPointLocations = new List<Point3d>();
+    List<int> switchPointTypes = new List<int>();
+    List<LineCurve> chords = new List<LineCurve>();
+    foreach (List<MedialAxisPointPair> subList in switchPoints)
+    {
+      foreach (MedialAxisPointPair pair in subList)
+      {
+        switchPointLocations.Add(pair.PointA.Point);
+        switchPointLocations.Add(pair.PointB.Point);
+        switchPointTypes.Add(pair.PointA.Type);
+        switchPointTypes.Add(pair.PointB.Type);
+        chords.Add(pair.PointA.Chord);
+        chords.Add(pair.PointB.Chord);
+      }
+    }
+
+    SwitchPointLocations = switchPointLocations;
+    SwitchPointTypes = switchPointTypes;
+    Chords = chords;
+    BranchPointBoundaries = CreateNodesAroundBranchPoints(BranchPointList, BoundaryCurveList, 10.0);
   }
   #endregion
   #region Additional
@@ -225,8 +264,8 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
   /// </summary>
   public struct MedialAxisPointPair
   {
-    MedialAxisPoint PointA;
-    MedialAxisPoint PointB;
+    public MedialAxisPoint PointA;
+    public MedialAxisPoint PointB;
     
     public MedialAxisPointPair(MedialAxisPoint pointA, MedialAxisPoint pointB)
     {
@@ -247,6 +286,7 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
     public List<double> ChordEndPointParameters;
     public List<Point3d> ChordEndPoints;
     public int Type;
+    public LineCurve Chord;
 
     public MedialAxisPoint(Curve medialAxisCurve, double parameter, List<Curve> chordEndPointCurves, List<double> chordEndPointParameters, List<Point3d> chordEndPoints, int type)
     {
@@ -257,6 +297,86 @@ public abstract class Script_Instance_f4d0e : GH_ScriptInstance
       ChordEndPointParameters = chordEndPointParameters;
       ChordEndPoints = chordEndPoints;
       Type = type;
+      Chord = new LineCurve(ChordEndPoints[0], ChordEndPoints[1]);
+    }
+  }
+
+  /// <summary>
+  /// TODO: Rewrite into function that can take points and create convex brep.
+  /// </summary>
+  /// <param name="points"></param>
+  /// <returns></returns>
+  private Brep CreateConvexBrepFromPoints(List<Point3d> points)
+  {
+    Grasshopper.Kernel.Geometry.Node2List points2D = new Grasshopper.Kernel.Geometry.Node2List(points);
+    Polyline boundary = Grasshopper.Kernel.Geometry.ConvexHull.Solver.ComputeHull(points2D);
+    try
+    {
+      return Brep.CreatePlanarBreps(boundary.ToNurbsCurve(), RhinoMath.DefaultDistanceToleranceMillimeters)[0];
+    }
+    catch {
+      return null;
+    }
+  }
+
+  /// <summary>
+  /// TODO: Rewrite into function that generates breps around branchpoints.
+  /// </summary>
+  /// <param name="branchPoints"></param>
+  /// <param name="boundaryCurves"></param>
+  /// <param name="tol"></param>
+  /// <returns></returns>
+  private List<Brep> CreateNodesAroundBranchPoints(List<Point3d> branchPoints, List<Curve> boundaryCurves, double tol)
+  {
+    List<Brep> boundaries = new List<Brep>();
+    foreach (Point3d branchPoint in branchPoints)
+    {
+      List<Point3d> closestPoints = GetClosestPointsToCurves(branchPoint, boundaryCurves);
+      List<double> distances = closestPoints.Select(cp => cp.DistanceTo(branchPoint)).ToList();
+      List<PointAndDistance> pointsAndDistances = Enumerable.Range(0, closestPoints.Count).Select(i => new PointAndDistance(closestPoints[i], distances[i])).ToList();
+      pointsAndDistances = pointsAndDistances.OrderBy(pD => pD.Distance).ToList();
+      List<Point3d> corners = new List<Point3d>();
+      double minDistance = pointsAndDistances[0].Distance;
+      foreach (PointAndDistance pointAndDistance in pointsAndDistances)
+      {
+        if (pointAndDistance.Distance - minDistance < tol)
+        {
+          corners.Add(pointAndDistance.Point);
+        }
+      }
+      Brep boundary = CreateConvexBrepFromPoints(corners);
+      boundaries.Add(boundary);
+    }
+    return boundaries;
+  }
+
+  /// <summary>
+  /// Finds the closest point from <paramref name="point"/> for each curve in <paramref name="curves"/>.
+  /// </summary>
+  /// <param name="point">The points from which to find the closest points.</param>
+  /// <param name="curves">The curves to find the closest points.</param>
+  /// <returns>The list of closest points, where the i-th point corresponds to the i-th curve in <paramref name="curves"/></returns>
+  private List<Point3d> GetClosestPointsToCurves(Point3d point, List<Curve> curves)
+  {
+    List<double> closestParams = new List<double>();
+    foreach (Curve curve in curves)
+    {
+      double closeParam;
+      curve.ClosestPoint(point, out closeParam);
+      closestParams.Add(closeParam);
+    }
+    return Enumerable.Range(0, curves.Count).Select(i => curves[i].PointAt(closestParams[i])).ToList();
+  }
+
+  public struct PointAndDistance
+  {
+    public Point3d Point;
+    public double Distance;
+
+    public PointAndDistance(Point3d point, double distance)
+    {
+      Point = point;
+      Distance = distance;
     }
   }
   #endregion
