@@ -69,7 +69,32 @@ Finally, restart Rhino and Grasshopper to activate the plugin.
 
 * * *
 
-## 6. Installing VisualArq
+## 6. Installing Human
+
+_Human_ is a plugin for Grasshopper.
+
+Visit [https://www.food4rhino.com/en/app/human](https://www.food4rhino.com/en/app/human) and download _Human for Rhino 6_. 
+
+To install the plugin, open Rhino and then open Grasshopper by typing "Grasshopper" in the command-line of Rhino. In Grasshopper, choose _File_ - _Special Folders_ - _Components Folder_ and drag and drop the downloaded file into the folder that just opened. 
+
+Finally, restart Rhino and Grasshopper to activate the plugin.
+
+* * *
+
+
+## 7. Installing Elefront
+
+_Elefront_ is a plugin for Grasshopper.
+
+Visit [https://www.food4rhino.com/en/app/elefront](https://www.food4rhino.com/en/app/elefront) and download _Elefront 4.2.2 (Rhino V6) - works in V7_. 
+
+To install the plugin, open Rhino and then open Grasshopper by typing "Grasshopper" in the command-line of Rhino. In Grasshopper, choose _File_ - _Special Folders_ - _Components Folder_ and drag and drop the downloaded file into the folder that just opened. 
+
+Finally, restart Rhino and Grasshopper to activate the plugin.
+
+* * *
+
+## 8. Installing VisualArq
 
 _VisualArq_ is a plugin for Rhino. Make sure step 3 is completed before installing VisualArq.
 
