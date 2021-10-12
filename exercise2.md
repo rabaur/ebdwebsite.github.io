@@ -11,6 +11,8 @@ permalink: /exercise2/
 
 # Exercise 2
 
+<!--
+
 ## 1. Model the typology
 * 2D orthographic floorplan
 * Possible resources: List of typologies but also choose from other databases.
@@ -64,3 +66,41 @@ Here we explain how you need to render.
 * Constrain resolution, dpi etc.
 * Upload the images named correctly to polybox.
 * Download this .md file and fill in the details.
+-->
+* * *
+
+## 1. Preprocessing the Layout
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/aBzpHc8Mf4U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+* * *
+
+## 2. Opening the Script and Computing the Medial Axis
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qEaVwEMZeyY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+* * *
+
+## 3. Building the Graph
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/hQt4_EK0nKw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+* * *
+
+## 4. Computing Measures
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cmsKklp2qEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+* * *
+
+## 5. Visualizing Measures
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/g0aWGNtUkQg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+* * * 
+
+## 6. Rendering a Visualization to an Image File
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5IcUh2u1Ox0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+* * *
