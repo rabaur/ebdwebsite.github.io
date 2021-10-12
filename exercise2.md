@@ -13,6 +13,25 @@ permalink: /exercise2/
 
 <!--
 
+## Exercise 2: Analyzing behavioral differences across hospital typologies (submission: 22.10)
+
+The goal of this exercise is to analyze how different hospital typologies differ with respect to behavioral differences, such as wayfinding, the efficiency of nursing care and quality of care.
+The analysis will be done using the three measures presented in class, and using the custom scripts built for the course (using grasshopper, see software page for instructions). 
+
+Choose a minimum of 2 hospital layouts and compare it across the following measures:
+* Circulation complexity: Inter-Connected Density (ICD), (O’Neill, 1991): ICD is the mean number of potential paths from any decision point within the floor plan. Lower  ICD is correlated with better wayfinding 
+•Nursing routine efficiency: Yale Traffic Index (Thompson and Goldin, 1975)
+The relative trip frequencies of selected traffic links multiplied by the distance between links. Lower YTI is associated with more efficient nursing routines 
+•Quality of Care:  Spatial Communication Index (Pachilova and Sailer, 2020): SCI is the accumulated visibility for key traffic links in a ward divided by the number of beds. A higher SCI is correlated with better quality of care 
+
+For each typology:
+*  export an image (See step 6 in the video tutorial) showing the analysis for each measure. 
+* Drag and drop these files to the Miro board (link is sent by email) and compare the two typologies across the three measures. 
+* Write a figure caption summarising your comparison. Your caption should be simple, and critical. What is the reason for the observed differences? Is it the configuration? The location of critical functions (e.g., the nurse station)? The size of the layout? 
+* Each student is required to present their results in class on the 22.10  (max 5 minutes per student) 
+
+
+
 ## 1. Model the typology
 * 2D orthographic floorplan
 * Possible resources: List of typologies but also choose from other databases.
