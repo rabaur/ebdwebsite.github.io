@@ -1,3 +1,9 @@
+---
+layout: default
+title: Exercise2
+permalink: /exercise2/
+---
+
 [Exercise 1]({{ site.baseurl }}{% link exercise1.md %})\
 [Exercise 2]({{ site.baseurl }}{% link exercise2.md %})\
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
