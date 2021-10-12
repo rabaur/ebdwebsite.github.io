@@ -8,8 +8,6 @@ permalink: /exercises/
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
-# Exercises
-
 # Exercise 1: Reading on Evidence-Based Design for Healthcare  
 
 ## Submission Details 
@@ -77,6 +75,3 @@ You can see two screenshots from the Miroboard below.
 * Ulrich, R. S. (2008). Biophilic theory and research for healthcare design. Biophilic design: The theory, science, and practice of bringing buildings to life, 1, 87-106.[PDF](https://polybox.ethz.ch/index.php/s/zP8IhvAZqrLp1Dy)
 * Lindahl, J., Thulesius, H., Rask, M., Wijk, H., Edvardsson, D., & Elmqvist, C. (2021). Assessing the Supportiveness of Healthcare Environments’ Light and Color: Development and Validation of the Light and Color Questionnaire (LCQ). HERD: Health Environments Research & Design Journal, 14(2), 130-144. [PDF](https://polybox.ethz.ch/index.php/s/sx61nMH6xBF7spR)
 * Gharaveis, A., Kirk Hamilton, D., Shepley, M., Pati, D., & Rodiek, S. (2019). Design suggestions for greater teamwork, communication and security in hospital emergency departments. Indoor and Built Environment, 28(8), 1126-1139.[PDF](https://polybox.ethz.ch/index.php/s/pDaNKydJYVuDlsZ)
-
-# Exercise 2
-# Exercise 3
