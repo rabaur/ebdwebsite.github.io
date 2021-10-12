@@ -17,3 +17,7 @@ Course Introduction, handout of Exercise 1
 ## Lecture 2, 1.10.2021
 Students' presentations - exercise 1, critical reading on evidence-based design for healthcare 
 [Download lecture slides](https://polybox.ethz.ch/index.php/s/fC2BXuzxD2QoLGQ)
+
+## Lecture 3, 8.10.2021
+Method#1 Spatial Simulations, analyzing behavioral differences across hospital typologies  
+[Download lecture slides](https://polybox.ethz.ch/index.php/s/K610SwVGHcwn4LR)
