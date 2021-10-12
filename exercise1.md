@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Exercise 1
+title: Exercise1
 permalink: /exercise1/
 ---
 
