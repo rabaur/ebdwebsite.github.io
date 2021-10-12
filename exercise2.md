@@ -13,7 +13,7 @@ permalink: /exercise2/
 The goal of this exercise is to analyze how different hospital typologies differ with respect to behavioral differences, such as wayfinding, the efficiency of nursing care and quality of care.
 **The analysis will be done using the three measures presented in class, and using the custom scripts built for the course (using grasshopper, see software page for instructions). Follow the steps in the video tutorial below to complete the analysis (please visit the software page and make sure you installed all the necessary software).**
 
-A. Choose a minimum of 2 hospital layouts, model it in 2D, and compare it across the following measures:
+**A. Choose a minimum of 2 hospital layouts, model it in 2D, and compare it across the following measures:**
 
 * **Circulation complexity: Inter-Connected Density (ICD)**, (O’Neill, 1991): ICD is the mean number of potential paths from any decision point within the floor plan. 
 > Lower  ICD is correlated with better wayfinding 
