@@ -9,12 +9,7 @@ permalink: /exercise2/
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
-# Exercise 2
-
-<!--
-
-## Exercise 2: Analyzing behavioral differences across hospital typologies (submission: 22.10)
-
+#  Analyzing behavioral differences across hospital typologies (submission: 22.10)
 The goal of this exercise is to analyze how different hospital typologies differ with respect to behavioral differences, such as wayfinding, the efficiency of nursing care and quality of care.
 The analysis will be done using the three measures presented in class, and using the custom scripts built for the course (using grasshopper, see software page for instructions). 
 
@@ -29,8 +24,7 @@ For each typology:
 * Drag and drop these files to the Miro board (link is sent by email) and compare the two typologies across the three measures. 
 * Write a figure caption summarising your comparison. Your caption should be simple, and critical. What is the reason for the observed differences? Is it the configuration? The location of critical functions (e.g., the nurse station)? The size of the layout? 
 * Each student is required to present their results in class on the 22.10  (max 5 minutes per student) 
-
-
+<!--
 
 ## 1. Model the typology
 * 2D orthographic floorplan
