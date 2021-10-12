@@ -29,6 +29,7 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 * Export an image (See step 6 in the video tutorial) showing the analysis for each measure. 
 * Drag and drop these files to the Miro board (link is sent by email) and compare the two typologies across the three measures. 
 * Write a figure caption summarising your comparison. Your caption should be simple, and critical. What is the reason for the observed differences? Is it the configuration? The location of critical functions (e.g., the nurse station)? The size of the layout? 
+![An example of the comparison matrix comparing both typologies across the three measures](/assets/images/ExampleMatrix.JPG)
 
 * Each student is required to present their results in class on the 22.10  (max 5 minutes per student) 
 
