@@ -33,6 +33,7 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 
 **C. Submission files**
 * Upload the images and the Rhino file (.3dm file, name as StudentFirstNameLastName.3dm) to polybox to this [link](https://polybox.ethz.ch/index.php/s/pVmCbbMoBLpgyP2)
+
 <!--
 
 ## 1. Model the typology
