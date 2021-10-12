@@ -3,7 +3,8 @@ layout: default
 title: Evidence-based Design Lecture Slides
 permalink: /ebd_lectureslides/
 ---
-[Exercises]({{ site.baseurl }}{% link exercises.md %})\
+[Exercise 1]({{ site.baseurl }}{% link exercise1.md %})\
+[Exercise 2]({{ site.baseurl }}{% link exercise1.md %})\
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
