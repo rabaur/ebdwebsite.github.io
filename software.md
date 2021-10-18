@@ -81,7 +81,6 @@ Finally, restart Rhino and Grasshopper to activate the plugin.
 
 * * *
 
-
 ## 7. Installing Elefront
 
 _Elefront_ is a plugin for Grasshopper.
@@ -93,6 +92,15 @@ To install the plugin, open Rhino and then open Grasshopper by typing "Grasshopp
 Finally, restart Rhino and Grasshopper to activate the plugin.
 
 * * *
+
+## 8. Installing ScriptParasite
+
+_Elefront_ is a plugin for Grasshopper.
+
+In contrary to the previous plugins, the installation of _ScriptParasite_ can be done using the Rhino Packagemanager. To install the plugin, type `PackageManager` in the Rhino console and then choose _ScriptParasite_.
+
+* * *
+
 
 ## 8. Installing VisualArq
 
