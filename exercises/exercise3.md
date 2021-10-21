@@ -6,16 +6,13 @@ permalink: /exercise3/
 
 [Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})\
 [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %})\
-<!--[Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})\-->
+[Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})\
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
 
 
 # Simulating patients and caregivers journey in Virtual Reality
-
-
-
 
 **In this exercise you will work in groups. There will be 2 groups in total.**
 * **Group 1**: will simulate patients and caregivers journey in the existing Emergency Department (ED) at USZ.
@@ -24,19 +21,29 @@ The goal is for you to quantitatively and qualitatively compare the differences 
 
 Towards this end, you will model in 3D (using Visualarq for Rhino) the existing or optimized ED (based on the images provided in the Miro board, link sent via email). Using this model, you will perform the walkthrough in Unity3D (follow the tutorial below) from the perspective of three typical users (patient, nurse, visitor) 
 
-**Submission date:** 5.11.2021
+**Submission date: 5.11.2021**
 
 **Submission files:** 
 * A zip folder containing the csv files for each path, a video recording (Screen recording) of the generated heat map (see example in the Miro board). 
 * A panel (in Miro, a link will be sent via email)  showing the results for each group. 
 
 **Submission Link (for zip folder):**  Drag and drop [here](https://polybox.ethz.ch/index.php/s/Unpf8bdLdv9IluV)
+
 ## Part 1: Model the ED layout 
+* To model the layouts we will use VisualArq for Rhino. 
+* A tutorial showing how to model a floor plan from an image using visualarq can be found here: Link to the video tutorial
+* For additional visualARQ tutorials, please visit this link: https://www.visualarq.com/learn/videos/
 
-## Part 1: Design the VR Walkthrough
+* Group 1: Please use the floor plan of the ED (see below) as a basis for your modeling.
+* Group 2: Please use the same floor plan and adapt the area marked in red (See below) according to the physical mockup. 
+* Once you are happy with the model, export it in FBX format. 
 
+![The existing vs the optimized ED](/assets/images/exercise3/ED.jpg)
+
+
+## Part 2: Design the VR Walkthrough
 * Describe the journey of 3 typical occupants **(e.g., nurse, patient, visitor)**
-* **For each occupant type**, specify  how **familiar** is she/he with the building (novice/experienced), do they have a liability? are they stressed? are they tired?
+* **For each occupant type**, specify  how **familiar** is she/he with the building (novice/experienced), do they have a liability? Are they stressed? Are they tired?
 * For each journey **describe** a **sequence of 3-4 typical activities** per occupant type. What is the **origin** and **destination** of each activity?
 * For each walkthrough **provide** a **complementary diagram**. See an example for a walkthrough below.
 
@@ -195,4 +202,5 @@ This script will visualize the VR-walkthroughs conducted in Exc#5. You need to i
 * See the trajectory described by the walkthrough in the scene (with customizable color and width).
 * See the distance that the agent has covered during the walkthrough.
 The distance is indicated in red. Please download this new script [here](https://polybox.ethz.ch/index.php/s/hBGphEwWugH59cT).
+
 
