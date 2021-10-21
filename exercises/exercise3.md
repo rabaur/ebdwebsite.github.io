@@ -34,11 +34,10 @@ Towards this end, you will model in 3D (using Visualarq for Rhino) the existing 
 * A tutorial showing how to model a floor plan from an image using visualarq can be found here: Link to the video tutorial
 * For additional visualARQ tutorials, please visit this link: https://www.visualarq.com/learn/videos/
 
-* Group 1: Please use the floor plan of the ED (see below) as a basis for your modeling.
-* Group 2: Please use the same floor plan and adapt the area marked in red (See below) according to the physical mockup. 
+* Group 1: Please use the floor plan of the ED (see the Miro board) as a basis for your modeling.
+* Group 2: Please use the same floor plan and adapt the area marked in red (See the Miro board) according to the physical mockup. 
 * Once you are happy with the model, export it in FBX format. 
 
-![The existing vs the optimized ED](/assets/images/exercise3/ED.jpg)
 
 
 ## Part 2: Design the VR Walkthrough
