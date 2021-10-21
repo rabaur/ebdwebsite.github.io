@@ -10,25 +10,30 @@ permalink: /exercise3/
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})
 
-![GIF](/assets/images/exercise3/image2.gif)
-![Exposure1](/assets/images/exercise3/image3.jpg)
-![Exposure2](/assets/images/exercise3/image7.jpg)
 
-# Simulating Occupants' Behaviour and Visual Attention in Virtual Reality
 
-**Submission date:** 25.3.2021
+# Simulating patients and caregivers journey in Virtual Reality
 
-**Submission files:** A zip folder containing the Unity3D project and data collected (including questioner data), a 2-3 page report concluding your findings
 
-**Submission Link:**  Drag and drop [here](https://drive.google.com/drive/folders/1QYdtEZR7F-BksPXElkPuRW19XmHK0p2S?usp=sharing)
+
+
+**In this exercise you will work in groups. There will be 2 groups in total.**
+* **Group 1**: will simulate patients and caregivers journey in the existing Emergency Department (ED) at USZ.
+* **Group 2**: will simulate patients and caregivers journey in the optimized Emergency Department (ED) at USZ. 
+The goal is for you to quantitatively and qualitatively compare the differences between the two ED layouts with respect to patients and caregivers behavior and experience. 
+
+Towards this end, you will model in 3D (using Visualarq for Rhino) the existing or optimized ED (based on the images provided in the Miro board, link sent via email). Using this model, you will perform the walkthrough in Unity3D (follow the tutorial below) from the perspective of three typical users (patient, nurse, visitor) 
+
+**Submission date:** 5.11.2021
+
+**Submission files:** 
+* A zip folder containing the csv files for each path, a video recording (Screen recording) of the generated heat map (see example in the Miro board). 
+* A panel (in Miro, a link will be sent via email)  showing the results for each group. 
+
+**Submission Link (for zip folder):**  Drag and drop [here](https://polybox.ethz.ch/index.php/s/Unpf8bdLdv9IluV)
+## Part 1: Model the ED layout 
 
 ## Part 1: Design the VR Walkthrough
-
-The aim of this exercise is to ***evaluate each of the building typologies** you modelled in Exc.2 from the perspective of different occupant groups.
-
-The evaluation criteria you choose to focus on should be related to the ones you included as part of Exc.2
-
-### Requirements
 
 * Describe the journey of 3 typical occupants **(e.g., nurse, patient, visitor)**
 * **For each occupant type**, specify  how **familiar** is she/he with the building (novice/experienced), do they have a liability? are they stressed? are they tired?
