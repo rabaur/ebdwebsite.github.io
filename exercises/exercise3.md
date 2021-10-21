@@ -15,8 +15,8 @@ permalink: /exercise3/
 # Simulating patients and caregivers journey in Virtual Reality
 
 **In this exercise you will work in groups. There will be 2 groups in total.**
-* **Group 1**: will simulate patients and caregivers journey in the existing Emergency Department (ED) at USZ.
-* **Group 2**: will simulate patients and caregivers journey in the optimized Emergency Department (ED) at USZ. 
+* **Group 1**: will simulate patients and caregivers journey in the **existing Emergency Department (ED) at USZ.**
+* **Group 2**: will simulate patients and caregivers journey in the **optimized Emergency Department (ED) at USZ.** 
 The goal is for you to quantitatively and qualitatively compare the differences between the two ED layouts with respect to patients and caregivers behavior and experience. 
 
 Towards this end, you will model in 3D (using Visualarq for Rhino) the existing or optimized ED (based on the images provided in the Miro board, link sent via email). Using this model, you will perform the walkthrough in Unity3D (follow the tutorial below) from the perspective of three typical users (patient, nurse, visitor) 
@@ -32,7 +32,7 @@ Towards this end, you will model in 3D (using Visualarq for Rhino) the existing 
 ## Part 1: Model the ED layout 
 * To model the layouts we will use VisualArq for Rhino. 
 * A tutorial showing how to model a floor plan from an image using visualarq can be found here: Link to the video tutorial
-* For additional visualARQ tutorials, please visit this link: https://www.visualarq.com/learn/videos/
+* For additional visualARQ tutorials, please visit this [link] (https://www.visualarq.com/learn/videos/)
 
 * Group 1: Please use the floor plan of the ED (see the Miro board) as a basis for your modeling.
 * Group 2: Please use the same floor plan and adapt the area marked in red (See the Miro board) according to the physical mockup. 
