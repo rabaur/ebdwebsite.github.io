@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Types;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_225e8 : GH_ScriptInstance
+public abstract class Script_Instance_c0441 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -60,7 +60,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
     // Then split the curve at these branchpoints.
     foreach (Curve curve in medialAxisCurvesList)
     {
-      // Find closest points on current for each branchpoint.
+      // Find closest points on current curve for each branchpoint.
       double[] closestParameters = new double[branchpointsList.Count];
       for (int i = 0; i < branchpointsList.Count; i++)
       {
@@ -116,7 +116,7 @@ public abstract class Script_Instance_225e8 : GH_ScriptInstance
         final.Add(split);
       }
     }
-    splitMedialAxisCurvesList = final;
+    splitMedialAxisCurvesList = splitAtBranchPoints;
   }
   #endregion
   #region Additional

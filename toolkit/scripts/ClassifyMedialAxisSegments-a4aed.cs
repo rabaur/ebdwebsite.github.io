@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Types;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_c2afb : GH_ScriptInstance
+public abstract class Script_Instance_a4aed : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -52,41 +52,9 @@ public abstract class Script_Instance_c2afb : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Point3d> CornerPointList, List<Curve> BoundaryCurveList, ref object RealCorners)
+  private void RunScript(List<Curve> MedialAxisCurveList, int InitialSubdivision, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries)
   {
-    // Check for each corner point if it is adjacent to a line, but not to its endpoints.
-    // That makes it not a real corner.
-    List<Point3d> realCorners = new List<Point3d>();
-    foreach (Point3d corner in CornerPointList)
-    {
-      bool isRealCorner = true;
-      foreach (Curve boundary in BoundaryCurveList)
-      {
-        double param;
-        boundary.ClosestPoint(corner, out param);
-        Point3d onLine = boundary.PointAt(param);
 
-        // The point does not even lie on the line.
-        if (corner.DistanceTo(onLine) > RhinoMath.DefaultDistanceToleranceMillimeters)
-        {
-          continue;
-        }
-
-        // Now check if it is one of the endpoints.
-        bool isStartPoint = corner.DistanceTo(boundary.PointAtStart) < RhinoMath.DefaultDistanceToleranceMillimeters;
-        bool isEndPoint = corner.DistanceTo(boundary.PointAtEnd) < RhinoMath.DefaultDistanceToleranceMillimeters;
-        if (!isStartPoint && !isEndPoint)
-        {
-          isRealCorner = false;
-          break;
-        }
-      }
-      if (isRealCorner)
-      {
-        realCorners.Add(corner);
-      }
-    }
-    RealCorners = realCorners;
   }
   #endregion
   #region Additional

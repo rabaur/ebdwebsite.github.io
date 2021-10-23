@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Types;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_51511 : GH_ScriptInstance
+public abstract class Script_Instance_5eb12 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>

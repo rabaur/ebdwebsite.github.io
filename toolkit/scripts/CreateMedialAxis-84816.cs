@@ -16,7 +16,7 @@ using System.Linq;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_13fe5 : GH_ScriptInstance
+public abstract class Script_Instance_84816 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -59,6 +59,10 @@ public abstract class Script_Instance_13fe5 : GH_ScriptInstance
     List<Line> allSegments = new List<Line>();
     foreach (Curve curve in voronoiDiagramCurveList)
     {
+      if (curve == null)
+      {
+        continue;
+      }
       if (!curve.IsPolyline())
       {
         throw new Exception("Input curve was not polyline.");

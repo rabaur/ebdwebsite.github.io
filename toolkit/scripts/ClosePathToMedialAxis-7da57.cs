@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Types;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_a4d89 : GH_ScriptInstance
+public abstract class Script_Instance_7da57 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -52,41 +52,55 @@ public abstract class Script_Instance_a4d89 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Point3d> CornerPointList, List<Curve> BoundaryCurveList, ref object RealCorners)
+  private void RunScript(List<Curve> medialAxisCurveList, List<Point3d> nodePoint3dList, ref object connectingCurveList)
   {
-    // Check for each corner point if it is adjacent to a line, but not to its endpoints.
-    // That makes it not a real corner.
-    List<Point3d> realCorners = new List<Point3d>();
-    foreach (Point3d corner in CornerPointList)
+    List<Curve> result = new List<Curve>();
+    foreach (Point3d node in nodePoint3dList)
     {
-      bool isRealCorner = true;
-      foreach (Curve boundary in BoundaryCurveList)
+      if (node == null)
       {
-        double param;
-        boundary.ClosestPoint(corner, out param);
-        Point3d onLine = boundary.PointAt(param);
+        continue;
+      }
+      Point3d closestPoint = new Point3d();
+      double minDist = double.MaxValue;
+      double minParam = -1.0;
+      Curve minCurve = medialAxisCurveList[0];
 
-        // The point does not even lie on the line.
-        if (corner.DistanceTo(onLine) > RhinoMath.DefaultDistanceToleranceMillimeters)
+      // Find the closest point over all medial axis curves.
+      foreach (Curve medialAxisCurve in medialAxisCurveList)
+      {
+        if (medialAxisCurve == null)
         {
           continue;
         }
-
-        // Now check if it is one of the endpoints.
-        bool isStartPoint = corner.DistanceTo(boundary.PointAtStart) < RhinoMath.DefaultDistanceToleranceMillimeters;
-        bool isEndPoint = corner.DistanceTo(boundary.PointAtEnd) < RhinoMath.DefaultDistanceToleranceMillimeters;
-        if (!isStartPoint && !isEndPoint)
+        double closeParam;
+        medialAxisCurve.ClosestPoint(node, out closeParam);
+        Point3d closePoint = medialAxisCurve.PointAt(closeParam);
+        double dist = node.DistanceTo(closePoint);
+        if (dist < minDist)
         {
-          isRealCorner = false;
-          break;
+          closestPoint = closePoint;
+          minDist = dist;
+          minParam = closeParam;
+          minCurve = medialAxisCurve;
         }
       }
-      if (isRealCorner)
+
+      // We need to split the curve and add the split segment to the list as well.
+      Curve[] splitMedialAxisCurves = minCurve.Split(minParam);
+      if (splitMedialAxisCurves == null)
       {
-        realCorners.Add(corner);
+        continue;
       }
+      foreach (Curve splitCurve in splitMedialAxisCurves)
+      {
+        result.Add(splitCurve);
+      }
+
+      // Construct connecting curve to closest point.
+      result.Add(new LineCurve(node, closestPoint));
     }
-    RealCorners = realCorners;
+    connectingCurveList = result;
   }
   #endregion
   #region Additional
