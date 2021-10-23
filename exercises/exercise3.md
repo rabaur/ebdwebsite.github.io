@@ -21,7 +21,7 @@ The goal is for you to quantitatively and qualitatively compare the differences 
 
 Towards this end, you will model in 3D (using Visualarq for Rhino) the existing or optimized ED (based on the images provided in the Miro board, link sent via email). Using this model, you will perform the walkthrough in Unity3D (follow the tutorial below) from the perspective of three typical users (patient, nurse, visitor) 
 
-**Submission date: 5.11.2021**
+**Submission date: 05.11.2021, 23:59**
 
 **Submission files:** 
 * A zip folder containing the csv files for each path, a video recording (Screen recording) of the generated heat map (see example in the Miro board). 
