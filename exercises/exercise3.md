@@ -38,7 +38,21 @@ Towards this end, you will model in 3D (using Visualarq for Rhino) the existing 
 * Group 2: Please use the same floor plan and adapt the area marked in red (See the Miro board) according to the physical mockup. 
 * Once you are happy with the model, export it in FBX format. 
 
+### UPDATE: More information for the modelling process
 
+#### Which part of the ED should we model exactly?
+You can restrict yourself to the part shaded in blue. ![Area of interest](/assets/images/exercise3/area_of_interest.jpg) Of course, you can always model beyond these boundaries if you want to.
+
+#### Which degree of detail will be required?
+The beauty of the VR-walkthrough is that you can create a relatively immersive experience. There is virtually no limit of what you  can achieve with Unity in terms of level of detail, but you should have modelled:
+* All walls.
+* All openings.
+* Windows or similar openings as good as possible with the primitives provided by VisualArq.
+* Furniture such as seating groups or stationary patient beds.
+You can find an example of student work with a good level of detail [here](https://polybox.ethz.ch/index.php/s/dFmbsTwYN9E2LYJ) (keep in mind that this is an office space). We have updated the [Miro board]( https://miro.com/app/board/o9J_loocpfU=/?invite_link_id=271054987729) with additional pictures of the ED and highly recommend that you draw some inspiration from them.
+
+#### (Group 2 only) How should we model the optimal scenario, given that there is no floorplan? 
+You can find a foam model of the optimal scenario in Patrik's presentation. Try to superimpose this layout on the ED. You can compensate the inevitable inaccuracies with your own archictural intuition.
 
 ## Part 2: Design the VR Walkthrough
 * Describe the journey of 3 typical occupants **(e.g., nurse, patient, visitor)**
