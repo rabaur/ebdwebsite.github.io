@@ -41,7 +41,11 @@ Towards this end, you will model in 3D (using Visualarq for Rhino) the existing 
 ### UPDATE: More information for the modelling process
 
 #### Which part of the ED should we model exactly?
-You can restrict yourself to the part shaded in blue. ![Area of interest](/assets/images/exercise3/area_of_interest.jpg) Of course, you can always model beyond these boundaries if you want to.
+You can restrict yourself to the part shaded in blue. 
+
+![Area of interest](/assets/images/exercise3/area_of_interest.jpg) 
+
+Of course, you can always model beyond these boundaries if you want to.
 
 #### Which degree of detail will be required?
 The beauty of the VR-walkthrough is that you can create a relatively immersive experience. There is virtually no limit of what you  can achieve with Unity in terms of level of detail, but you should have modelled:
