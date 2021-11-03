@@ -31,7 +31,7 @@ Towards this end, you will model in 3D (using Visualarq for Rhino) the existing 
 
 ## Part 1: Model the ED layout 
 * To model the layouts we will use VisualArq for Rhino. 
-* A tutorial showing how to model a floor plan from an image using visualarq can be found here: Link to the video tutorial
+* A tutorial showing how to model a floor plan from an image using visualarq can be found [here](https://drive.google.com/file/d/1NVp7wVHzlMYqUnkfs7qSa9iyu5t3iO9D/view)
 * For additional visualARQ tutorials, please visit this [link](https://www.visualarq.com/learn/videos/)
 
 * Group 1: Please use the floor plan of the ED (see the Miro board) as a basis for your modeling.
