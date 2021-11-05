@@ -85,7 +85,7 @@ You can find a foam model of the optimal scenario in Patrik's presentation. Try 
 We will use Unity3D in this exercise. In case you have not installed it yet, please do so following the instructions [here]({{ site.baseurl }}{% link software.md %}).
 
 The UnityProject (to get accustomed with the setting) and tutorial videos:
-* [UnityProject](https://polybox.ethz.ch/index.php/s/abt6xCtxFuwiPvj) of the tutorial (you can either build upon this project or make one from scratch).
+* [UnityProject](https://polybox.ethz.ch/index.php/s/abt6xCtxFuwiPvj) of the tutorial (you can either build upon this project or make one from scratch). **Changelog**: The current version of the script `CaptureWalkthrough` changes the output-format of the data depending on your regional configuration of Windows. For future projects, please exchange it with [this version](https://polybox.ethz.ch/index.php/s/Q1KQ0i8iN8DzkDF).
 * [Video 0](https://polybox.ethz.ch/index.php/s/WaQNPrHtU0ywizR): Reusing the tutorial project.
 * [Video 1](https://polybox.ethz.ch/index.php/s/plabTFa6Bwi3yrc): Introduction
 * [Video 2](https://polybox.ethz.ch/index.php/s/JNfsNKcsIIT0LHc): Setting up the Scene
