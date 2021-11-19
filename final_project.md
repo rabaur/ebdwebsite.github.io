@@ -31,5 +31,16 @@ permalink: /final_project/
 | Redesigned ED (option a) | Your hypothesis | Your hypothesis | Your hypothesis | Your hypothesis |
 | Redesigned ED (option b) | Your hypothesis | Your hypothesis | Your hypothesis | Your hypothesis |
 
+* This table is important as it provides a guide to how you evaluate your design.
+* Make sure you set performance criteria that you can measure using the tools provided.
 
+## Part 4: Generating design variations
+* Conduct the analysis using the tools learned in class.
+* Did you confirm or reject your hypotheses?
+* Is there another design that could have achieved better performance? If so, generate it and redo the analysis.
+
+## Part 5: Presenting your findings
+* Each group will have 25 minutes to present the project to external guests, the ED team and healthcare architects.
+* You can present the project in any way you find useful, from a presentation to a video.
+* Members of the winning group will get ???
 
