@@ -13,7 +13,7 @@ permalink: /final_project/
 [Software]({{ site.baseurl }}{% link software.md %})
 
 # Final Project
-* The final project will be a group project, you will keep the same groups as in Exc3
+* The final project can be done in groups or individualy. 
 * Your goal is to redesign the existing Emergency Department at the USZ using evidence-based design literature and the tools learned in class (the virtual reality walkthrough and spatial simulation tools).
 
 ## Part 1: Formulating your research questions 
@@ -50,7 +50,7 @@ permalink: /final_project/
 * Is there another design that could have achieved better performance? If so, generate it and redo the analysis.
 
 ## Part 5: Presenting your findings
-* Each group will have 25 minutes to present the project to external guests, the ED team and healthcare architects.
+* Each student/group will have 25 minutes to present the project to external guests, the ED team and healthcare architects.
 * You can present the project in any way you find useful, from a presentation to a video.
 
 the final date of the presentations will be set in collaboration with students (we will send you a Doodle).
