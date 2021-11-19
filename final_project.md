@@ -13,9 +13,11 @@ permalink: /final_project/
 [Software]({{ site.baseurl }}{% link software.md %})
 
 # Final Project
+* The final project will be a group project, you will keep the same groups as in Exc3
+* Your goal is to redesign the existing Emergency Department at the USZ using evidence-based design literature and the tools learned in class (the virtual reality walkthrough and spatial simulation tools).
 
 ## Part 1: Formulating your research questions 
-* Each project should formulate one or more research question and several design hypotheses.
+* Each project should formulate one or more research questions and several design hypotheses.
 * The research question should focus on the relationship between the architectural design and users’ behavior or experience in the ED. Try to ground your question in a problem or   opportunity you identified when conducting exc3. What can be improved? What is problematic in the current ED?
 * For instance:
   * How can the design of the emergency department layout improve patients' exposure to outdoor view and still reduce nurses’ walking distances?
