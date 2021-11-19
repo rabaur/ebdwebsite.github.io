@@ -17,10 +17,18 @@ permalink: /final_project/
 
 ## Part 2: Setting up your design hypotheses
 * Once you have defined your research questions, turn to the evidence-based design literature (consult with us as well) to develop a design hypothesis, for instance:
-  * By increasing the architectural differentiation at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical                destinations such as the nurse station or main waiting area.
-  or:
-  * By increasing visibility at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical destinations such as the nurse        station or main waiting area.
+  * By increasing the architectural differentiation at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical               destinations such as the nurse station or main waiting area.
+  * By increasing visibility at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical destinations such as the nurse       station or main waiting area.
 
-## Part 3
+## Part 3: Generating design variations
+* Once you formulated your research questions and design hypotheses, suggest and implement 2 design variations of the existing ED. Your design variations should be as systematic     as possible. For instance, if ‘increased visibility’ is your design strategy, try to have 3 conditions: the existing ED, the ED with medium visibility, and the ED with high       visibility.
+* In the crits left you will present your research question and design variations to us and received feedback in a group tutorial manner .
+* Once your design variations are finalized, prepare the following matrix that will be used by each group to analyze the design with respect to the hypotheses set:
+| Layout/performance criteria | Wayfinding efficiency (measured using ICD and in VR) | Staff collaboration (measured using SCI) | Layout efficiency (measured using YTI) | Patients’ visual  exposure to outdoor view (measured using VR) |
+|-|-|-|-|-|
+| Existing ED | Your hypothesis | Your hypothesis | Your hypothesis | Your hypothesis |
+| Redesigned ED (option a) | Your hypothesis | Your hypothesis | Your hypothesis | Your hypothesis |
+| Redesigned ED (option b) | Your hypothesis | Your hypothesis | Your hypothesis | Your hypothesis |
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+
