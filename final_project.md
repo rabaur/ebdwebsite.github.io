@@ -24,6 +24,7 @@ permalink: /final_project/
 * Once you formulated your research questions and design hypotheses, suggest and implement 2 design variations of the existing ED. Your design variations should be as systematic     as possible. For instance, if ‘increased visibility’ is your design strategy, try to have 3 conditions: the existing ED, the ED with medium visibility, and the ED with high       visibility.
 * In the crits left you will present your research question and design variations to us and received feedback in a group tutorial manner .
 * Once your design variations are finalized, prepare the following matrix that will be used by each group to analyze the design with respect to the hypotheses set:
+
 | Layout/performance criteria | Wayfinding efficiency (measured using ICD and in VR) | Staff collaboration (measured using SCI) | Layout efficiency (measured using YTI) | Patients’ visual  exposure to outdoor view (measured using VR) |
 |-|-|-|-|-|
 | Existing ED | Your hypothesis | Your hypothesis | Your hypothesis | Your hypothesis |
