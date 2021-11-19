@@ -42,7 +42,7 @@ permalink: /final_project/
 * This table is important as it provides a guide to how you evaluate your design.
 * Make sure you set performance criteria that you can measure using the tools provided.
 
-## Part 4: Generating design variations
+## Part 4: Running the analysis 
 * Conduct the analysis using the tools learned in class.
 * Did you confirm or reject your hypotheses?
 * Is there another design that could have achieved better performance? If so, generate it and redo the analysis.
@@ -51,4 +51,5 @@ permalink: /final_project/
 * Each group will have 25 minutes to present the project to external guests, the ED team and healthcare architects.
 * You can present the project in any way you find useful, from a presentation to a video.
 
+the final date of the presentations will be set in collaboration with students (we will send you a Doodle).
 
