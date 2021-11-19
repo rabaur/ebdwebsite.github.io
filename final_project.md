@@ -50,5 +50,5 @@ permalink: /final_project/
 ## Part 5: Presenting your findings
 * Each group will have 25 minutes to present the project to external guests, the ED team and healthcare architects.
 * You can present the project in any way you find useful, from a presentation to a video.
-* Members of the winning group will get ???
+
 
