@@ -17,9 +17,9 @@ permalink: /final_project/
 
 ## Part 2: Setting up your design hypotheses
 * Once you have defined your research questions, turn to the evidence-based design literature (consult with us as well) to develop a design hypothesis, for instance:
- * By increasing the architectural differentiation at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical                destinations such as the nurse station or main waiting area.
- or:
- * By increasing visibility at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical destinations such as the nurse        station or main waiting area.
+  * By increasing the architectural differentiation at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical                destinations such as the nurse station or main waiting area.
+  or:
+  * By increasing visibility at decision points, wayfinding would be made more efficient, resulting in people finding their way faster to typical destinations such as the nurse        station or main waiting area.
 
 ## Part 3
 
