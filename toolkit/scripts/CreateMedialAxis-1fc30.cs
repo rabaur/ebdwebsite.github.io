@@ -16,7 +16,7 @@ using System.Linq;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_84816 : GH_ScriptInstance
+public abstract class Script_Instance_1fc30 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -56,32 +56,12 @@ public abstract class Script_Instance_84816 : GH_ScriptInstance
   private void RunScript(List<Curve> voronoiDiagramCurveList, List<Curve> boundaryCurveList, Brep walkableSurfaceBrep, double boundaryProximityTolerance, ref object medialAxisCurveList)
   {
     // First "explode" all curves from the Voronoi-diagram into segments and eventually save them in array for parallel processing.
-    List<Line> allSegments = new List<Line>();
-    foreach (Curve curve in voronoiDiagramCurveList)
-    {
-      if (curve == null)
-      {
-        continue;
-      }
-      if (!curve.IsPolyline())
-      {
-        throw new Exception("Input curve was not polyline.");
-      }
-      Polyline polyline = new Polyline();
-      curve.TryGetPolyline(out polyline);
-      Line[] segments = polyline.GetSegments();
-      foreach (Line segment in segments)
-      {
-        allSegments.Add(segment);
-      }
-    }
+    Line[] allSegmentArray = CreateSegmentsSequential(voronoiDiagramCurveList); // For some reason, the sequential method is slightly faster here.
 
-    Line[] allSegmentArray = allSegments.ToArray();
-    bool[] mask = new bool[allSegmentArray.Length];
-    System.Threading.Tasks.Parallel.For(0, mask.Length, i =>
-      {
-      mask[i] = SegmentApproximatesMedialAxis(allSegmentArray[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
-      });
+    // Create mask for valid segments.
+    bool[] mask = SelectValidSegmentsParallel(allSegmentArray, boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance); // Parallel clearly faster.
+    
+    // Only select valid medial axis segments.
     List<Line> result = new List<Line>();
     for (int i = 0; i < allSegmentArray.Length; i++)
     {
@@ -95,13 +75,94 @@ public abstract class Script_Instance_84816 : GH_ScriptInstance
   #endregion
   #region Additional
 
+  private Line[] CreateSegmentsSequential(List<Curve> voronoiDiagramCurveList)
+  {
+    List<Line> allSegments = new List<Line>();
+    foreach (Curve curve in voronoiDiagramCurveList)
+    {
+      if (curve == null)
+      {
+        throw new Exception("Input curve was null.");
+      }
+      if (!curve.IsPolyline())
+      {
+        throw new Exception("Input curve was not polyline.");
+      }
+      Polyline polyline = new Polyline();
+      curve.TryGetPolyline(out polyline);
+      Line[] segments = polyline.GetSegments();
+      foreach (Line segment in segments)
+      {
+        allSegments.Add(segment);
+      }
+    }
+    return allSegments.ToArray();
+  }
+
+  private Line[] CreateSegmentsParallel(List<Curve> voronoiDiagramCurveList)
+  {
+    Line[][] segments = new Line[voronoiDiagramCurveList.Count][];
+    System.Threading.Tasks.Parallel.For(0, segments.Length, i =>
+    {
+      Curve curve = voronoiDiagramCurveList[i];
+      if (curve == null)
+      {
+        throw new Exception("Input curve was null.");
+      }
+      if (!curve.IsPolyline())
+      {
+        throw new Exception("Input curve was not polyline.");
+      }
+      Polyline polyline = new Polyline();
+      curve.TryGetPolyline(out polyline);
+      segments[i] = polyline.GetSegments();
+    });
+    return segments.SelectMany(a => a).ToArray();
+  }
+
+  /// <summary>
+  /// Parallel implementation: Selects all Voronoi-diagram segments that approximate the medial axis.
+  /// </summary>
+  /// <param name="segments">Segments of the Voronoi-diagram.</param>
+  /// <param name="boundaryCurveList">Boundary curves of the shape for which the medial axis is computed.</param>
+  /// <param name="walkableSurfaceBrep">Surface inside of the shape.</param>
+  /// <param name="boundaryProximityTolerance">If a segment is closer than that to the shape-boundary, it is discarded.</param>
+  /// <returns>A boolean array of the same length as <paramref name="segments"/>, acting as a mask for the valid segments.</returns>
+  private bool[] SelectValidSegmentsParallel(Line[] segments, List<Curve> boundaryCurveList, Brep walkableSurfaceBrep, double boundaryProximityTolerance)
+  {
+    bool[] mask = new bool[segments.Length];
+    System.Threading.Tasks.Parallel.For(0, mask.Length, i =>
+    {
+      mask[i] = IsValidSegment(segments[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
+    });
+    return mask;
+  }
+
+  /// <summary>
+  /// Sequential implementation: Selects all Voronoi-diagram segments that approximate the medial axis.
+  /// </summary>
+  /// <param name="segments">Segments of the Voronoi-diagram.</param>
+  /// <param name="boundaryCurveList">Boundary curves of the shape for which the medial axis is computed.</param>
+  /// <param name="walkableSurfaceBrep">Surface inside of the shape.</param>
+  /// <param name="boundaryProximityTolerance">If a segment is closer than that to the shape-boundary, it is discarded.</param>
+  /// <returns>A boolean array of the same length as <paramref name="segments"/>, acting as a mask for the valid segments.</returns>
+  private bool[] SelectValidSegmentsSequential(Line[] segments, List<Curve> boundaryCurveList, Brep walkableSurfaceBrep, double boundaryProximityTolerance)
+  {
+    bool[] mask = new bool[segments.Length];
+    for (int i = 0; i < segments.Length; i++)
+    {
+      mask[i] = IsValidSegment(segments[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
+    }
+    return mask;
+  }
+
   /// <summary>
   /// Checks if a segment belongs to the subgraph of the Voronoi-diagram that approximates the medial axis.
   /// </summary>
   /// <param name="segment">The segment for which to check.</param>
   /// <param name="boundaryCurves">The curves describing the boundary for which to find the medial axis.</param>
   /// <returns>true if is medial axis segment, false otherwise.</returns>
-  private bool SegmentApproximatesMedialAxis(Line segment, List<Curve> boundaryCurves, Brep walkableSurfaceBrep, double closenessTolerance)
+  private bool IsValidSegment(Line segment, List<Curve> boundaryCurves, Brep walkableSurfaceBrep, double closenessTolerance)
   {
     bool isIntersecting = SegmentIntersectsBoundary(segment, boundaryCurves, RhinoMath.SqrtEpsilon);
     bool isWalkable = SegmentIsOnWalkableSurface(segment, walkableSurfaceBrep, RhinoMath.SqrtEpsilon);
