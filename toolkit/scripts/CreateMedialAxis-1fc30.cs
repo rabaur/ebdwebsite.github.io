@@ -60,7 +60,7 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
 
     // Create mask for valid segments.
     bool[] mask = SelectValidSegmentsParallel(allSegmentArray, boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance); // Parallel clearly faster.
-    
+
     // Only select valid medial axis segments.
     List<Line> result = new List<Line>();
     for (int i = 0; i < allSegmentArray.Length; i++)
@@ -103,7 +103,7 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
   {
     Line[][] segments = new Line[voronoiDiagramCurveList.Count][];
     System.Threading.Tasks.Parallel.For(0, segments.Length, i =>
-    {
+      {
       Curve curve = voronoiDiagramCurveList[i];
       if (curve == null)
       {
@@ -116,7 +116,7 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
       Polyline polyline = new Polyline();
       curve.TryGetPolyline(out polyline);
       segments[i] = polyline.GetSegments();
-    });
+      });
     return segments.SelectMany(a => a).ToArray();
   }
 
@@ -132,9 +132,9 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
   {
     bool[] mask = new bool[segments.Length];
     System.Threading.Tasks.Parallel.For(0, mask.Length, i =>
-    {
+      {
       mask[i] = IsValidSegment(segments[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
-    });
+      });
     return mask;
   }
 
