@@ -7,7 +7,8 @@ layout: default
 [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})\
 [Final Project]({{ site.baseurl }}{% link final_project.md %})\
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
-[Software]({{ site.baseurl }}{% link software.md %})
+[Software]({{ site.baseurl }}{% link software.md %})\
+[Past Courses]({{ site.baseurl }}{% link past_courses.md %})\
 
 * * *
 
