@@ -8,7 +8,7 @@ layout: default
 [Final Project]({{ site.baseurl }}{% link final_project.md %})\
 [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
 [Software]({{ site.baseurl }}{% link software.md %})\
-[Past Courses]({{ site.baseurl }}{% link past_courses.md %})\
+[Past Courses]({{ site.baseurl }}{% link past_courses.md %})
 
 * * *
 
