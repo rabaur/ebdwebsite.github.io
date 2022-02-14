@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Software
-permalink: /software/
 ---
 
 [Exercise 1]({{ site.baseurl }}{% link HS21/exercises/exercise1.md %})\

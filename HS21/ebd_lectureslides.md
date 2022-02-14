@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Evidence-based Design Lecture Slides
-permalink: /ebd_lectureslides/
 ---
 
 [Exercise 1]({{ site.baseurl }}{% link HS21/exercises/exercise1.md %})\

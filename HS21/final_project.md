@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Final Project
-permalink: /final_project/
 ---
 
 
