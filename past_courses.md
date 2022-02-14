@@ -1,7 +1,7 @@
 ---
 layout: default
-title: Software
-permalink: /software/
+title: Past Courses
+permalink: /past_courses/
 ---
 
 [Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})\
