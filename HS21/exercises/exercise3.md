@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Exercise3
-permalink: /exercise3/
+permalink: /exercise3_h21/
 ---
 
 [Exercise 1]({{ site.baseurl }}{% link HS21/exercises/exercise1.md %})\
