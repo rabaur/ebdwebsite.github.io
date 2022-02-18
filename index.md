@@ -10,7 +10,7 @@ layout: default
 [Software]({{ site.baseurl }}{% link software.md %})\
 [Past Courses]({{ site.baseurl }}{% link past_courses.md %})
 
-{% include figure image_path="/assets/images/EBDposter22 - Poster1.jpeg" alt="poster1" caption="" %}{: .w-100 .tc}
+![An example pair of cards](/assets/images/EBDposter22 - Poster1.jpeg)
 
 * * *
 
