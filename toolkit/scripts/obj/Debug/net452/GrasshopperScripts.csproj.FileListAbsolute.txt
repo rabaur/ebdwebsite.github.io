@@ -1,0 +1,5 @@
+C:\Users\rapha\Documents\ebdwebsite.github.io\toolkit\scripts\obj\Debug\net452\GrasshopperScripts.csproj.AssemblyReference.cache
+C:\Users\rapha\Documents\ebdwebsite.github.io\toolkit\scripts\obj\Debug\net452\GrasshopperScripts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rapha\Documents\ebdwebsite.github.io\toolkit\scripts\obj\Debug\net452\GrasshopperScripts.AssemblyInfoInputs.cache
+C:\Users\rapha\Documents\ebdwebsite.github.io\toolkit\scripts\obj\Debug\net452\GrasshopperScripts.AssemblyInfo.cs
+C:\Users\rapha\Documents\ebdwebsite.github.io\toolkit\scripts\obj\Debug\net452\GrasshopperScripts.csproj.CoreCompileInputs.cache

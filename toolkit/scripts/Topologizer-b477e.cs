@@ -53,7 +53,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects)
+  private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, int idx1, int idx2, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs)
   {
     List<Curve> splitSegments = new List<Curve>();
     foreach (Curve seg in SegmentCurveList)
@@ -120,8 +120,8 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         splitSegments.Add(seg);
       }
     }
-
-    List<Point3d> specInter = new List<Point3d>();
+    step1Segs = new List<Curve>(splitSegments);
+    
     for (int i = 0; i < splitSegments.Count; i++)
     {
       Curve seg0 = splitSegments[i];
@@ -137,6 +137,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         {
           continue;
         }
+
         // Check for overlaps.
         foreach (IntersectionEvent intersect in intersects)
         {
@@ -158,60 +159,58 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
             }
             continue;
           }
-
-          // Check if the first segment is completely covered by the second one.
-          if (intersect.OverlapA.Min <= seg0.Domain.Min + RhinoMath.SqrtEpsilon && seg0.Domain.Max - RhinoMath.SqrtEpsilon <= intersect.OverlapA.Max)
+          else // Intersection is overlap.
           {
-            splitSegments[i] = null;
-          }
-          else
-          {
-            // Otherwise just remove the part from the first segment that is overlapping.
-            bool minInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Min, RhinoMath.SqrtEpsilon);
-            bool maxInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Max, RhinoMath.SqrtEpsilon);
-
-            // Ensure that always exactly one side of the interval is in the domain, otherwise this would not be a valid overlap.
-            if (!minInDomain ^ maxInDomain)
+            // Check if the first segment is completely covered by the second one.
+            if (intersect.OverlapA.Min <= seg0.Domain.Min + RhinoMath.SqrtEpsilon && seg0.Domain.Max - RhinoMath.SqrtEpsilon <= intersect.OverlapA.Max)
             {
-              crv1 = seg0;
-              crv2 = seg1;
-              if (intersect.OverlapA.Max - intersect.OverlapA.Min < RhinoMath.SqrtEpsilon || intersect.OverlapB.Max - intersect.OverlapB.Min < RhinoMath.SqrtEpsilon)
-              {
-                // This should actually be a point-intersection, but for some reason, Rhino fucked up.
-                if (!IsCurveEndPoint(seg0, intersect.ParameterA, RhinoMath.SqrtEpsilon))
-                {
-                  // Curves intersect at endpoints, so we can ignore that case.
-                  Curve[] split0 = seg0.Split(intersect.ParameterA);
-                  Curve longerSeg0 = split0[0].GetLength() > split0[1].GetLength() ? split0[0] : split0[1];
-                  splitSegments[i] = longerSeg0;
-                }
-                if (!IsCurveEndPoint(seg1, intersect.ParameterB, RhinoMath.SqrtEpsilon))
-                {
-                  Curve[] split1 = seg1.Split(intersect.ParameterB);
-                  Curve longerSeg1 = split1[0].GetLength() > split1[1].GetLength() ? split1[0] : split1[1];
-                  splitSegments[j] = longerSeg1;
-                }
-                continue;
-              }
-              // throw new Exception(intersect.OverlapB + "Not a valid overlap: " + intersect.OverlapA.Min + ", " + intersect.OverlapA.Max);
-            }
-
-            Print(intersect.OverlapB.ToString());
-            Curve segmentToSurvive;
-            if (minInDomain)
-            {
-              segmentToSurvive = seg0.Split(intersect.OverlapA.Min)[1];
+              splitSegments[i] = null;
             }
             else
             {
-              segmentToSurvive = seg1.Split(intersect.OverlapA.Max)[0];
+              // Otherwise just remove the part from the first segment that is overlapping.
+              bool minInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Min, RhinoMath.SqrtEpsilon);
+              bool maxInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Max, RhinoMath.SqrtEpsilon);
+
+              // Ensure that always exactly one side of the interval is in the domain, otherwise this would not be a valid overlap.
+              if (!minInDomain ^ maxInDomain)
+              {
+                if (intersect.OverlapA.Max - intersect.OverlapA.Min < RhinoMath.SqrtEpsilon || intersect.OverlapB.Max - intersect.OverlapB.Min < RhinoMath.SqrtEpsilon)
+                {
+                  // This should actually be a point-intersection, but for some reason, Rhino fucked up.
+                  if (!IsCurveEndPoint(seg0, intersect.ParameterA, RhinoMath.SqrtEpsilon))
+                  {
+                    // Curves intersect at endpoints, so we can ignore that case.
+                    Curve[] split0 = seg0.Split(intersect.ParameterA);
+                    Curve longerSeg0 = split0[0].GetLength() > split0[1].GetLength() ? split0[0] : split0[1];
+                    splitSegments[i] = longerSeg0;
+                  }
+                  if (!IsCurveEndPoint(seg1, intersect.ParameterB, RhinoMath.SqrtEpsilon))
+                  {
+                    Curve[] split1 = seg1.Split(intersect.ParameterB);
+                    Curve longerSeg1 = split1[0].GetLength() > split1[1].GetLength() ? split1[0] : split1[1];
+                    splitSegments[j] = longerSeg1;
+                  }
+                  continue;
+                }
+                continue;
+              }
+              Curve segmentToSurvive;
+              if (minInDomain)
+              {
+                segmentToSurvive = seg0.Split(intersect.OverlapA.Min)[0];
+              }
+              else
+              {
+                segmentToSurvive = seg0.Split(intersect.OverlapA.Max)[1];
+              }
+              splitSegments[i] = segmentToSurvive;
+              seg0 = segmentToSurvive;
             }
-            splitSegments[i] = segmentToSurvive;
           }
         }
       }
     }
-    specialIntersects = specInter;
     SplitSegments = splitSegments;
 
     // Building segment graph where segments are nodes and there is and edge between segments iff they intersect at a point which is not a branchpoint.
@@ -219,6 +218,10 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
     for (int i = 0; i < splitSegments.Count; i++)
     {
       Curve seg0 = splitSegments[i];
+      if (seg0 == null)
+      {
+        continue;
+      }
       segmentGraph[seg0] = new List<Curve> { seg0 };
       for (int j = 0; j < splitSegments.Count; j++)
       {
@@ -227,6 +230,10 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           continue;
         }
         Curve seg1 = splitSegments[j];
+        if (seg1 == null)
+        {
+          continue;
+        }
         CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon);
 
         // No intersections between curves.
@@ -292,16 +299,10 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
       if (joinedConnectedComponent.Length > 1)
       {
         CurveIntersections intersects = Intersection.CurveCurve(joinedConnectedComponent[0], joinedConnectedComponent[1], RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon);
-        Print(intersects.Count.ToString());
-        Print(intersects[0].IsOverlap.ToString());
-        Print(intersects[0].OverlapA.ToString());
-        crv1 = joinedConnectedComponent[0];
-        crv2 = joinedConnectedComponent[1];
       }
       joinedSegments.Add(joinedConnectedComponent[0]);
     }
     BranchPointDelimitedCurvesList = joinedSegments;
-
   }
   #endregion
   #region Additional

@@ -4,19 +4,19 @@ using System.Collections.Generic;
 
 using Rhino;
 using Rhino.Geometry;
+using Rhino.Geometry.Intersect;
 
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
-using Rhino.Geometry.Intersect;
 
 
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_5b144 : GH_ScriptInstance
+public abstract class Script_Instance_20516 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -53,71 +53,25 @@ public abstract class Script_Instance_5b144 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, ref object UncoveredSegmentCurves)
+  private void RunScript(List<Curve> Segments, ref object PairwiseSplitSegments)
   {
-    // Sort segments by length.
-    double[] lengths = new double[SegmentCurveList.Count];
-    for (int i = 0; i < SegmentCurveList.Count; i++)
+    List<Curve> pairwiseSplitCurves = new List<Curve>();
+    foreach (Curve seg0 in Segments)
     {
-      lengths[i] = SegmentCurveList[i].GetLength();
-    }
-    Curve[] segmentCurveArray = SegmentCurveList.ToArray();
-    Array.Sort(lengths, segmentCurveArray);
-    Array.Reverse(segmentCurveArray);
-
-    // Create mask indicating if segment is covered.
-    bool[] covered = new bool[segmentCurveArray.Length];
-
-    // Test for each pair if the segment of greater or equal length completely covers the smaller segment.
-    for (int i = 0; i < segmentCurveArray.Length; i++)
-    {
-      if (covered[i])
+      List<Curve> split = new List<Curve>();
+      foreach (Curve seg1 in Segments)
       {
-        continue;
-      }
-      Curve largeSeg = segmentCurveArray[i];
-      for (int j = i + 1; j < segmentCurveArray.Length; j++)
-      {
-        if (covered[j])
+        if (seg0 == seg1)
         {
           continue;
         }
-        Curve smallSeg = segmentCurveArray[j];
-        // Check if the smaller curve is covered completely by the larger curve, i.e.:
-        // 1. There is an intersection.
-        // 2. This intersection is an overlap.
-        // 3. Up to some tolerance, the overlap domain is equivalent to the domain of the smaller curve.
-        CurveIntersections intersects = Intersection.CurveCurve(largeSeg, smallSeg, 0.1, 0.1);
-        if (intersects == null)
+        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 0.01, 0.01);
+        if (intersects != null)
         {
-          // No intersections.
           continue;
         }
-        foreach (IntersectionEvent intersect in intersects)
-        {
-          if (!intersect.IsOverlap)
-          {
-            continue;
-          }
-          Interval smallDomain = smallSeg.Domain;
-          if (intersect.OverlapB.Min <= smallDomain.Min + RhinoMath.SqrtEpsilon && smallDomain.Max - RhinoMath.SqrtEpsilon <= intersect.OverlapB.Max)
-          {
-            covered[j] = true;
-          }
-        }
       }
     }
-
-    // Filter curves that are covered.
-    List<Curve> notCovered = new List<Curve>();
-    for (int i = 0; i < segmentCurveArray.Length; i++)
-    {
-      if (!covered[i])
-      {
-        notCovered.Add(segmentCurveArray[i]);
-      }
-    }
-    UncoveredSegmentCurves = notCovered;
   }
   #endregion
   #region Additional

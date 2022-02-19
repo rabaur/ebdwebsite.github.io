@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using Rhino;
 using Rhino.Geometry;
-using Rhino.Geometry.Intersect;
 
 using Grasshopper;
 using Grasshopper.Kernel;
@@ -16,7 +15,7 @@ using Grasshopper.Kernel.Types;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_e843e : GH_ScriptInstance
+public abstract class Script_Instance_55e12 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -53,28 +52,40 @@ public abstract class Script_Instance_e843e : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, ref object BranchPointList, ref object BranchPointDelimitedSegmentCurveList)
+  private void RunScript(List<Curve> BoundarySegmentCurveList, double StepSize, ref object SampleParametersTree, ref object AdaptedIntervalBoundarySegmentList)
   {
-
+    // Each element is a list of points where the boundary should be sampled.
+    List<List<double>> sampleLocationList = new List<List<double>>();
+    foreach (Curve boundarySegment in BoundarySegmentCurveList)
+    {
+      double curveLength = boundarySegment.GetLength();
+      int regularlySpacedSampleNum = (int)Math.Floor(curveLength / (2 * StepSize));
+      boundarySegment.Domain.MakeIncreasing();
+      Interval boundaryDomain = boundarySegment.Domain;
+      double stepSizeParamSpace = boundaryDomain.Length * (StepSize / curveLength);
+      List<double> sampleLocations = new List<double>();
+      for (int i = 0; i < regularlySpacedSampleNum; i++)
+      {
+        sampleLocations.Add(boundaryDomain.Min + i * stepSizeParamSpace);
+        sampleLocations.Add(boundaryDomain.Max - i * stepSizeParamSpace);
+      }
+      sampleLocationList.Add(sampleLocations);
+    }
+    SampleParametersTree = ListOfListsToTree(sampleLocationList);
+    AdaptedIntervalBoundarySegmentList = BoundarySegmentCurveList;
   }
   #endregion
   #region Additional
-
-  /// <summary>
-  /// The script receives a list of explodes medial axis segments as input. In order to reduce complexity, branchpoint-classification is done on 
-  /// sublists of segments that are contiguous.
-  /// </summary>
-  /// <param name="segments">Non-empty list of possibly discontiguous medial axis segments.</param>
-  /// <returns>List of lists of contiguous medial axis segments.</returns>
-  private List<List<Curve>> PartitionInputIntoContiguousSubLists(List<Curve> segments)
+  DataTree<T> ListOfListsToTree<T>(List<List<T>> list)
   {
-    List<Curve> subList = new List<Curve>();
-    subList.Add(segments[0]);
-    for (int i = 1; i < segments.Count; i++)
+    DataTree<T> tree = new DataTree<T>();
+    int i = 0;
+    foreach (List<T> innerList in list)
     {
-      Rhino.Geometry.Intersect.CurveIntersections intersect = Rhino.
-      if (Rhino.InsubList[subList.Count - 1].)
+      tree.AddRange(innerList, new GH_Path(new int[] { 0, i }));
+      i++;
     }
+    return tree;
   }
   #endregion
 }
