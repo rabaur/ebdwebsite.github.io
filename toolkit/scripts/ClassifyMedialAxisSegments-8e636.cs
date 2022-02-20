@@ -123,6 +123,13 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       {
         startIdx++;
       }
+
+      if (startIdx == currTypes.Count)
+      {
+        // This segment only consists of full ligatures, so we can set the startIdx back to 0.
+        startIdx = 0;
+      }
+
       double lastFullLigParam = startIdx > 1 ? currParams[startIdx - 1] : 0.0;
 
       // Find first switch-point. Work from inside to outside.
@@ -159,6 +166,12 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       {
         endIdx--;
       }
+
+      if (endIdx == -1)
+      {
+        // We went all the way to the beginning. We can set the index to the last element.
+        endIdx = currTypes.Count - 1;
+      }
       double firstFullLigParam = endIdx < currTypes.Count - 1 ? currParams[endIdx + 1] : 1.0;
 
       // Find last switch-point. Work from inside to outside.
@@ -178,6 +191,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
 
     ClassifiedPointList = queryPoints;
     TypeList = types;
+    
     List<Point3d> switchPoints = new List<Point3d>();
     List<Line> chords = new List<Line>();
     foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medialAxisCurve2SwitchPointList)

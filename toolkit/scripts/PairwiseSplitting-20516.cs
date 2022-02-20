@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 using Rhino;
 using Rhino.Geometry;
-using Rhino.Geometry.Intersect;
 
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
+using Rhino.Geometry.Intersect;
 
 
 /// <summary>
@@ -58,20 +58,35 @@ public abstract class Script_Instance_20516 : GH_ScriptInstance
     List<Curve> pairwiseSplitCurves = new List<Curve>();
     foreach (Curve seg0 in Segments)
     {
-      List<Curve> split = new List<Curve>();
+      List<double> splitParams = new List<double>();
       foreach (Curve seg1 in Segments)
       {
         if (seg0 == seg1)
         {
           continue;
         }
-        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 0.01, 0.01);
-        if (intersects != null)
+        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 0.1, 0.1);
+        if (intersects == null)
         {
           continue;
         }
+        foreach (IntersectionEvent intersect in intersects)
+        {
+          if (intersect.IsPoint)
+          {
+            splitParams.Add(intersect.ParameterA);
+          }
+        }
       }
+      Curve[] splitCurves = seg0.Split(splitParams);
+      Print(splitCurves.Length.ToString());
+      if (splitCurves == null)
+      {
+        throw new Exception("Splitting curve did not yield correct result.");
+      }
+      pairwiseSplitCurves.AddRange(splitCurves);
     }
+    PairwiseSplitSegments = pairwiseSplitCurves;
   }
   #endregion
   #region Additional

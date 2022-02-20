@@ -211,6 +211,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         }
       }
     }
+    
     SplitSegments = splitSegments;
 
     // Building segment graph where segments are nodes and there is and edge between segments iff they intersect at a point which is not a branchpoint.
@@ -234,7 +235,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         {
           continue;
         }
-        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon);
+        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 0.01, 0.01);
 
         // No intersections between curves.
         if (intersects == null)

@@ -82,7 +82,7 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
     {
       if (curve == null)
       {
-        throw new Exception("Input curve was null.");
+        continue;
       }
       if (!curve.IsPolyline())
       {

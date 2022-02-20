@@ -52,10 +52,10 @@ public abstract class Script_Instance_55e12 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> BoundarySegmentCurveList, double StepSize, ref object SampleParametersTree, ref object AdaptedIntervalBoundarySegmentList)
+  private void RunScript(List<Curve> BoundarySegmentCurveList, double StepSize, ref object SamplePoints)
   {
     // Each element is a list of points where the boundary should be sampled.
-    List<List<double>> sampleLocationList = new List<List<double>>();
+    List<Point3d> sampleLocations = new List<Point3d>();
     foreach (Curve boundarySegment in BoundarySegmentCurveList)
     {
       double curveLength = boundarySegment.GetLength();
@@ -63,16 +63,14 @@ public abstract class Script_Instance_55e12 : GH_ScriptInstance
       boundarySegment.Domain.MakeIncreasing();
       Interval boundaryDomain = boundarySegment.Domain;
       double stepSizeParamSpace = boundaryDomain.Length * (StepSize / curveLength);
-      List<double> sampleLocations = new List<double>();
-      for (int i = 0; i < regularlySpacedSampleNum; i++)
+      for (int i = 1; i < regularlySpacedSampleNum + 1; i++)
       {
-        sampleLocations.Add(boundaryDomain.Min + i * stepSizeParamSpace);
-        sampleLocations.Add(boundaryDomain.Max - i * stepSizeParamSpace);
+        sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Min + i * stepSizeParamSpace));
+        sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Max - i * stepSizeParamSpace));
       }
-      sampleLocationList.Add(sampleLocations);
+      sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Mid));
     }
-    SampleParametersTree = ListOfListsToTree(sampleLocationList);
-    AdaptedIntervalBoundarySegmentList = BoundarySegmentCurveList;
+    SamplePoints = sampleLocations;
   }
   #endregion
   #region Additional

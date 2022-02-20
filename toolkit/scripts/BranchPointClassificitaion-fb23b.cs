@@ -54,7 +54,7 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, ref object BranchPointList, ref object BranchPointDelimitedCurveList)
+  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, int idx, ref object BranchPointList, ref object BranchPointDelimitedCurveList, ref object SelectedAngles)
   {
     List<List<Curve>> contiguousSegmentList = PartitionSegmentsByAdjacencyParallel(SegmentCurveList); // Empirically, parallel method was substantially faster.
 
@@ -71,11 +71,45 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
       // Insert split segments back into list. Notice the order.
       contiguousSegments.Insert(0, splitFirstSeg[1]);
       contiguousSegments.Insert(0, splitFirstSeg[0]);
+
+      Curve lastSeg = contiguousSegments[contiguousSegments.Count - 1];
+      Curve[] splitLastSeg = lastSeg.Split(lastSeg.Domain.Mid);
+      if (splitLastSeg == null)
+      {
+        throw new Exception("Splitting first segment yielded null");
+      }
+
+      // Insert split segments back into list. Notice the order.
+      contiguousSegments.Insert(contiguousSegments.Count - 1, splitLastSeg[0]);
+      contiguousSegments.Insert(contiguousSegments.Count - 1, splitLastSeg[1]);
     }
+
+    // Find branchpoints first, then split segments.
+    List<Point3d> branchPoints = new List<Point3d>();
+    foreach (List<Curve> contiguousSegments in contiguousSegmentList)
+    {
+      double[] angles = CalculateAngles(contiguousSegments);
+      double[] sndDers = FiniteDifferences(angles);
+      for (int i = 0; i < sndDers.Length - 1; i++)
+      {
+        double currSndDer = sndDers[i];
+        double nextSndDer = sndDers[i + 1];
+        double diff = Math.Abs(currSndDer - nextSndDer);
+        bool branchPointDetected = ContainsPointParallel(contiguousSegments[i + 1].PointAtEnd, branchPoints, RhinoMath.SqrtEpsilon);
+        if (currSndDer > 0.0 && nextSndDer < 0.0 && diff >= LowerTolerance && diff <= UpperTolerance || branchPointDetected)
+        {
+          if (!branchPointDetected)
+          {
+            branchPoints.Add(contiguousSegments[i + 1].PointAtEnd);
+          }
+        }
+      }
+    }
+
+    Print("Number of branchpoints: " + branchPoints.Count);
 
     // Find branchpoints for each list of contiguous segments.
     List<Curve> branchPointDelimitedSegments = new List<Curve>();
-    List<Point3d> branchPoints = new List<Point3d>();
     foreach (List<Curve> contiguousSegments in contiguousSegmentList)
     {
       double[] angles = CalculateAngles(contiguousSegments);
@@ -86,8 +120,9 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
         currSegs.Add(contiguousSegments[i + 1]);
         double currSndDer = sndDers[i];
         double nextSndDer = sndDers[i + 1];
-        double diff = currSndDer - nextSndDer;
-        if (currSndDer > 0.0 && nextSndDer < 0.0 && diff >= LowerTolerance && diff <= UpperTolerance)
+        double diff = Math.Abs(currSndDer - nextSndDer);
+        bool branchPointDetected = ContainsPointParallel(contiguousSegments[i + 1].PointAtEnd, branchPoints, RhinoMath.SqrtEpsilon);
+        if (currSndDer > 0.0 && nextSndDer < 0.0 && diff >= LowerTolerance && diff <= UpperTolerance || branchPointDetected)
         {
           Curve[] joinedCurves = Curve.JoinCurves(currSegs, RhinoMath.SqrtEpsilon);
           if (joinedCurves.Length == 0)
@@ -95,7 +130,10 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
             throw new Exception("Joining curves was not successful.");
           }
           branchPointDelimitedSegments.AddRange(joinedCurves);
-          branchPoints.Add(contiguousSegments[i + 1].PointAtEnd);
+          if (!branchPointDetected)
+          {
+            branchPoints.Add(contiguousSegments[i + 1].PointAtEnd);
+          }
           currSegs = new List<Curve>();
         }
       }
@@ -115,18 +153,7 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
     }
     BranchPointDelimitedCurveList = branchPointDelimitedSegments;
     BranchPointList = branchPoints;
-
-    /*
-    double[] angles = CalculateAngles(contiguousSegmentList[0]);
-    Angles = angles;
-    double[] sndDers = FiniteDifferences(angles);
-    SndDers = sndDers;
-    */
-
-    foreach (List<Curve> contigSegs in contiguousSegmentList)
-    {
-      Print(contigSegs.Count.ToString());
-    }
+    SelectedAngles = branchPointDelimitedSegments[idx];
   }
   #endregion
   #region Additional
@@ -219,6 +246,23 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
       diffs[i] = values[i + 1] - values[i];
     }
     return diffs;
+  }
+
+  private bool ContainsPointParallel(Point3d queryPoint, List<Point3d> pointList, double tol)
+  {
+    bool[] isClose = new bool[pointList.Count];
+    System.Threading.Tasks.Parallel.For(0, pointList.Count, i =>
+    {
+      isClose[i] = queryPoint.DistanceTo(pointList[i]) < tol;
+    });
+    for (int i = 0; i < isClose.Length; i++)
+    {
+      if (isClose[i])
+      {
+        return true;
+      }
+    }
+    return false;
   }
   #endregion
 }

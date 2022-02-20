@@ -56,11 +56,12 @@ public abstract class Script_Instance_5b144 : GH_ScriptInstance
   private void RunScript(List<Curve> SegmentCurveList, ref object UncoveredSegmentCurves)
   {
     // Sort segments by length.
+    // Lustig lustig trallalala
     double[] lengths = new double[SegmentCurveList.Count];
-    for (int i = 0; i < SegmentCurveList.Count; i++)
+    System.Threading.Tasks.Parallel.For(0, SegmentCurveList.Count, i =>
     {
       lengths[i] = SegmentCurveList[i].GetLength();
-    }
+    });
     Curve[] segmentCurveArray = SegmentCurveList.ToArray();
     Array.Sort(lengths, segmentCurveArray);
     Array.Reverse(segmentCurveArray);
@@ -82,12 +83,13 @@ public abstract class Script_Instance_5b144 : GH_ScriptInstance
         {
           continue;
         }
+
         Curve smallSeg = segmentCurveArray[j];
         // Check if the smaller curve is covered completely by the larger curve, i.e.:
         // 1. There is an intersection.
         // 2. This intersection is an overlap.
         // 3. Up to some tolerance, the overlap domain is equivalent to the domain of the smaller curve.
-        CurveIntersections intersects = Intersection.CurveCurve(largeSeg, smallSeg, 0.1, 0.1);
+        CurveIntersections intersects = Intersection.CurveCurve(largeSeg, smallSeg, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon);
         if (intersects == null)
         {
           // No intersections.

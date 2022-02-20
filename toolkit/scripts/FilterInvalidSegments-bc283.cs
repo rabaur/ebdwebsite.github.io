@@ -57,7 +57,7 @@ public abstract class Script_Instance_bc283 : GH_ScriptInstance
     List<Curve> filteredSegments = new List<Curve>();
     foreach (Curve segment in SegmentCurveList)
     {
-      if (segment.GetLength() >= MinLength || ContainsPointParallel(segment.PointAtStart, BranchPointList, RhinoMath.SqrtEpsilon) && ContainsPointParallel(segment.PointAtEnd, BranchPointList, RhinoMath.SqrtEpsilon))
+      if (segment.GetLength() >= MinLength || ContainsPointParallel(segment.PointAtStart, BranchPointList, RhinoMath.SqrtEpsilon) || ContainsPointParallel(segment.PointAtEnd, BranchPointList, RhinoMath.SqrtEpsilon))
       {
         filteredSegments.Add(segment);
       }
