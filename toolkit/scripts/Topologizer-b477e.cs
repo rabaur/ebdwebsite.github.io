@@ -146,6 +146,10 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
             if (!IsCurveEndPoint(seg0, intersect.ParameterA, RhinoMath.SqrtEpsilon))
             {
               Curve[] split0 = seg0.Split(intersect.ParameterA);
+              if (split0 == null)
+              {
+                throw new Exception("Splitting at point intersection with first segment failed.");
+              }
               Curve longerSeg0 = split0[0].GetLength() > split0[1].GetLength() ? split0[0] : split0[1];
               splitSegments[i] = longerSeg0;
               seg0 = longerSeg0;
