@@ -54,7 +54,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> MedialAxisCurveList, double InitialStepSize, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, int idx, double t, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries, ref object chord1, ref object chord2, ref object qPoint, ref object radius1, ref object radius2, ref object SwitchPointChords, ref object crv1, ref object crv2, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object CheckLines)
+  private void RunScript(List<Curve> MedialAxisCurveList, double InitialStepSize, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, int idx, double t, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries, ref object chord1, ref object chord2, ref object qPoint, ref object radius1, ref object radius2, ref object SwitchPointChords, ref object crv1, ref object crv2, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object CheckLines, ref object FaultyCurves, ref object segsToSurf, ref object typesToSurf, ref object line0ToSurf, ref object line1ToSurf)
   {
     Curve selectedCurve = MedialAxisCurveList[idx];
     qPoint = selectedCurve.PointAt(t);
@@ -148,19 +148,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       // Now we will construct all switch points:
       int currType = currTypes[startIdx];
       double lastParam = currParams[startIdx];
-      for (int i = startIdx + 1; i < currTypes.Count; i++)
-      {
-        // If the types differ, there must lie a switchpoint between these two classified points.
-        if (currTypes[i] != currType)
-        {
-          double switchParam = FindSwitchPoint(medialAxisCurve, CornerPointList, BoundaryCurveList, lastParam, currParams[i], currType);
-          medialAxisCurve2SwitchPointList[medialAxisCurve].Add(new SwitchPoint(switchParam, currType, currTypes[i]));
-          currType = currTypes[i];
-          lastParam = currParams[i];
-        }
-      }
-
-      // Find last point that is not classified as full-ligature. The segment after this point will be assumend to be a full ligature.
       int endIdx = currTypes.Count - 1;
       while (endIdx >= 0 && currTypes[endIdx] == 2)
       {
@@ -172,6 +159,18 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
         // We went all the way to the beginning. We can set the index to the last element.
         endIdx = currTypes.Count - 1;
       }
+      for (int i = startIdx + 1; i < endIdx + 1; i++)
+      {
+        // If the types differ, there must lie a switchpoint between these two classified points.
+        if (currTypes[i] != currType)
+        {
+          double switchParam = FindSwitchPoint(medialAxisCurve, CornerPointList, BoundaryCurveList, lastParam, currParams[i], currType);
+          medialAxisCurve2SwitchPointList[medialAxisCurve].Add(new SwitchPoint(switchParam, currType, currTypes[i]));
+          currType = currTypes[i];
+          lastParam = currParams[i];
+        }
+      }
+
       double firstFullLigParam = endIdx < currTypes.Count - 1 ? currParams[endIdx + 1] : 1.0;
 
       // Find last switch-point. Work from inside to outside.
@@ -209,14 +208,46 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     // Create surfaces.
     List<Brep> elementaryBreps = new List<Brep>();
     List<int> elementaryBrepTypes = new List<int>();
+    List<Curve> faultySegs = new List<Curve>();
+    List<Curve> segmentForEachSurf = new List<Curve>();
+    List<string> typesForEachSurf = new List<string>();
+    List<Curve> line0ForEachSurf = new List<Curve>();
+    List<Curve> line1ForEachSurf = new List<Curve>();
     foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medialAxisCurve2SwitchPointList)
     {
       Curve medaxCurve = keyVal.Key;
       List<SwitchPoint> switches = keyVal.Value;
+      if (switches[0].prevType != 2)
+      {
+        throw new Exception("First ligature type was not 2");
+      }
+      if (switches[switches.Count - 1].nextType != 2)
+      {
+        throw new Exception("Last ligature type was not 2");
+      }
+      if (switches.Count == 2)
+      {
+        if (switches[0].nextType == 2 && switches[1].prevType == 2)
+        {
+          continue;
+        }
+      }
       for (int i = 0; i < switches.Count - 1; i++)
       {
         Chord c0 = GetChordParallel(medaxCurve.PointAt(switches[i].param), BoundaryCurveList);
         Chord c1 = GetChordParallel(medaxCurve.PointAt(switches[i + 1].param), BoundaryCurveList);
+        line0ForEachSurf.Add(c0.line);
+        line1ForEachSurf.Add(c1.line);
+        Curve currTrim = medaxCurve.Trim(switches[i].param, switches[i + 1].param);
+        segmentForEachSurf.Add(medaxCurve.Trim(switches[i].param, switches[i + 1].param));
+        typesForEachSurf.Add(switches[i].prevType + ", " + switches[i].nextType + ", " + switches[i + 1].prevType + ", " + switches[i + 1].nextType );
+        if (currTrim != null)
+        {
+          if (currTrim.GetLength() < 0.1 && switches[i].nextType == 1 && ContainsPointParallel(currTrim.PointAtStart, BranchPointList, 0.1))
+          {
+            continue;
+          }
+        }
 
         List<Curve> edges = new List<Curve> { c0.line, c1.line }; // Contains the edges of the surface to be generated.
 
@@ -268,9 +299,24 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
           }
         }
         elementaryBreps.Add(Brep.CreateEdgeSurface(edges));
+        if (switches[i].nextType != switches[i+1].prevType)
+        {
+          string allSwitches = "";
+          foreach (SwitchPoint switchPoint in switches)
+          {
+            allSwitches += switchPoint.prevType + ", " + switchPoint.nextType + ", ";
+          }
+          Print(allSwitches);
+          faultySegs.Add(medaxCurve);
+        }
         elementaryBrepTypes.Add(switches[i].nextType);
       }
     }
+    FaultyCurves = faultySegs;
+    segsToSurf = segmentForEachSurf;
+    typesToSurf = typesForEachSurf;
+    line0ToSurf = line0ForEachSurf;
+    line1ToSurf = line1ForEachSurf;
 
     // Now we need to add the surfaces that correspond to branchpoints.
     List<Curve> checkLines = new List<Curve>();
@@ -288,7 +334,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
           adjParams.Add(closestParam);
         }
       }
-      Print("Number of adjacent medial axis segments: " + adjMedaxs.Count);
+      // Print("Number of adjacent medial axis segments: " + adjMedaxs.Count);
 
       // Generate the chord (on the correct side of the medial axis segment) for each medial axis segment that ends in this branchpoint.
       List<Chord> adjChords = new List<Chord>();
@@ -305,7 +351,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       }
 
       // Checking.
-      Print(adjChords.Count.ToString());
+      // Print(adjChords.Count.ToString());
       List<Curve> currChords = new List<Curve>();
       foreach (Chord chord in adjChords)
       {
@@ -317,7 +363,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     }
     ElementarySurfacesList = elementaryBreps;
     ElementarySurfaceTypeList = elementaryBrepTypes;
-    CheckLines = checkLines;
+    // CheckLines = checkLines;
   }
   #endregion
   #region Additional
@@ -528,10 +574,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     Curve new1 = newChord.curves.Item1;
     Curve new2 = newChord.curves.Item2;
     bool sameBoundary = old1 == new1 && old2 == new2 || old1 == new2 && old2 == new1;
-    if (selectedCurve == medialAxisCurve)
-    {
-      Print(isIntersecting.ToString() + ", " + typesAreSame.ToString() + ", " + sameBoundary.ToString());
-    }
     return isIntersecting && typesAreSame && sameBoundary;
   }
 
