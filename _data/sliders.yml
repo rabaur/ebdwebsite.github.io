@@ -1,0 +1,12 @@
+- selector: example_slider
+  captions: true
+  images:
+    - src: "/assets/images/EBDposter22 - Poster1.jpeg"
+      alt: image one
+    - src: "/assets/images/EBDposter22 - Poster2.jpeg"
+      alt: image two
+    - src: "/assets/images/EBDposter22 - Poster3.jpeg"
+      alt: image three
+  settings:
+    height: "'auto'"
+    effect: "'fade'"

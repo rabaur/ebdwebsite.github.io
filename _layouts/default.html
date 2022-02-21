@@ -5,17 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% seo %}
+    {% seo %}
+    <link rel="stylesheet" href="/bower_components/ideal-image-slider/ideal-image-slider.css">
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">  
     {% include head-custom.html %}
+    {% include slider_styles.html %}
   </head>
   <body>
+    <script src="/bower_components/ideal-image-slider/ideal-image-slider.js"></script>
     <div class="wrapper">
       <header>
-        <h1><a href="{{ "/" }}">{{ site.title | default: site.github.repository_name }}</a></h1>
+        <myTitle><a href="{{ "/" }}">{{ site.title | default: site.github.repository_name }}</a></myTitle>
+        <subtitle>{{ site.subtitle | default: site.github.repository_name }}</subtitle>
 
         {% if site.logo %}
           <img src="{{site.logo | relative_url}}" alt="Logo" />
@@ -56,5 +65,6 @@
         -->
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+    {% include slider_scripts.html %}
   </body>
 </html>

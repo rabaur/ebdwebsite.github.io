@@ -10,10 +10,9 @@ layout: default
 [Software]({{ site.baseurl }}{% link software.md %})\
 [Past Courses]({{ site.baseurl }}{% link past_courses.md %})
 
-![An example pair of cards](/assets/images/EBDposter22 - Poster1.jpeg)
-![An example pair of cards](/assets/images/EBDposter22 - Poster2.jpeg)
-![An example pair of cards](/assets/images/EBDposter22 - Poster3.jpeg)
-![An example pair of cards](/assets/images/EBDposter22 - Poster4.jpeg)
+
+{% include slider.html selector="example_slider" %}
+Hello darkness my old friend.
 
 * * *
 
