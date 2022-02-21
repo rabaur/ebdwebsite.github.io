@@ -306,7 +306,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
           {
             allSwitches += switchPoint.prevType + ", " + switchPoint.nextType + ", ";
           }
-          Print(allSwitches);
           faultySegs.Add(medaxCurve);
         }
         elementaryBrepTypes.Add(switches[i].nextType);
@@ -334,7 +333,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
           adjParams.Add(closestParam);
         }
       }
-      // Print("Number of adjacent medial axis segments: " + adjMedaxs.Count);
 
       // Generate the chord (on the correct side of the medial axis segment) for each medial axis segment that ends in this branchpoint.
       List<Chord> adjChords = new List<Chord>();
@@ -351,7 +349,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       }
 
       // Checking.
-      // Print(adjChords.Count.ToString());
       List<Curve> currChords = new List<Curve>();
       foreach (Chord chord in adjChords)
       {
