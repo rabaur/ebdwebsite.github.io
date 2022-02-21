@@ -7,6 +7,8 @@
       alt: image two
     - src: "/assets/images/EBDposter22 - Poster3.jpeg"
       alt: image three
+    - src: "/assets/images/EBDposter22 - Poster4.jpeg"
+      alt: image four
   settings:
     height: "'auto'"
     effect: "'fade'"

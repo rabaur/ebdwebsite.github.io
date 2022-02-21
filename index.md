@@ -1,5 +1,7 @@
 ---
 layout: default
+image_sliders:
+  - example_slider
 ---
 
 [Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})\
