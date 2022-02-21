@@ -22,7 +22,7 @@ logo: /assets/images/Logo.JPG
 title: "Evidence-Based Design in Architecture: Linking Cognition and Architecture to Design Resilient Healthcare Architecture"
 email: michal.gath@gess.ethz.ch
 description: >- # this means to ignore newlines until "baseurl:"
-  Fall 2021, Friday 10-12, ONLINE, ETH Zurich 
+  Spring 2022, Friday 10-12, ONLINE, ETH Zurich 
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "www.ebdarch.ethz.ch" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
