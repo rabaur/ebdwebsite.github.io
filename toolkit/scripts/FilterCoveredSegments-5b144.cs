@@ -56,7 +56,6 @@ public abstract class Script_Instance_5b144 : GH_ScriptInstance
   private void RunScript(List<Curve> SegmentCurveList, ref object UncoveredSegmentCurves)
   {
     // Sort segments by length.
-    // Lustig lustig trallalala
     double[] lengths = new double[SegmentCurveList.Count];
     System.Threading.Tasks.Parallel.For(0, SegmentCurveList.Count, i =>
     {
@@ -89,7 +88,7 @@ public abstract class Script_Instance_5b144 : GH_ScriptInstance
         // 1. There is an intersection.
         // 2. This intersection is an overlap.
         // 3. Up to some tolerance, the overlap domain is equivalent to the domain of the smaller curve.
-        CurveIntersections intersects = Intersection.CurveCurve(largeSeg, smallSeg, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon);
+        CurveIntersections intersects = Intersection.CurveCurve(largeSeg, smallSeg, 1.0, 1.0);
         if (intersects == null)
         {
           // No intersections.

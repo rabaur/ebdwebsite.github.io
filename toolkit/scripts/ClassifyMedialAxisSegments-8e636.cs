@@ -592,7 +592,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     Array.Sort(distances, closestPoints);
     Point3d c0 = closestPoints[0].point;
     int idx = 1;
-    while (idx < closestPoints.Length && c0.DistanceTo(closestPoints[idx].point) < 0.1)
+    while (idx < closestPoints.Length && c0.DistanceTo(closestPoints[idx].point) < 1.0)
     {
       idx++;
     }

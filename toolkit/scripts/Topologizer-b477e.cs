@@ -287,7 +287,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         double closestCornerParam;
         seg.ClosestPoint(corner, out closestCornerParam);
         Interval domain = seg.Domain;
-        if (corner.DistanceTo(seg.PointAt(closestCornerParam)) > 2.5 * cornerTol)
+        if (corner.DistanceTo(seg.PointAt(closestCornerParam)) > 2 * cornerTol)
         {
           continue;
         }
