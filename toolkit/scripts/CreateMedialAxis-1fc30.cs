@@ -59,7 +59,8 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
     Line[] allSegmentArray = CreateSegmentsSequential(voronoiDiagramCurveList); // For some reason, the sequential method is slightly faster here.
 
     // Create mask for valid segments.
-    bool[] mask = SelectValidSegmentsParallel(allSegmentArray, boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance); // Parallel clearly faster.
+    BoundingBox[] bbs = new BoundingBox[boundaryCurveList.Count];
+    bool[] mask = SelectValidSegmentsParallel(allSegmentArray, boundaryCurveList, bbs, walkableSurfaceBrep, boundaryProximityTolerance); // Parallel clearly faster.
 
     // Only select valid medial axis segments.
     List<Line> result = new List<Line>();
@@ -86,7 +87,8 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
       }
       if (!curve.IsPolyline())
       {
-        throw new Exception("Input curve was not polyline.");
+        // throw new Exception("Input curve was not polyline.");
+        continue;
       }
       Polyline polyline = new Polyline();
       curve.TryGetPolyline(out polyline);
@@ -128,12 +130,22 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
   /// <param name="walkableSurfaceBrep">Surface inside of the shape.</param>
   /// <param name="boundaryProximityTolerance">If a segment is closer than that to the shape-boundary, it is discarded.</param>
   /// <returns>A boolean array of the same length as <paramref name="segments"/>, acting as a mask for the valid segments.</returns>
-  private bool[] SelectValidSegmentsParallel(Line[] segments, List<Curve> boundaryCurveList, Brep walkableSurfaceBrep, double boundaryProximityTolerance)
+  private bool[] SelectValidSegmentsParallel(Line[] segments, List<Curve> boundaryCurveList, BoundingBox[] bbs, Brep walkableSurfaceBrep, double boundaryProximityTolerance)
   {
     bool[] mask = new bool[segments.Length];
+
+    for (int i = 0; i < boundaryCurveList.Count; i++)
+    {
+      if (boundaryCurveList[i] == null)
+      {
+        bbs[i] = BoundingBox.Empty;
+        continue;
+      }
+      bbs[i] = boundaryCurveList[i].GetBoundingBox(accurate:false);
+    }
     System.Threading.Tasks.Parallel.For(0, mask.Length, i =>
       {
-      mask[i] = IsValidSegment(segments[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
+      mask[i] = IsValidSegment(segments[i], boundaryCurveList, bbs, walkableSurfaceBrep, boundaryProximityTolerance);
       });
     return mask;
   }
@@ -146,12 +158,12 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
   /// <param name="walkableSurfaceBrep">Surface inside of the shape.</param>
   /// <param name="boundaryProximityTolerance">If a segment is closer than that to the shape-boundary, it is discarded.</param>
   /// <returns>A boolean array of the same length as <paramref name="segments"/>, acting as a mask for the valid segments.</returns>
-  private bool[] SelectValidSegmentsSequential(Line[] segments, List<Curve> boundaryCurveList, Brep walkableSurfaceBrep, double boundaryProximityTolerance)
+  private bool[] SelectValidSegmentsSequential(Line[] segments, List<Curve> boundaryCurveList, BoundingBox[] bbs, Brep walkableSurfaceBrep, double boundaryProximityTolerance)
   {
     bool[] mask = new bool[segments.Length];
     for (int i = 0; i < segments.Length; i++)
     {
-      mask[i] = IsValidSegment(segments[i], boundaryCurveList, walkableSurfaceBrep, boundaryProximityTolerance);
+      mask[i] = IsValidSegment(segments[i], boundaryCurveList, bbs, walkableSurfaceBrep, boundaryProximityTolerance);
     }
     return mask;
   }
@@ -162,9 +174,9 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
   /// <param name="segment">The segment for which to check.</param>
   /// <param name="boundaryCurves">The curves describing the boundary for which to find the medial axis.</param>
   /// <returns>true if is medial axis segment, false otherwise.</returns>
-  private bool IsValidSegment(Line segment, List<Curve> boundaryCurves, Brep walkableSurfaceBrep, double closenessTolerance)
+  private bool IsValidSegment(Line segment, List<Curve> boundaryCurves, BoundingBox[] bbs, Brep walkableSurfaceBrep, double closenessTolerance)
   {
-    bool isIntersecting = SegmentIntersectsBoundary(segment, boundaryCurves, RhinoMath.SqrtEpsilon);
+    bool isIntersecting = SegmentIntersectsBoundary(segment, boundaryCurves, bbs, RhinoMath.SqrtEpsilon);
     bool isWalkable = SegmentIsOnWalkableSurface(segment, walkableSurfaceBrep, RhinoMath.SqrtEpsilon);
     bool isTooCloseToBoundary = SegmentIsTooCloseToBoundary(segment, boundaryCurves, closenessTolerance);
     return !isIntersecting && isWalkable && !isTooCloseToBoundary;
@@ -177,11 +189,17 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
   /// <param name="boundaryCurves">The curves that define the boundary.</param>
   /// <param name="tolerance">The distance to the boundary must be larger than this to be non-crossing.</param>
   /// <returns>true if the segment crosses the boundary or is too close to it. false otherwise.</returns>
-  private bool SegmentIntersectsBoundary(Line segment, List<Curve> boundaryCurves, double tolerance)
+  private bool SegmentIntersectsBoundary(Line segment, List<Curve> boundaryCurves, BoundingBox[] bbs, double tolerance)
   {
     bool intersects = false;
-    foreach (Curve boundaryCurve in boundaryCurves)
+    BoundingBox currBB = segment.BoundingBox;
+    for (int i = 0; i < boundaryCurves.Count; i++)
     {
+      Curve boundaryCurve = boundaryCurves[i];
+      if (currBB.IsValid && bbs[i].IsValid && !BoundingBoxesIntersect2D(currBB, bbs[i]))
+      {
+        continue;
+      }
       if (Rhino.Geometry.Intersect.Intersection.CurveCurve(boundaryCurve, segment.ToNurbsCurve(), tolerance, 0.0).Count != 0)
       {
         intersects = true;
@@ -236,6 +254,11 @@ public abstract class Script_Instance_1fc30 : GH_ScriptInstance
       }
     }
     return false;
+  }
+
+  private bool BoundingBoxesIntersect2D(BoundingBox b0, BoundingBox b1)
+  {
+    return (b0.Min.X < b1.Max.X) && (b0.Max.X > b1.Min.X) && (b0.Min.Y < b1.Max.Y) && (b0.Max.Y > b1.Min.Y);
   }
   #endregion
 }

@@ -176,7 +176,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         {
           continue;
         }
-        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 0.1, 0.1);
+        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 1.0, 1.0);
 
         // No intersections between curves.
         if (intersects == null)

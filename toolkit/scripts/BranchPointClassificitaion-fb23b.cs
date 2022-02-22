@@ -59,32 +59,6 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
     List<List<Curve>> contiguousSegmentList = PartitionSegmentsByAdjacencyParallel(SegmentCurveList); // Empirically, parallel method was substantially faster.
 
     // Split the first segment in each list of contiguous segment, to avoid that second segment is directly after branchpoint, which would not be detected in this case.
-    /*
-    foreach (List<Curve> contiguousSegments in contiguousSegmentList)
-    {
-      Curve firstSeg = contiguousSegments[0];
-      Curve[] splitFirstSeg = firstSeg.Split(firstSeg.Domain.Mid);
-      if (splitFirstSeg == null)
-      {
-        throw new Exception("Splitting first segment yielded null");
-      }
-
-      // Insert split segments back into list. Notice the order.
-      contiguousSegments.Insert(0, splitFirstSeg[1]);
-      contiguousSegments.Insert(0, splitFirstSeg[0]);
-
-      Curve lastSeg = contiguousSegments[contiguousSegments.Count - 1];
-      Curve[] splitLastSeg = lastSeg.Split(lastSeg.Domain.Mid);
-      if (splitLastSeg == null)
-      {
-        throw new Exception("Splitting first segment yielded null");
-      }
-
-      // Insert split segments back into list. Notice the order.
-      contiguousSegments.Insert(contiguousSegments.Count - 1, splitLastSeg[0]);
-      contiguousSegments.Insert(contiguousSegments.Count - 1, splitLastSeg[1]);
-    }
-    */
     SelectedCurves = contiguousSegmentList[idx];
     SelectedAngles = CalculateAngles(contiguousSegmentList[idx]);
 
@@ -134,7 +108,7 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
       Curve[] lastJoinedCurves = Curve.JoinCurves(currSegs);
       if (lastJoinedCurves.Length == 0)
       {
-        throw new Exception("Joining curves at end was not successful.");
+        // throw new Exception("Joining curves at end was not successful.");
       }
 
       branchPointDelimitedSegments.AddRange(lastJoinedCurves);

@@ -291,7 +291,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
             // Should not happen, but just to be sure.
             if (Intersection.CurveCurve(diffA, diffB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count > 0)
             {
-              throw new Exception("Connecting lines between chords cross both ways");
+              // throw new Exception("Connecting lines between chords cross both ways");
             }
 
             edges.Add(diffA);

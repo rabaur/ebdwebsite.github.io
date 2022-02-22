@@ -52,10 +52,11 @@ public abstract class Script_Instance_55e12 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> BoundarySegmentCurveList, double StepSize, ref object SamplePoints)
+  private void RunScript(List<Curve> BoundarySegmentCurveList, double StepSize, double RelativeNoise, ref object SamplePoints)
   {
     // Each element is a list of points where the boundary should be sampled.
     List<Point3d> sampleLocations = new List<Point3d>();
+    Random rand = new Random();
     foreach (Curve boundarySegment in BoundarySegmentCurveList)
     {
       double curveLength = boundarySegment.GetLength();
@@ -65,8 +66,12 @@ public abstract class Script_Instance_55e12 : GH_ScriptInstance
       double stepSizeParamSpace = boundaryDomain.Length * (StepSize / curveLength);
       for (int i = 1; i < regularlySpacedSampleNum + 1; i++)
       {
-        sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Min + i * stepSizeParamSpace));
-        sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Max - i * stepSizeParamSpace));
+        // Adding some uniform noise to sample location according to prevent artifacts in Voronoi diagram, as suggested in:
+        // https://www.grasshopper3d.com/forum/topics/voronoi-component-errors
+        double randomDisp0 = -0.5 * RelativeNoise * stepSizeParamSpace + rand.NextDouble() * RelativeNoise * stepSizeParamSpace;
+        double randomDisp1 = -0.5 * RelativeNoise * stepSizeParamSpace + rand.NextDouble() * RelativeNoise * stepSizeParamSpace;
+        sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Min + i * stepSizeParamSpace + randomDisp0));
+        sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Max - i * stepSizeParamSpace + randomDisp1));
       }
       sampleLocations.Add(boundarySegment.PointAt(boundaryDomain.Mid));
     }

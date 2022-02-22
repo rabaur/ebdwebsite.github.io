@@ -78,6 +78,11 @@ public abstract class Script_Instance_20516 : GH_ScriptInstance
           }
         }
       }
+      if (splitParams.Count == 0)
+      {
+        // No intersection.
+        pairwiseSplitCurves.Add(seg0);
+      }
       Curve[] splitCurves = seg0.Split(splitParams);
       Print(splitCurves.Length.ToString());
       if (splitCurves == null)
