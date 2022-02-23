@@ -213,7 +213,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     List<string> typesForEachSurf = new List<string>();
     List<Curve> line0ForEachSurf = new List<Curve>();
     List<Curve> line1ForEachSurf = new List<Curve>();
-    Dictionary<ConnectivityGraphNode, List<ConnectivityGraphNode>> connectivityGraph = new Dictionary<ConnectivityGraphNode, List<ConnectivityGraphNode>>();
     foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medialAxisCurve2SwitchPointList)
     {
       Curve medaxCurve = keyVal.Key;
@@ -233,8 +232,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
           continue;
         }
       }
-
-      List<ConnectivityGraphNode> innerNodes = new List<ConnectivityGraphNode>(); // All nodes generated from the inner segments of this medial axis segment.
       for (int i = 0; i < switches.Count - 1; i++)
       {
         Chord c0 = GetChordParallel(medaxCurve.PointAt(switches[i].param), BoundaryCurveList);
@@ -305,9 +302,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
             edges.Add(diffB);
           }
         }
-        Brep currBrep = Brep.CreateEdgeSurface(edges);
-        elementaryBreps.Add(currBrep);
-
+        elementaryBreps.Add(Brep.CreateEdgeSurface(edges));
         if (switches[i].nextType != switches[i+1].prevType)
         {
           string allSwitches = "";
@@ -317,36 +312,8 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
           }
           faultySegs.Add(medaxCurve);
         }
-        int currType = switches[i].nextType;
-        elementaryBrepTypes.Add(currType);
-
-        // Generate node.
-        ConnectivityGraphNode innerNode = new ConnectivityGraphNode(currBrep, currType, switches[i], switches[i + 1], medaxCurve);
-        innerNodes.Add(innerNode);
+        elementaryBrepTypes.Add(switches[i].nextType);
       }
-
-      // Now that all inner nodes for this segment have been generated, we can add them to the graph and connect consecutive nodes.
-      for (int i = 0; i < innerNodes.Count; i++)
-      {
-        ConnectivityGraphNode innerNode = innerNodes[i];
-        connectivityGraph[innerNode] = new List<ConnectivityGraphNode>();
-        if (i - 1 >= 0)
-        {
-          // Add previous node on medax as neighbor.
-          connectivityGraph[innerNode].Add(innerNodes[i - 1]);
-        }
-        if (i + 1 < innerNodes.Count)
-        {
-          connectivityGraph[innerNode].Add(innerNodes[i + 1]);
-        }
-      }
-    }
-
-    List<Point3d> nodeLocs = new List<Point3d>();
-    List<LineCurve> edges = new List<LineCurve>();
-    foreach (KeyValuePair<ConnectivityGraphNode, List<ConnectivityGraphNode>> keyVal in connectivityGraph)
-    {
-
     }
     FaultyCurves = faultySegs;
     segsToSurf = segmentForEachSurf;
@@ -401,23 +368,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   }
   #endregion
   #region Additional
-  public struct ConnectivityGraphNode
-  {
-    public ConnectivityGraphNode(Brep surface, int type, SwitchPoint switch0, SwitchPoint switch1, Curve medax)
-    {
-      this.surf = surface;
-      this.type = type;
-      this.switch0 = switch0;
-      this.switch1 = switch1;
-      this.medax = medax;
-    }
-    public Brep surf;
-    public int type;
-    public SwitchPoint switch0;
-    public SwitchPoint switch1;
-    public Curve medax;
-  }
-
   public struct SwitchPoint
   {
     public SwitchPoint(double param, int prevType, int nextType)

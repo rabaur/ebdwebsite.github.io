@@ -117,7 +117,6 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
               // Ensure that always exactly one side of the interval is in the domain, otherwise this would not be a valid overlap.
               if (!minInDomain ^ maxInDomain)
               {
-                Print("here");
                 if (intersect.OverlapA.Max - intersect.OverlapA.Min < RhinoMath.SqrtEpsilon || intersect.OverlapB.Max - intersect.OverlapB.Min < RhinoMath.SqrtEpsilon)
                 {
                   // This should actually be a point-intersection, but for some reason, Rhino fucked up.
@@ -154,7 +153,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         }
       }
     }
-    pair = intersectionPairs[pairIdx];
+    pair = intersectionPairs[pairIdx]; 
     SplitSegments = splitSegments;
 
     // Building segment graph where segments are nodes and there is and edge between segments iff they intersect at a point which is not a branchpoint.
@@ -179,6 +178,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           continue;
         }
         CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 2.0, 1.0);
+
         // No intersections between curves.
         if (intersects == null)
         {
@@ -189,7 +189,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         foreach (IntersectionEvent intersect in intersects)
         {
           Point3d intersectionPoint = intersect.PointA;
-          if (!ContainsPointParallel(intersectionPoint, BranchPointList, 3.0))
+          if (!ContainsPointParallel(intersectionPoint, BranchPointList, 0.1))
           {
             segmentGraph[seg0].Add(seg1);
           }
@@ -209,6 +209,11 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
     {
       Curve initSeg = keyValue.Key;
       List<Curve> neighbors = keyValue.Value;
+      if (initSeg == splitSegments[6])
+      {
+        Print("neighbors: " + neighbors.Count);
+        OminousNeigbors = neighbors;
+      }
       if (visited[initSeg])
       {
         continue;
@@ -268,9 +273,9 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
   {
     bool[] isClose = new bool[pointList.Count];
     System.Threading.Tasks.Parallel.For(0, pointList.Count, i =>
-      {
+    {
       isClose[i] = queryPoint.DistanceTo(pointList[i]) < tol;
-      });
+    });
     for (int i = 0; i < isClose.Length; i++)
     {
       if (isClose[i])
