@@ -54,18 +54,8 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> MedialAxisCurveList, double InitialStepSize, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, int idx, double t, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries, ref object chord1, ref object chord2, ref object qPoint, ref object radius1, ref object radius2, ref object SwitchPointChords, ref object crv1, ref object crv2, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object CheckLines, ref object FaultyCurves, ref object segsToSurf, ref object typesToSurf, ref object line0ToSurf, ref object line1ToSurf, ref object Test, ref object SwitchPointMedialAxisCurveIdx, ref object SwitchPointParameters, ref object SwitchPointPreviousTypes, ref object SwitchPointNextTypes)
+  private void RunScript(List<Curve> MedialAxisCurveList, double InitialStepSize, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, ref object ClassifiedPointList, ref object TypeList, ref object SwitchPointMedialAxisCurveIdx, ref object SwitchPointParameters, ref object SwitchPointPreviousTypes, ref object SwitchPointNextTypes)
   {
-    Curve selectedCurve = MedialAxisCurveList[idx];
-    qPoint = selectedCurve.PointAt(t);
-    Chord testChord = GetChordParallel(selectedCurve.PointAt(t), BoundaryCurveList);
-    chord1 = testChord.points.Item1;
-    chord2 = testChord.points.Item2;
-    crv1 = testChord.curves.Item1;
-    crv2 = testChord.curves.Item2;
-    radius1 = selectedCurve.PointAt(t).DistanceTo(testChord.points.Item1);
-    radius2 = selectedCurve.PointAt(t).DistanceTo(testChord.points.Item2);
-
     // Parameters corresponding to the locations of the points to be classified.
     List<double> queryParams = new List<double>();
 
@@ -178,7 +168,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       if (endIdx == currTypes.Count - 1)
       {
         Chord lastChord = GetChordParallel(medialAxisCurve.PointAt(currParams[endIdx]), BoundaryCurveList);
-        endSwitchParam = FindEndSwitchPoint(medialAxisCurve, CornerPointList, BoundaryCurveList, currParams[endIdx], firstFullLigParam, currTypes[endIdx], lastChord, 0, selectedCurve);
+        endSwitchParam = FindEndSwitchPoint(medialAxisCurve, CornerPointList, BoundaryCurveList, currParams[endIdx], firstFullLigParam, currTypes[endIdx], lastChord);
       }
       else
       {
@@ -190,7 +180,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
 
     ClassifiedPointList = queryPoints;
     TypeList = types;
-    
+
     List<Point3d> switchPoints = new List<Point3d>();
     List<Line> chords = new List<Line>();
     foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medialAxisCurve2SwitchPointList)
@@ -225,170 +215,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     SwitchPointParameters = switchPointParameters;
     SwitchPointPreviousTypes = switchPointPreviousTypes;
     SwitchPointNextTypes = switchPointNextTypes;
-    Test = medialAxisCurve2SwitchPointList[MedialAxisCurveList[0]];
-    SwitchPointChords = chords;
-    SwitchPointLocations = switchPoints;
-
-    // Create surfaces.
-    List<Brep> elementaryBreps = new List<Brep>();
-    List<int> elementaryBrepTypes = new List<int>();
-    List<Curve> faultySegs = new List<Curve>();
-    List<Curve> segmentForEachSurf = new List<Curve>();
-    List<string> typesForEachSurf = new List<string>();
-    List<Curve> line0ForEachSurf = new List<Curve>();
-    List<Curve> line1ForEachSurf = new List<Curve>();
-    foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medialAxisCurve2SwitchPointList)
-    {
-      Curve medaxCurve = keyVal.Key;
-      List<SwitchPoint> switches = keyVal.Value;
-      if (switches[0].prevType != 2)
-      {
-        throw new Exception("First ligature type was not 2");
-      }
-      if (switches[switches.Count - 1].nextType != 2)
-      {
-        throw new Exception("Last ligature type was not 2");
-      }
-      if (switches.Count == 2)
-      {
-        if (switches[0].nextType == 2 && switches[1].prevType == 2)
-        {
-          continue;
-        }
-      }
-      for (int i = 0; i < switches.Count - 1; i++)
-      {
-        Chord c0 = GetChordParallel(medaxCurve.PointAt(switches[i].param), BoundaryCurveList);
-        Chord c1 = GetChordParallel(medaxCurve.PointAt(switches[i + 1].param), BoundaryCurveList);
-        line0ForEachSurf.Add(c0.line);
-        line1ForEachSurf.Add(c1.line);
-        Curve currTrim = medaxCurve.Trim(switches[i].param, switches[i + 1].param);
-        segmentForEachSurf.Add(medaxCurve.Trim(switches[i].param, switches[i + 1].param));
-        typesForEachSurf.Add(switches[i].prevType + ", " + switches[i].nextType + ", " + switches[i + 1].prevType + ", " + switches[i + 1].nextType );
-        
-        // There tend to be instabilities in proximity of branchpoints. Often this results in spurious, small segments being classified as semi,
-        // however these segments are delimited by faulty corners. When these surfaces of these segments are generated, they cover the surface
-        // that would normally be covered by a full-ligature.
-        if (currTrim != null)
-        {
-          if (currTrim.GetLength() < 1.0 && switches[i].nextType == 1 && ContainsPointParallel(currTrim.PointAtStart, BranchPointList, 1.0))
-          {
-            continue;
-          }
-        }
-
-        List<Curve> edges = new List<Curve> { c0.line, c1.line }; // Contains the edges of the surface to be generated.
-
-        // Case: the resulting face is triangular, i.e. two of the endpoints of each chord are identical.
-        if (c0.points.Item1.DistanceTo(c1.points.Item1) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item2, c1.points.Item2));
-        }
-        else if (c0.points.Item1.DistanceTo(c1.points.Item2) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item2, c1.points.Item1));
-        }
-        else if (c0.points.Item2.DistanceTo(c1.points.Item1) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item1, c1.points.Item2));
-        }
-        else if (c0.points.Item2.DistanceTo(c1.points.Item2) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item1, c1.points.Item1));
-        }
-        else
-        {
-          // None of the chord-endpoints are identical, so we are dealing with a rectangular surface.
-
-          // Here we need to check that we connect the endpoints such that the connecting lines do not cross.
-          Curve sameA = new LineCurve(c0.points.Item1, c1.points.Item1);
-          Curve sameB = new LineCurve(c0.points.Item2, c1.points.Item2);
-
-          // Check intersection.
-          if (Intersection.CurveCurve(sameA, sameB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count == 0)
-          {
-            edges.Add(sameA);
-            edges.Add(sameB);
-          }
-          else
-          {
-            // Then we need to connect the other way around.
-            Curve diffA = new LineCurve(c0.points.Item1, c1.points.Item2);
-            Curve diffB = new LineCurve(c0.points.Item2, c1.points.Item1);
-
-            // Should not happen, but just to be sure.
-            if (Intersection.CurveCurve(diffA, diffB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count > 0)
-            {
-              throw new Exception("Connecting lines between chords cross both ways");
-            }
-
-            edges.Add(diffA);
-            edges.Add(diffB);
-          }
-        }
-        elementaryBreps.Add(Brep.CreateEdgeSurface(edges));
-        if (switches[i].nextType != switches[i+1].prevType)
-        {
-          string allSwitches = "";
-          foreach (SwitchPoint switchPoint in switches)
-          {
-            allSwitches += switchPoint.prevType + ", " + switchPoint.nextType + ", ";
-          }
-          faultySegs.Add(medaxCurve);
-        }
-        elementaryBrepTypes.Add(switches[i].nextType);
-      }
-    }
-    FaultyCurves = faultySegs;
-    segsToSurf = segmentForEachSurf;
-    typesToSurf = typesForEachSurf;
-    line0ToSurf = line0ForEachSurf;
-    line1ToSurf = line1ForEachSurf;
-
-    // Now we need to add the surfaces that correspond to branchpoints.
-    List<Curve> checkLines = new List<Curve>();
-    foreach (Point3d branchPoint in BranchPointList)
-    {
-      List<Curve> adjMedaxs = new List<Curve>();
-      List<double> adjParams = new List<double>();
-      foreach (Curve medax in MedialAxisCurveList)
-      {
-        double closestParam;
-        medax.ClosestPoint(branchPoint, out closestParam);
-        if (branchPoint.DistanceTo(medax.PointAt(closestParam)) < 0.05)
-        {
-          adjMedaxs.Add(medax);
-          adjParams.Add(closestParam);
-        }
-      }
-
-      // Generate the chord (on the correct side of the medial axis segment) for each medial axis segment that ends in this branchpoint.
-      List<Chord> adjChords = new List<Chord>();
-      for (int i = 0; i < adjMedaxs.Count; i++)
-      {
-        if (Math.Abs(adjMedaxs[i].Domain.Min - adjParams[i]) < Math.Abs(adjMedaxs[i].Domain.Max - adjParams[i]))
-        {
-          adjChords.Add(GetChordParallel(adjMedaxs[i].PointAt(medialAxisCurve2SwitchPointList[adjMedaxs[i]].First().param), BoundaryCurveList));
-        }
-        else
-        {
-          adjChords.Add(GetChordParallel(adjMedaxs[i].PointAt(medialAxisCurve2SwitchPointList[adjMedaxs[i]].Last().param), BoundaryCurveList));
-        }
-      }
-
-      // Checking.
-      List<Curve> currChords = new List<Curve>();
-      foreach (Chord chord in adjChords)
-      {
-        currChords.Add(chord.line);
-        checkLines.Add(chord.line);
-      }
-      elementaryBreps.Add(Brep.CreateEdgeSurface(currChords));
-      elementaryBrepTypes.Add(2);
-    }
-    ElementarySurfacesList = elementaryBreps;
-    ElementarySurfaceTypeList = elementaryBrepTypes;
-    // CheckLines = checkLines;
   }
   #endregion
   #region Additional
@@ -409,10 +235,10 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   {
     public Chord(Tuple<double, double> chordParams, Tuple<Curve, Curve> boundaryCurves, Tuple<Point3d, Point3d> chordPoints)
     {
-      this.parameters = chordParams;
-      this.curves = boundaryCurves;
-      this.points = chordPoints;
-      this.line = new LineCurve(chordPoints.Item1, chordPoints.Item2);
+      parameters = chordParams;
+      curves = boundaryCurves;
+      points = chordPoints;
+      line = new LineCurve(chordPoints.Item1, chordPoints.Item2);
     }
     public Tuple<double, double> parameters;
     public Tuple<Curve, Curve> curves;
@@ -545,17 +371,8 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     double prevParam,
     double nextParam,
     int nextType,
-    Chord oldChord,
-    int depth,
-    Curve selectedCurve)
+    Chord oldChord)
   {
-    if (depth == 0)
-    {
-      Point3d queryPoint = medialAxisCurve.PointAt(prevParam);
-      Chord chord = GetChordParallel(queryPoint, boundaryCurveList);
-      CheckConditions(medialAxisCurve, queryPoint, chord, boundaryCurveList, cornerPointList, oldChord, nextType, selectedCurve);
-    }
-
     // We test in the middle of the interval delimited by lowerParam and higherParam.
     double queryParam = 0.5 * (prevParam + nextParam);
 
@@ -564,25 +381,25 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     {
       Point3d queryPoint = medialAxisCurve.PointAt(prevParam);
       Chord chord = GetChordParallel(queryPoint, boundaryCurveList);
-      CheckConditions(medialAxisCurve, queryPoint, chord, boundaryCurveList, cornerPointList, oldChord, nextType, selectedCurve);
+      CheckConditions(medialAxisCurve, queryPoint, chord, boundaryCurveList, cornerPointList, oldChord, nextType);
       return prevParam;
     }
     else
     {
       Point3d queryPoint = medialAxisCurve.PointAt(queryParam);
       Chord chord = GetChordParallel(queryPoint, boundaryCurveList);
-      if (!CheckConditions(medialAxisCurve, queryPoint, chord, boundaryCurveList, cornerPointList, oldChord, nextType, selectedCurve))
+      if (!CheckConditions(medialAxisCurve, queryPoint, chord, boundaryCurveList, cornerPointList, oldChord, nextType))
       {
-        return FindEndSwitchPoint(medialAxisCurve, cornerPointList, boundaryCurveList, prevParam, queryParam, nextType, oldChord, depth + 1, selectedCurve);
+        return FindEndSwitchPoint(medialAxisCurve, cornerPointList, boundaryCurveList, prevParam, queryParam, nextType, oldChord);
       }
       else
       {
-        return FindEndSwitchPoint(medialAxisCurve, cornerPointList, boundaryCurveList, queryParam, nextParam, nextType, chord, depth + 1, selectedCurve);
+        return FindEndSwitchPoint(medialAxisCurve, cornerPointList, boundaryCurveList, queryParam, nextParam, nextType, chord);
       }
     }
   }
 
-  private bool CheckConditions(Curve medialAxisCurve, Point3d queryPoint, Chord newChord, List<Curve> boundaryCurveList, List<Point3d> cornerPointList, Chord oldChord, int nextType, Curve selectedCurve)
+  private bool CheckConditions(Curve medialAxisCurve, Point3d queryPoint, Chord newChord, List<Curve> boundaryCurveList, List<Point3d> cornerPointList, Chord oldChord, int nextType)
   {
     LineCurve chordLine = newChord.line;
 
