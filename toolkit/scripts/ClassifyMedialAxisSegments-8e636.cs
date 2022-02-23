@@ -213,21 +213,6 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
       Curve currMedax = keyVal.Key;
       int currMedaxIdx = MedialAxisCurveList.IndexOf(currMedax);
       List<SwitchPoint> currSwitchPoints = keyVal.Value;
-      if (currSwitchPoints[0].prevType != 2)
-      {
-        throw new Exception("First ligature type was not 2");
-      }
-      if (currSwitchPoints[currSwitchPoints.Count - 1].nextType != 2)
-      {
-        throw new Exception("Last ligature type was not 2");
-      }
-      if (currSwitchPoints.Count == 2)
-      {
-        if (currSwitchPoints[0].nextType == 2 && currSwitchPoints[1].prevType == 2)
-        {
-          continue;
-        }
-      }
       foreach (SwitchPoint switchPoint in currSwitchPoints)
       {
         switchPointMedialAxisIdx.Add(currMedaxIdx);

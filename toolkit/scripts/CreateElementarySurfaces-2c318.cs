@@ -59,6 +59,12 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
 
+    // Reassemble medial axis curves.
+    MedialAxisCurveList = new List<Curve>();
+    foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medax2SwitchPoint)
+    {
+      MedialAxisCurveList.Add(keyVal.Key);
+    }
 
     // Create surfaces.
     List<Brep> elementaryBreps = new List<Brep>();
@@ -87,6 +93,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
           continue;
         }
       }
+
       for (int i = 0; i < switches.Count - 1; i++)
       {
         Chord c0 = GetChordParallel(medaxCurve.PointAt(switches[i].param), BoundaryCurveList);
