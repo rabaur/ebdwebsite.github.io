@@ -54,7 +54,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> MedialAxisCurveList, double InitialStepSize, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, int idx, double t, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries, ref object chord1, ref object chord2, ref object qPoint, ref object radius1, ref object radius2, ref object SwitchPointChords, ref object crv1, ref object crv2, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object CheckLines, ref object FaultyCurves, ref object segsToSurf, ref object typesToSurf, ref object line0ToSurf, ref object line1ToSurf)
+  private void RunScript(List<Curve> MedialAxisCurveList, double InitialStepSize, List<Curve> BoundaryCurveList, List<Point3d> CornerPointList, List<Point3d> BranchPointList, int idx, double t, ref object ClassifiedPointList, ref object TypeList, ref object initialEvaluationPointsOut, ref object SwitchPointLocations, ref object SwitchPointTypes, ref object Chords, ref object BranchPointBoundaries, ref object chord1, ref object chord2, ref object qPoint, ref object radius1, ref object radius2, ref object SwitchPointChords, ref object crv1, ref object crv2, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object CheckLines, ref object FaultyCurves, ref object segsToSurf, ref object typesToSurf, ref object line0ToSurf, ref object line1ToSurf, ref object Test, ref object SwitchPointMedialAxisCurveIdx, ref object SwitchPointParameters, ref object SwitchPointPreviousTypes, ref object SwitchPointNextTypes)
   {
     Curve selectedCurve = MedialAxisCurveList[idx];
     qPoint = selectedCurve.PointAt(t);
@@ -202,6 +202,45 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
         chords.Add(new Line(chord.points.Item1, chord.points.Item2));
       }
     }
+
+    // Deconstruct mapping from curves to switchpoints such that it can be used in later components.
+    List<int> switchPointMedialAxisIdx = new List<int>();
+    List<double> switchPointParameters = new List<double>();
+    List<int> switchPointPreviousTypes = new List<int>();
+    List<int> switchPointNextTypes = new List<int>();
+    foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medialAxisCurve2SwitchPointList)
+    {
+      Curve currMedax = keyVal.Key;
+      int currMedaxIdx = MedialAxisCurveList.IndexOf(currMedax);
+      List<SwitchPoint> currSwitchPoints = keyVal.Value;
+      if (currSwitchPoints[0].prevType != 2)
+      {
+        throw new Exception("First ligature type was not 2");
+      }
+      if (currSwitchPoints[currSwitchPoints.Count - 1].nextType != 2)
+      {
+        throw new Exception("Last ligature type was not 2");
+      }
+      if (currSwitchPoints.Count == 2)
+      {
+        if (currSwitchPoints[0].nextType == 2 && currSwitchPoints[1].prevType == 2)
+        {
+          continue;
+        }
+      }
+      foreach (SwitchPoint switchPoint in currSwitchPoints)
+      {
+        switchPointMedialAxisIdx.Add(currMedaxIdx);
+        switchPointParameters.Add(switchPoint.param);
+        switchPointPreviousTypes.Add(switchPoint.prevType);
+        switchPointNextTypes.Add(switchPoint.nextType);
+      }
+    }
+    SwitchPointMedialAxisCurveIdx = switchPointMedialAxisIdx;
+    SwitchPointParameters = switchPointParameters;
+    SwitchPointPreviousTypes = switchPointPreviousTypes;
+    SwitchPointNextTypes = switchPointNextTypes;
+    Test = medialAxisCurve2SwitchPointList[MedialAxisCurveList[0]];
     SwitchPointChords = chords;
     SwitchPointLocations = switchPoints;
 
