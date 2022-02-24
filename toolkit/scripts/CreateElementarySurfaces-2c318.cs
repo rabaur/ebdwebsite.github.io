@@ -54,7 +54,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList)
+  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges)
   {
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
@@ -66,116 +66,87 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       MedialAxisCurveList.Add(keyVal.Key);
     }
 
-    // Create surfaces.
+    // Create surfaces and graph.
     List<Brep> elementaryBreps = new List<Brep>();
     List<int> elementaryBrepTypes = new List<int>();
-    List<Curve> faultySegs = new List<Curve>();
-    List<Curve> segmentForEachSurf = new List<Curve>();
-    List<string> typesForEachSurf = new List<string>();
-    List<Curve> line0ForEachSurf = new List<Curve>();
-    List<Curve> line1ForEachSurf = new List<Curve>();
+    Dictionary<Node, List<Node>> graph = new Dictionary<Node, List<Node>>(); // Each key is a vertex, each value is a list of neighbors.
+    Dictionary<Curve, List<Node>> medax2Node = new Dictionary<Curve, List<Node>>(); // Maps medial axis curves to nodes for more efficient retrieval when creating branchpoint nodes.
+    foreach (Curve medax in MedialAxisCurveList)
+    {
+      medax2Node[medax] = new List<Node>();
+    }
     foreach (KeyValuePair<Curve, List<SwitchPoint>> keyVal in medax2SwitchPoint)
     {
-      Curve medaxCurve = keyVal.Key;
-      List<SwitchPoint> switches = keyVal.Value;
-      if (switches[0].prevType != 2)
+      Curve medax = keyVal.Key;
+      List<SwitchPoint> switchPoints = keyVal.Value;
+      if (switchPoints[0].prevType != 2)
       {
-        throw new Exception("First ligature type was not 2: " + switches[0].prevType);
+        throw new Exception("First ligature type was not 2: " + switchPoints[0].prevType);
       }
-      if (switches[switches.Count - 1].nextType != 2)
+      if (switchPoints[switchPoints.Count - 1].nextType != 2)
       {
-        throw new Exception("Last ligature type was not 2: " + switches[switches.Count - 1].nextType);
+        throw new Exception("Last ligature type was not 2: " + switchPoints[switchPoints.Count - 1].nextType);
       }
-      if (switches.Count == 2)
+      if (switchPoints.Count == 2)
       {
-        if (switches[0].nextType == 2 && switches[1].prevType == 2)
+        if (switchPoints[0].nextType == 2 && switchPoints[1].prevType == 2)
         {
           continue;
         }
       }
 
-      for (int i = 0; i < switches.Count - 1; i++)
+      // Generating all nodes corresponding to this medial axis segment on the fly. Ensuring adjacency between consecutive nodes afterwards.
+      List<Node> nodes = new List<Node>();
+
+      for (int i = 0; i < switchPoints.Count - 1; i++)
       {
-        Chord c0 = GetChordParallel(medaxCurve.PointAt(switches[i].param), BoundaryCurveList);
-        Chord c1 = GetChordParallel(medaxCurve.PointAt(switches[i + 1].param), BoundaryCurveList);
-        line0ForEachSurf.Add(c0.line);
-        line1ForEachSurf.Add(c1.line);
-        Curve currTrim = medaxCurve.Trim(switches[i].param, switches[i + 1].param);
-        segmentForEachSurf.Add(medaxCurve.Trim(switches[i].param, switches[i + 1].param));
-        typesForEachSurf.Add(switches[i].prevType + ", " + switches[i].nextType + ", " + switches[i + 1].prevType + ", " + switches[i + 1].nextType);
+        SwitchPoint currSwitchPoint = switchPoints[i];
+        SwitchPoint nextSwitchPoint = switchPoints[i + 1];
+        Chord c0 = GetChordParallel(medax.PointAt(currSwitchPoint.param), BoundaryCurveList);
+        Chord c1 = GetChordParallel(medax.PointAt(nextSwitchPoint.param), BoundaryCurveList);
+        Curve currTrim = medax.Trim(switchPoints[i].param, nextSwitchPoint.param);
 
         // There tend to be instabilities in proximity of branchpoints. Often this results in spurious, small segments being classified as semi,
         // however these segments are delimited by faulty corners. When these surfaces of these segments are generated, they cover the surface
         // that would normally be covered by a full-ligature.
         if (currTrim != null)
         {
-          if (currTrim.GetLength() < 1.0 && switches[i].nextType == 1 && ContainsPointParallel(currTrim.PointAtStart, BranchPointList, 1.0))
+          if (currTrim.GetLength() < 1.0 && currSwitchPoint.nextType == 1 && ContainsPointParallel(currTrim.PointAtStart, BranchPointList, 1.0))
           {
             continue;
           }
         }
-
-        List<Curve> edges = new List<Curve> { c0.line, c1.line }; // Contains the edges of the surface to be generated.
-
-        // Case: the resulting face is triangular, i.e. two of the endpoints of each chord are identical.
-        if (c0.points.Item1.DistanceTo(c1.points.Item1) < RhinoMath.SqrtEpsilon)
+        if (currSwitchPoint.nextType != nextSwitchPoint.prevType)
         {
-          edges.Add(new LineCurve(c0.points.Item2, c1.points.Item2));
+          throw new Exception("The type of consecutive switchpoints did not match.");
         }
-        else if (c0.points.Item1.DistanceTo(c1.points.Item2) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item2, c1.points.Item1));
-        }
-        else if (c0.points.Item2.DistanceTo(c1.points.Item1) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item1, c1.points.Item2));
-        }
-        else if (c0.points.Item2.DistanceTo(c1.points.Item2) < RhinoMath.SqrtEpsilon)
-        {
-          edges.Add(new LineCurve(c0.points.Item1, c1.points.Item1));
-        }
-        else
-        {
-          // None of the chord-endpoints are identical, so we are dealing with a rectangular surface.
+        Brep currBrep = CreateBrepFromChords(c0, c1);
+        int currType = currSwitchPoint.nextType;
+        elementaryBreps.Add(currBrep);
+        elementaryBrepTypes.Add(currType);
 
-          // Here we need to check that we connect the endpoints such that the connecting lines do not cross.
-          Curve sameA = new LineCurve(c0.points.Item1, c1.points.Item1);
-          Curve sameB = new LineCurve(c0.points.Item2, c1.points.Item2);
-
-          // Check intersection.
-          if (Intersection.CurveCurve(sameA, sameB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count == 0)
-          {
-            edges.Add(sameA);
-            edges.Add(sameB);
-          }
-          else
-          {
-            // Then we need to connect the other way around.
-            Curve diffA = new LineCurve(c0.points.Item1, c1.points.Item2);
-            Curve diffB = new LineCurve(c0.points.Item2, c1.points.Item1);
-
-            // Should not happen, but just to be sure.
-            if (Intersection.CurveCurve(diffA, diffB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count > 0)
-            {
-              throw new Exception("Connecting lines between chords cross both ways");
-            }
-
-            edges.Add(diffA);
-            edges.Add(diffB);
-          }
-        }
-        elementaryBreps.Add(Brep.CreateEdgeSurface(edges));
-        if (switches[i].nextType != switches[i + 1].prevType)
-        {
-          string allSwitches = "";
-          foreach (SwitchPoint switchPoint in switches)
-          {
-            allSwitches += switchPoint.prevType + ", " + switchPoint.nextType + ", ";
-          }
-          faultySegs.Add(medaxCurve);
-        }
-        elementaryBrepTypes.Add(switches[i].nextType);
+        // Adding the node.
+        nodes.Add(new Node(currBrep, currType, ComputePolyCenter(currBrep), Point3d.Origin));
       }
+
+      // Adding newly created nodes to graph and establishing adjacency between consecutive nodes.
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        Node node = nodes[i];
+        graph[node] = new List<Node>();
+
+        // A node is adjacent to the node corresponding to the last segment and the next segment.
+        if (i > 0)
+        {
+          graph[node].Add(nodes[i - 1]);
+        }
+        if (i < nodes.Count - 1)
+        {
+          graph[node].Add(nodes[i + 1]);
+        }
+      }
+      // Only the first or last node can be adjacent to a branchpoint.
+      medax2Node[medax] = new List<Node>() { nodes[0], nodes[nodes.Count - 1] };
     }
 
     // Now we need to add the surfaces that correspond to branchpoints.
@@ -184,9 +155,10 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     {
       List<Curve> adjMedaxs = new List<Curve>();
       List<double> adjParams = new List<double>();
-      foreach (Curve medax in MedialAxisCurveList)
+      foreach (KeyValuePair<Curve, List<Node>> keyVal in medax2Node)
       {
         double closestParam;
+        Curve medax = keyVal.Key;
         medax.ClosestPoint(branchPoint, out closestParam);
         if (branchPoint.DistanceTo(medax.PointAt(closestParam)) < 0.05)
         {
@@ -197,31 +169,103 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
 
       // Generate the chord (on the correct side of the medial axis segment) for each medial axis segment that ends in this branchpoint.
       List<Chord> adjChords = new List<Chord>();
+      List<Node> adjNodes = new List<Node>();
       for (int i = 0; i < adjMedaxs.Count; i++)
       {
         if (Math.Abs(adjMedaxs[i].Domain.Min - adjParams[i]) < Math.Abs(adjMedaxs[i].Domain.Max - adjParams[i]))
         {
           adjChords.Add(GetChordParallel(adjMedaxs[i].PointAt(medax2SwitchPoint[adjMedaxs[i]].First().param), BoundaryCurveList));
+          if (medax2Node[adjMedaxs[i]].Count > 0)
+          {
+            adjNodes.Add(medax2Node[adjMedaxs[i]][0]);
+          }
         }
         else
         {
           adjChords.Add(GetChordParallel(adjMedaxs[i].PointAt(medax2SwitchPoint[adjMedaxs[i]].Last().param), BoundaryCurveList));
+          if (medax2Node[adjMedaxs[i]].Count > 0)
+          {
+            adjNodes.Add(medax2Node[adjMedaxs[i]][1]);
+          }
         }
       }
-
-      // Checking.
       List<Curve> currChords = new List<Curve>();
       foreach (Chord chord in adjChords)
       {
         currChords.Add(chord.line);
-        checkLines.Add(chord.line);
       }
-      elementaryBreps.Add(Brep.CreateEdgeSurface(currChords));
+      Brep currBrep = Brep.CreateEdgeSurface(currChords);
+      elementaryBreps.Add(currBrep);
       elementaryBrepTypes.Add(2);
+      graph[new Node(currBrep, 2, ComputePolyCenter(currBrep), branchPoint)] = adjNodes;
+    }
+
+    // Connect type 2 breps which share a medial axis segment.
+    foreach (Curve medax in MedialAxisCurveList)
+    {
+      List<SwitchPoint> switchPoints = medax2SwitchPoint[medax];
+      if (switchPoints.Count != 2)
+      {
+        // We are only interested in purely type 2 segments.
+        continue;
+      }
+      if (!(switchPoints[0].nextType == 2 && switchPoints[1].prevType == 2))
+      {
+        // We are only interested in purely type 2 segments.
+        continue;
+      }
+      Print("here");
+      // Getting the branchpoints.
+      Point3d startBp = medax.PointAtStart;
+      Point3d endBp = medax.PointAtEnd;
+
+      // Search the nodes corresponding to these two branchpoints.
+      // TODO: Restrict search to graph only consisting on type 2 nodes (search on subgraph).
+      List<Node> toConnect = new List<Node>();
+      foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
+      {
+        Node currNode = keyVal.Key;
+        List<Node> neighbors = keyVal.Value;
+        if (currNode.type != 2)
+        {
+          continue;
+        }
+        if (currNode.branchPoint.DistanceTo(startBp) < 1.0 || currNode.branchPoint.DistanceTo(endBp) < 1.0)
+        {
+          Print("here");
+          toConnect.Add(currNode);
+        }
+      }
+      
+      // Connect all nodes that are adjacent to this medial axis segment.
+      for (int i = 0; i < toConnect.Count; i++)
+      {
+        Node node0 = toConnect[i];
+        for (int j = 0; j < toConnect.Count; j++)
+        {
+          if (i == j)
+          {
+            continue;
+          }
+          Node node1 = toConnect[j];
+          graph[node0].Add(node1);
+        }
+      }
     }
     ElementarySurfacesList = elementaryBreps;
     ElementarySurfaceTypeList = elementaryBrepTypes;
-    // CheckLines = checkLines;
+    List<Point3d> nodeLocs = new List<Point3d>();
+    List<LineCurve> graphEdges = new List<LineCurve>();
+    foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
+    {
+      nodeLocs.Add(keyVal.Key.location);
+      foreach (Node neighbor in keyVal.Value)
+      {
+        graphEdges.Add(new LineCurve(keyVal.Key.location, neighbor.location));
+      }
+    }
+    NodeLocations = nodeLocs;
+    Edges = graphEdges;
   }
   #endregion
   #region Additional
@@ -238,10 +282,8 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       double param = parameters[i];
       int prevType = previousTypes[i];
       int nextType = nextTypes[i];
-      Print(prevType + ", " + nextType);
       res[medax].Add(new SwitchPoint(param, prevType, nextType));
     }
-    Print("--------------------");
     return res;
   }
 
@@ -262,10 +304,10 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   {
     public Chord(Tuple<double, double> chordParams, Tuple<Curve, Curve> boundaryCurves, Tuple<Point3d, Point3d> chordPoints)
     {
-      this.parameters = chordParams;
-      this.curves = boundaryCurves;
-      this.points = chordPoints;
-      this.line = new LineCurve(chordPoints.Item1, chordPoints.Item2);
+      parameters = chordParams;
+      curves = boundaryCurves;
+      points = chordPoints;
+      line = new LineCurve(chordPoints.Item1, chordPoints.Item2);
     }
     public Tuple<double, double> parameters;
     public Tuple<Curve, Curve> curves;
@@ -283,6 +325,21 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     public Curve curve;
     public double param;
     public Point3d point;
+  }
+
+  public struct Node
+  {
+    public Brep brep;
+    public int type;
+    public Point3d location;
+    public Point3d branchPoint; // Only used for type 2 nodes.
+    public Node(Brep brep, int type, Point3d location, Point3d branchPoint)
+    {
+      this.brep = brep;
+      this.type = type;
+      this.location = location;
+      this.branchPoint = branchPoint;
+    }
   }
 
   private bool ContainsPointParallel(Point3d queryPoint, List<Point3d> pointList, double tol)
@@ -331,6 +388,94 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     Point3d point0 = closestPoints[0].point;
     Point3d point1 = closestPoints[idx].point;
     return new Chord(new Tuple<double, double>(param0, param1), new Tuple<Curve, Curve>(curve0, curve1), new Tuple<Point3d, Point3d>(point0, point1));
+  }
+
+  private Brep CreateBrepFromChords(Chord c0, Chord c1)
+  {
+    List<Curve> edges = new List<Curve> { c0.line, c1.line }; // Contains the edges of the surface to be generated.
+
+    // Case: the resulting face is triangular, i.e. two of the endpoints of each chord are identical.
+    if (c0.points.Item1.DistanceTo(c1.points.Item1) < RhinoMath.SqrtEpsilon)
+    {
+      edges.Add(new LineCurve(c0.points.Item2, c1.points.Item2));
+    }
+    else if (c0.points.Item1.DistanceTo(c1.points.Item2) < RhinoMath.SqrtEpsilon)
+    {
+      edges.Add(new LineCurve(c0.points.Item2, c1.points.Item1));
+    }
+    else if (c0.points.Item2.DistanceTo(c1.points.Item1) < RhinoMath.SqrtEpsilon)
+    {
+      edges.Add(new LineCurve(c0.points.Item1, c1.points.Item2));
+    }
+    else if (c0.points.Item2.DistanceTo(c1.points.Item2) < RhinoMath.SqrtEpsilon)
+    {
+      edges.Add(new LineCurve(c0.points.Item1, c1.points.Item1));
+    }
+    else
+    {
+      // None of the chord-endpoints are identical, so we are dealing with a rectangular surface.
+
+      // Here we need to check that we connect the endpoints such that the connecting lines do not cross.
+      Curve sameA = new LineCurve(c0.points.Item1, c1.points.Item1);
+      Curve sameB = new LineCurve(c0.points.Item2, c1.points.Item2);
+
+      // Check intersection.
+      if (Intersection.CurveCurve(sameA, sameB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count == 0)
+      {
+        edges.Add(sameA);
+        edges.Add(sameB);
+      }
+      else
+      {
+        // Then we need to connect the other way around.
+        Curve diffA = new LineCurve(c0.points.Item1, c1.points.Item2);
+        Curve diffB = new LineCurve(c0.points.Item2, c1.points.Item1);
+
+        // Should not happen, but just to be sure.
+        if (Intersection.CurveCurve(diffA, diffB, RhinoMath.SqrtEpsilon, RhinoMath.SqrtEpsilon).Count > 0)
+        {
+          throw new Exception("Connecting lines between chords cross both ways");
+        }
+
+        edges.Add(diffA);
+        edges.Add(diffB);
+      }
+    }
+    return Brep.CreateEdgeSurface(edges);
+  }
+
+  private Point3d ComputePolyCenter(Brep brep)
+  {
+    List<Point3d> corners = new List<Point3d>();
+    if (brep == null)
+    {
+      return Point3d.Origin;
+    }
+    foreach (BrepVertex brepVertex in brep.Vertices)
+    {
+      Point3d location = brepVertex.Location;
+
+      // Need to check if point is already close to corners.
+      bool tooClose = false;
+      foreach (Point3d corner in corners)
+      {
+        if (location.DistanceTo(corner) < 2.0)
+        {
+          tooClose = true;
+          break;
+        }
+      }
+      if (!tooClose)
+      {
+        corners.Add(location);
+      }
+    }
+    Point3d center = Point3d.Origin;
+    foreach (Point3d corner in corners)
+    {
+      center += corner;
+    }
+    return center / corners.Count;
   }
   #endregion
 }
