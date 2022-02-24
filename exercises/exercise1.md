@@ -14,13 +14,11 @@ permalink: /exercise1/
 # Exercise 1: Reading on Evidence-Based Design for Healthcare  
 
 ## Submission Details 
-**Submission date**: 30.10.2021 (00:00 Zurich time)
+**Submission date**: 4.03.2022 (00:00 Zurich time)
 
-**Submission format**: One-page report(A4), Evidence-Based Design cards (template provided on Miro, link provided in email) 
+**Submission format**: Evidence-Based Design cards (template provided on Miro, link provided in email) 
 
-**Presentation date**: 1.10 in class, 5 minutes per student
-
-**Submission link (for the one page report)**: https://polybox.ethz.ch/index.php/s/8L6Oba4HrxWXaKe
+**Presentation date**: 4.03.2022 in class, 5 minutes per student
 
 **Miro link (for the cards)**: provided via email
 
@@ -56,6 +54,9 @@ You can see two screenshots from the Miroboard below.
 
 ## List of papers: 
 
+* Joshi, R., Joseph, A., Ossmann, M., Taaffe, K., Pirrallo, R., Allison, D., & Perino, L. C. (2021). Emergency Physicians’ Workstation Design: An Observational Study of Interruptions and Perception of Collaboration During Shift-End Handoffs. HERD: Health Environments Research & Design Journal, 14(4), 174-193. [PDF](https://polybox.ethz.ch/index.php/s/w3M7zI04r3GQVKM)
+* Tindle, K., David, A., Carlisle, S., Faircloth, B., Fields, J. M., Hayden, G., & Ku, B. (2020). Relationship of the built environment on nursing communication patterns in the emergency department: a task performance and analysis time study. Journal of Emergency Nursing, 46(4), 440-448.
+[PDF]([PDF](https://polybox.ethz.ch/index.php/s/w3M7zI04r3GQVKM))
 * Yi, L., & Seo, H. B. (2012). The effect of hospital unit layout on nurse walking behavior. HERD: Health Environments Research & Design Journal, 6(1), 66-82. [PDF](https://polybox.ethz.ch/index.php/s/9AUBzLIGR2Yd6V0)
 * Seo, H. B., Choi, Y. S., & Zimring, C. (2011). Impact of hospital unit design for patient-centered care on nurses’ behavior. Environment and Behavior, 43(4), 443-468.[PDF](https://polybox.ethz.ch/index.php/s/dObPtSGV57LwEgn)
 * Bosch, S. J., Apple, M., Hiltonen, B., Worden, E., Lu, Y., Nanda, U., & Kim, D. (2016). To see or not to see: Investigating the links between patient visibility and potential moderators affecting the patient experience. Journal of Environmental Psychology, 47, 33-43. [PDF](https://polybox.ethz.ch/index.php/s/eClwKt7Zv2esnz4)
