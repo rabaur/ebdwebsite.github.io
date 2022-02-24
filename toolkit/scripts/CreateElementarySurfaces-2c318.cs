@@ -279,6 +279,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     DeconstructGraph(graph, ref outBreps, ref outTypes, ref outLocations, ref outFirstDelimitingPoints, ref outSecondDelimitingPoints, ref adjacencyMatrix);
     GraphBreps = outBreps;
     GraphTypes = outTypes;
+    GraphLocations = outLocations;
     GraphFirstDelimitingPoints = outFirstDelimitingPoints;
     GraphSecondDelimitingPoints = outSecondDelimitingPoints;
     AdjacencyMatrix = adjacencyMatrix;
