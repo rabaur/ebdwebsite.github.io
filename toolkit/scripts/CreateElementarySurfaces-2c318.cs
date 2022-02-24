@@ -54,7 +54,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges)
+  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object GraphBreps, ref object GraphTypes, ref object GraphLocations, ref object GraphFirstDelimitingPoints, ref object GraphSecondDelimitingPoints, ref object AdjacencyMatrix)
   {
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
@@ -102,8 +102,10 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       {
         SwitchPoint currSwitchPoint = switchPoints[i];
         SwitchPoint nextSwitchPoint = switchPoints[i + 1];
-        Chord c0 = GetChordParallel(medax.PointAt(currSwitchPoint.param), BoundaryCurveList);
-        Chord c1 = GetChordParallel(medax.PointAt(nextSwitchPoint.param), BoundaryCurveList);
+        Point3d currSwitchLoc = medax.PointAt(currSwitchPoint.param);
+        Point3d nextSwitchLoc = medax.PointAt(nextSwitchPoint.param);
+        Chord c0 = GetChordParallel(currSwitchLoc, BoundaryCurveList);
+        Chord c1 = GetChordParallel(nextSwitchLoc, BoundaryCurveList);
         Curve currTrim = medax.Trim(switchPoints[i].param, nextSwitchPoint.param);
 
         // There tend to be instabilities in proximity of branchpoints. Often this results in spurious, small segments being classified as semi,
@@ -126,7 +128,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         elementaryBrepTypes.Add(currType);
 
         // Adding the node.
-        nodes.Add(new Node(currBrep, currType, ComputePolyCenter(currBrep), Point3d.Origin));
+        nodes.Add(new Node(currBrep, currType, ComputePolyCenter(currBrep), new List<Point3d>() { currSwitchLoc, nextSwitchLoc } ));
       }
 
       // Adding newly created nodes to graph and establishing adjacency between consecutive nodes.
@@ -197,7 +199,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       Brep currBrep = Brep.CreateEdgeSurface(currChords);
       elementaryBreps.Add(currBrep);
       elementaryBrepTypes.Add(2);
-      graph[new Node(currBrep, 2, ComputePolyCenter(currBrep), branchPoint)] = adjNodes;
+      graph[new Node(currBrep, 2, ComputePolyCenter(currBrep), new List<Point3d>() { branchPoint, branchPoint } )] = adjNodes;
     }
 
     // Connect type 2 breps which share a medial axis segment.
@@ -230,7 +232,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         {
           continue;
         }
-        if (currNode.branchPoint.DistanceTo(startBp) < 1.0 || currNode.branchPoint.DistanceTo(endBp) < 1.0)
+        if (currNode.delimitingPoints[0].DistanceTo(startBp) < 1.0 || currNode.delimitingPoints[0].DistanceTo(endBp) < 1.0)
         {
           Print("here");
           toConnect.Add(currNode);
@@ -266,6 +268,20 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     }
     NodeLocations = nodeLocs;
     Edges = graphEdges;
+
+    // Deconstruct graph.
+    List<Brep> outBreps = new List<Brep>();
+    List<int> outTypes = new List<int>();
+    List<Point3d> outLocations = new List<Point3d>();
+    List<Point3d> outFirstDelimitingPoints = new List<Point3d>();
+    List<Point3d> outSecondDelimitingPoints = new List<Point3d>();
+    Matrix adjacencyMatrix = new Matrix(graph.Count, graph.Count);
+    DeconstructGraph(graph, ref outBreps, ref outTypes, ref outLocations, ref outFirstDelimitingPoints, ref outSecondDelimitingPoints, ref adjacencyMatrix);
+    GraphBreps = outBreps;
+    GraphTypes = outTypes;
+    GraphFirstDelimitingPoints = outFirstDelimitingPoints;
+    GraphSecondDelimitingPoints = outSecondDelimitingPoints;
+    AdjacencyMatrix = adjacencyMatrix;
   }
   #endregion
   #region Additional
@@ -332,13 +348,13 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     public Brep brep;
     public int type;
     public Point3d location;
-    public Point3d branchPoint; // Only used for type 2 nodes.
-    public Node(Brep brep, int type, Point3d location, Point3d branchPoint)
+    public List<Point3d> delimitingPoints; // Only used for type 2 nodes.
+    public Node(Brep brep, int type, Point3d location, List<Point3d> delimitingPoints)
     {
       this.brep = brep;
       this.type = type;
       this.location = location;
-      this.branchPoint = branchPoint;
+      this.delimitingPoints = delimitingPoints;
     }
   }
 
@@ -476,6 +492,41 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       center += corner;
     }
     return center / corners.Count;
+  }
+
+  private void DeconstructGraph(
+    Dictionary<Node, List<Node>> graph, 
+    ref List<Brep> breps, 
+    ref List<int> types, 
+    ref List<Point3d> locations, 
+    ref List<Point3d> firstDelimitingPoints, 
+    ref List<Point3d> secondDelimitingPoints,
+    ref Matrix adjacencyMatrix)
+  {
+    List<Node> allNodes = new List<Node>();
+    foreach (KeyValuePair<Node, List<Node>> keyValue in graph)
+    {
+      allNodes.Add(keyValue.Key);
+    }
+    foreach (KeyValuePair<Node, List<Node>> keyValue in graph)
+    {
+      Node currNode = keyValue.Key;
+      List<Node> neighbors = keyValue.Value;
+
+      // Transform into lists.
+      breps.Add(currNode.brep);
+      types.Add(currNode.type);
+      locations.Add(currNode.location);
+      firstDelimitingPoints.Add(currNode.delimitingPoints[0]);
+      secondDelimitingPoints.Add(currNode.delimitingPoints[1]);
+
+      int currIdx = allNodes.IndexOf(currNode);
+      foreach (Node neighbor in neighbors)
+      {
+        int neighIdx = allNodes.IndexOf(neighbor);
+        adjacencyMatrix[currIdx, neighIdx] = 1;
+      }
+    }
   }
   #endregion
 }
