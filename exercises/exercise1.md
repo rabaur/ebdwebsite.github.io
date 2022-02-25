@@ -13,11 +13,11 @@ permalink: /exercise1/
 # Exercise 1: Reading on Evidence-Based Design for Healthcare  
 
 ## Submission Details 
-**Submission date**: 4.03.2022 (00:00 Zurich time)
+**Submission date**: 03.03.2022 (23:59 Zurich time)
 
 **Submission format**: Evidence-Based Design cards (template provided on Miro, link provided in email) 
 
-**Presentation date**: 4.03.2022 in class, 5 minutes per student
+**Presentation date**: 04.03.2022 in class, 5 minutes per student
 
 **Miro link (for the cards)**: provided via email
 
