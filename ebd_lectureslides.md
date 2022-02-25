@@ -10,4 +10,4 @@ permalink: /ebd_lectureslides/
 
 ## Lecture 1, 25.09.2021
 Course Introduction, handout of Exercise 1
-[Download lecture slides](https://polybox.ethz.ch/index.php/s/ypEqylg1JPJCgwt)
+[Download lecture slides](https://polybox.ethz.ch/index.php/s/ulRM7VdTZGsb3lc)
