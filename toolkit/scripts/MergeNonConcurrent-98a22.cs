@@ -15,7 +15,7 @@ using Grasshopper.Kernel.Types;
 /// <summary>
 /// This class will be instantiated on demand by the Script component.
 /// </summary>
-public abstract class Script_Instance_12013 : GH_ScriptInstance
+public abstract class Script_Instance_98a22 : GH_ScriptInstance
 {
   #region Utility functions
   /// <summary>Print a String to the [Out] Parameter of the Script component.</summary>
@@ -52,56 +52,19 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix)
+  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut)
   {
+    // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
-
-    // Join all bipartite subgraphs which only consist of type 0 and type 2 nodes and the type 2 nodes are not concurrent, i.e. have at most 2 type 2 neighbors (ignoring type 1 neighbors).
-    Dictionary<Node, bool> visited = new Dictionary<Node, bool>(); // Indicated whether a node was already visited.
-    List<Brep> mergedBreps = new List<Brep>();
-    List<Curve> curves = new List<Curve>();
-    List<Brep> joinable = new List<Brep>();
-    List<Point3d> extremal = new List<Point3d>();
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
+
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
       Node currNode = keyVal.Key;
-      if (currNode.type != 2)
-      {
-        continue;
-      }
-      if (!ContainsPointParallel(currNode.delimitingPoints[0], BranchPointList, 1.0))
-      {
-        continue;
-      }
-      List<Node> neighbors = keyVal.Value;
-      List<Node> toContract = new List<Node>() { currNode };
-      if (currNode.brep == null)
-      {
-        continue;
-      }
-      foreach (Node neighbor in neighbors)
-      {
-        if (neighbor.type != 1)
-        {
-          continue;
-        }
-        if (neighbor.delimitingPoints[0].DistanceTo(currNode.delimitingPoints[0]) > 2.0 && neighbor.delimitingPoints[1].DistanceTo(currNode.delimitingPoints[0]) > 2.0)
-        {
-          continue;
-        }
-        toContract.Add(neighbor);
-      }
-      if (toContract.Count == 1)
-      {
-        continue;
-      }
-      ContractNodes(graphCopy, toContract, 2);
-    }
-    Tuple<List<Point3d>, List<LineCurve>> locsAndEdges = GetPointsAndEdges(graphCopy);
-    NodeLocations = locsAndEdges.Item1;
-    Edges = locsAndEdges.Item2;
 
+    }
+
+    // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
     List<int> outTypes = new List<int>();
     List<Point3d> outLocations = new List<Point3d>();
@@ -113,6 +76,10 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
     OutLocations = outLocations;
     OutDelimitingPoints = outDelimitingPoints;
     OutAdjacencyMatrix = adjacencyMatrix;
+    Tuple<List<Point3d>, List<LineCurve>> nodeLocsAndEdges = GetPointsAndEdges(graphCopy);
+    NodeLocations = nodeLocsAndEdges.Item1;
+    Edges = nodeLocsAndEdges.Item2;
+
   }
   #endregion
   #region Additional
@@ -230,7 +197,6 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
     List<double> angles = new List<double>();
     foreach (Vector3d connector in connectors)
     {
-      Print(AngleToXY(connector).ToString());
       angles.Add(AngleToXY(connector));
     }
 
@@ -400,7 +366,7 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
       {
         msg += redundant[i].ToString() + ", ";
       }
-      throw new Exception(msg);
+      throw new Exception("Merged surface was null");
     }
     if (res.Length != 1)
     {

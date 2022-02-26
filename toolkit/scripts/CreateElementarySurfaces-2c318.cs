@@ -54,7 +54,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object GraphBreps, ref object GraphTypes, ref object GraphLocations, ref object GraphFirstDelimitingPoints, ref object GraphSecondDelimitingPoints, ref object AdjacencyMatrix)
+  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix)
   {
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
@@ -291,16 +291,14 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     List<Brep> outBreps = new List<Brep>();
     List<int> outTypes = new List<int>();
     List<Point3d> outLocations = new List<Point3d>();
-    List<Point3d> outFirstDelimitingPoints = new List<Point3d>();
-    List<Point3d> outSecondDelimitingPoints = new List<Point3d>();
+    DataTree<Point3d> outDelimitingPoints = new DataTree<Point3d>();
     Matrix adjacencyMatrix = new Matrix(graph.Count, graph.Count);
-    DeconstructGraph(graph, ref outBreps, ref outTypes, ref outLocations, ref outFirstDelimitingPoints, ref outSecondDelimitingPoints, ref adjacencyMatrix);
-    GraphBreps = outBreps;
-    GraphTypes = outTypes;
-    GraphLocations = outLocations;
-    GraphFirstDelimitingPoints = outFirstDelimitingPoints;
-    GraphSecondDelimitingPoints = outSecondDelimitingPoints;
-    AdjacencyMatrix = adjacencyMatrix;
+    DeconstructGraph(graph, ref outBreps, ref outTypes, ref outLocations, ref outDelimitingPoints, ref adjacencyMatrix);
+    OutBreps = outBreps;
+    OutTypes = outTypes;
+    OutLocations = outLocations;
+    OutDelimitingPoints = outDelimitingPoints;
+    OutAdjacencyMatrix = adjacencyMatrix;
   }
   #endregion
   #region Additional
@@ -514,12 +512,11 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   }
 
   private void DeconstructGraph(
-    Dictionary<Node, List<Node>> graph, 
-    ref List<Brep> breps, 
-    ref List<int> types, 
-    ref List<Point3d> locations, 
-    ref List<Point3d> firstDelimitingPoints, 
-    ref List<Point3d> secondDelimitingPoints,
+    Dictionary<Node, List<Node>> graph,
+    ref List<Brep> breps,
+    ref List<int> types,
+    ref List<Point3d> locations,
+    ref DataTree<Point3d> delimitingPoints,
     ref Matrix adjacencyMatrix)
   {
     List<Node> allNodes = new List<Node>();
@@ -527,6 +524,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     {
       allNodes.Add(keyValue.Key);
     }
+    int branchIdx = 0;
     foreach (KeyValuePair<Node, List<Node>> keyValue in graph)
     {
       Node currNode = keyValue.Key;
@@ -536,8 +534,8 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       breps.Add(currNode.brep);
       types.Add(currNode.type);
       locations.Add(currNode.location);
-      firstDelimitingPoints.Add(currNode.delimitingPoints[0]);
-      secondDelimitingPoints.Add(currNode.delimitingPoints[1]);
+      delimitingPoints.AddRange(currNode.delimitingPoints, new GH_Path(new int[] { 0, branchIdx }));
+      branchIdx++;
 
       int currIdx = allNodes.IndexOf(currNode);
       foreach (Node neighbor in neighbors)
