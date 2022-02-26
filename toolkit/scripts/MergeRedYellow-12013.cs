@@ -52,7 +52,7 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Brep> GraphBreps, List<int> GraphTypes, List<Point3d> GraphLocations, List<Point3d> GraphFirstDelimitingPoints, List<Point3d> GraphSecondDelimitingPoints, object AdjacencyMatrix, List<Point3d> BranchPointList, ref object MergedBreps, ref object Curves, ref object Joinable, ref object Extremal)
+  private void RunScript(List<Brep> GraphBreps, List<int> GraphTypes, List<Point3d> GraphLocations, List<Point3d> GraphFirstDelimitingPoints, List<Point3d> GraphSecondDelimitingPoints, object AdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges)
   {
     Dictionary<Node, List<Node>> graph = ReassembleGraph(GraphBreps, GraphTypes, GraphLocations, GraphFirstDelimitingPoints, GraphSecondDelimitingPoints, (Matrix)AdjacencyMatrix);
 
@@ -62,6 +62,7 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
     List<Curve> curves = new List<Curve>();
     List<Brep> joinable = new List<Brep>();
     List<Point3d> extremal = new List<Point3d>();
+    Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
       Node currNode = keyVal.Key;
@@ -74,7 +75,7 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
         continue;
       }
       List<Node> neighbors = keyVal.Value;
-      List<Brep> toBeMerged = new List<Brep>() { currNode.brep };
+      List<Node> toContract = new List<Node>() { currNode };
       if (currNode.brep == null)
       {
         continue;
@@ -89,44 +90,17 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
         {
           continue;
         }
-        toBeMerged.Add(neighbor.brep);
+        toContract.Add(neighbor);
       }
-      if (toBeMerged.Count == 1)
+      if (toContract.Count == 1)
       {
         continue;
       }
-      if (joinable.Count == 0)
-      {
-        joinable.AddRange(toBeMerged);
-        extremal.Add(currNode.delimitingPoints[0]);
-      }
-      Point3d center = ComputePolyCenter(toBeMerged);
-      List<Point3d> corners = new List<Point3d>();
-      foreach (Brep brep in toBeMerged)
-      {
-        foreach (BrepVertex bVert in brep.Vertices)
-        {
-          corners.Add(bVert.Location);
-        }
-      }
-      Point3d[] sortedCorners = SortPointsWithAngle(center, corners);
-      List<LineCurve> edges = new List<LineCurve>();
-      for (int i = 0; i < sortedCorners.Length; i++)
-      {
-        edges.Add(new LineCurve(sortedCorners[i], sortedCorners[(i + 1) % sortedCorners.Length]));
-      }
-      curves.AddRange(edges);
-      Brep[] res = Brep.CreatePlanarBreps(edges, RhinoMath.SqrtEpsilon);
-      if (res == null)
-      {
-        continue;
-      }
-      mergedBreps.AddRange(Brep.CreatePlanarBreps(edges, RhinoMath.SqrtEpsilon));
+      ContractNodes(graphCopy, toContract, 2);
     }
-    MergedBreps = mergedBreps;
-    Curves = curves;
-    Joinable = joinable;
-    Extremal = extremal;
+    Tuple<List<Point3d>, List<LineCurve>> locsAndEdges = GetPointsAndEdges(graphCopy);
+    NodeLocations = locsAndEdges.Item1;
+    Edges = locsAndEdges.Item2;
   }
   #endregion
   #region Additional
@@ -266,6 +240,179 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
     {
       return 360.0 - RhinoMath.ToDegrees(Vector3d.VectorAngle(vec, xAxis));
     }
+  }
+
+  private void ContractNodes(Dictionary<Node, List<Node>> graph, List<Node> toContract, int newType)
+  {
+    // Find neighborhood of nodes to be contracted (without the nodes themselves).
+    // TODO: Make more efficient by tracking the neighbors that were already added (instead of invoking Contains every time.)
+    List<Node> neighbors = new List<Node>();
+    foreach (Node contract in toContract)
+    {
+      foreach (Node neighbor in graph[contract])
+      {
+        if (!toContract.Contains(neighbor) && !neighbors.Contains(neighbor))
+        {
+          neighbors.Add(neighbor);
+        }
+      }
+    }
+
+    // Delete each node which was to be contracted.
+    foreach (Node contract in toContract)
+    {
+      DeleteNode(graph, contract);
+    }
+
+    // Construct new node from nodes that were contracted.
+    Brep newBrep = MergeBreps(toContract); // New brep.
+
+    // Breaking the convention that there can only be two delimiting points now.
+    List<Point3d> newDelimPoints = new List<Point3d>();
+    foreach (Node contract in toContract)
+    {
+      foreach (Point3d delimPoint in contract.delimitingPoints)
+      {
+        bool tooClose = false;
+        foreach (Point3d added in newDelimPoints)
+        {
+          if (added.DistanceTo(delimPoint) <= 1.0)
+          {
+            tooClose = true;
+            break;
+          }
+        }
+        if (!tooClose)
+        {
+          newDelimPoints.Add(delimPoint);
+        }
+      }
+    }
+    Node newNode = new Node(newBrep, newType, ComputePolyCenter(new List<Brep> { newBrep }), newDelimPoints);
+
+    // Add node to the graph.
+    graph[newNode] = neighbors;
+
+    // Add node to all neighbors.
+    foreach (Node neighbor in neighbors)
+    {
+      graph[neighbor].Add(newNode);
+    }
+  }
+
+  // Returns old neighborhood if successful.
+  private void DeleteNode(Dictionary<Node, List<Node>> graph, Node toDelete)
+  {
+    List<Node> neighbors = new List<Node>();
+    if (!graph.TryGetValue(toDelete, out neighbors))
+    {
+      throw new Exception("The node to be deleted was not present in the graph.");
+    }
+
+    // Delete the node.
+    graph.Remove(toDelete);
+
+    // Remove node from neighbor's adjacency list.
+    foreach (Node neighbor in neighbors)
+    {
+      graph[neighbor].Remove(toDelete);
+    }
+  }
+
+  private Brep MergeBreps(List<Node> nodes)
+  {
+    List<Brep> brepsToBeMerged = new List<Brep>();
+    foreach (Node contract in nodes)
+    {
+      brepsToBeMerged.Add(contract.brep);
+    }
+    Point3d center = ComputePolyCenter(brepsToBeMerged);
+    List<Point3d> corners = new List<Point3d>();
+    foreach (Brep brep in brepsToBeMerged)
+    {
+      foreach (BrepVertex bVert in brep.Vertices)
+      {
+        bool tooClose = false;
+        foreach (Point3d added in corners)
+        {
+          if (added.DistanceTo(bVert.Location) < 0.1)
+          {
+            tooClose = true;
+            break;
+          }
+        }
+        if (!tooClose)
+        {
+          corners.Add(bVert.Location);
+        }
+      }
+    }
+    Point3d[] sortedCorners = SortPointsWithAngle(center, corners);
+
+    // Check if any of the corners lies on the straight line segment connecting the previous and next corner.
+    // If so, this corner is redundant.
+    bool[] redundant = new bool[sortedCorners.Length];
+
+    // Starting from 1 to avoid needing to deal with negative remainders.
+    for (int i = 1; i < sortedCorners.Length + 1; i++)
+    {
+      LineCurve connector = new LineCurve(sortedCorners[i - 1], sortedCorners[(i + 1) % sortedCorners.Length]);
+
+      // Find closest point.
+      double closestParam;
+      connector.ClosestPoint(sortedCorners[i % sortedCorners.Length], out closestParam);
+      Point3d closestPoint = connector.PointAt(closestParam);
+      if (closestPoint.DistanceTo(sortedCorners[i % sortedCorners.Length]) < 0.1)
+      {
+        redundant[i % sortedCorners.Length] = true;
+      }
+    }
+
+    List<Point3d> nonRedundantCorners = new List<Point3d>();
+    for (int i = 0; i < sortedCorners.Length; i++)
+    {
+      if (!redundant[i])
+      {
+        nonRedundantCorners.Add(sortedCorners[i]);
+      }
+    }
+    List<LineCurve> newBrepEdges = new List<LineCurve>();
+    for (int i = 0; i < nonRedundantCorners.Count; i++)
+    {
+      newBrepEdges.Add(new LineCurve(nonRedundantCorners[i], nonRedundantCorners[(i + 1) % nonRedundantCorners.Count]));
+    }
+    Brep[] res = Brep.CreatePlanarBreps(newBrepEdges, RhinoMath.SqrtEpsilon);
+    if (res == null)
+    {
+      string msg = "";
+      for (int i = 0; i < redundant.Length; i++)
+      {
+        msg += redundant[i].ToString() + ", ";
+      }
+      throw new Exception(msg);
+    }
+    if (res.Length != 1)
+    {
+      throw new Exception("Too few or too many breps resulted from merging: " + res.Length);
+    }
+    return res[0];
+  }
+
+  private Tuple<List<Point3d>, List<LineCurve>> GetPointsAndEdges(Dictionary<Node, List<Node>> graph)
+  {
+    List<Point3d> nodeLocs = new List<Point3d>();
+    List<LineCurve> edges = new List<LineCurve>();
+    foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
+    {
+      Node node = keyVal.Key;
+      List<Node> neighbors = keyVal.Value;
+      nodeLocs.Add(node.location);
+      foreach (Node neighbor in neighbors)
+      {
+        edges.Add(new LineCurve(node.location, neighbor.location));
+      }
+    }
+    return new Tuple<List<Point3d>, List<LineCurve>>(nodeLocs, edges);
   }
   #endregion
 }
