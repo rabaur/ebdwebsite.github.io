@@ -4,7 +4,8 @@ image_sliders:
   - example_slider
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}){: .btn .btn--dark} 
+[Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})
 
 
 {% include slider.html selector="example_slider" %}
