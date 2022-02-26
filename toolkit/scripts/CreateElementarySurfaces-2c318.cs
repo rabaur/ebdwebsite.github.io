@@ -97,7 +97,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
 
       // Generating all nodes corresponding to this medial axis segment on the fly. Ensuring adjacency between consecutive nodes afterwards.
       List<Node> nodes = new List<Node>();
-
+      List<SwitchPoint> switchPointsToRemove = new List<SwitchPoint>();
       for (int i = 0; i < switchPoints.Count - 1; i++)
       {
         SwitchPoint currSwitchPoint = switchPoints[i];
@@ -113,8 +113,9 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         // that would normally be covered by a full-ligature.
         if (currTrim != null)
         {
-          if (currTrim.GetLength() < 1.0 && currSwitchPoint.nextType == 1 && ContainsPointParallel(currTrim.PointAtStart, BranchPointList, 1.0))
+          if (currTrim.GetLength() < 1.0 && currSwitchPoint.nextType == 1 && ContainsPointParallel(currTrim.PointAtStart, BranchPointList, 1.5))
           {
+            switchPointsToRemove.Add(nextSwitchPoint);
             continue;
           }
         }
@@ -129,6 +130,19 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
 
         // Adding the node.
         nodes.Add(new Node(currBrep, currType, ComputePolyCenter(currBrep), new List<Point3d>() { currSwitchLoc, nextSwitchLoc } ));
+      }
+
+      // Remove invalid switchpoints.
+      foreach (SwitchPoint switchPointToRemove in switchPointsToRemove)
+      {
+        int idx = switchPointsToRemove.IndexOf(switchPointToRemove);
+        Print("Removing: " + idx);
+        // Change previous and next-types of adjacent switchpoints.
+        // Note that an invalid switchpoint can neither be the last or first switchpoint, as the first and last one are always type 2 nodes.
+        Print(switchPoints[idx].prevType + ", " + switchPoints[idx + 1].prevType);
+        SwitchPoint switch0 = new SwitchPoint(switchPoints[idx + 1].param, switchPoints[idx].prevType, switchPoints[idx + 1].nextType);
+        switchPoints[idx + 1] = switch0;
+        switchPoints.Remove(switchPointToRemove);
       }
 
       // Adding newly created nodes to graph and establishing adjacency between consecutive nodes.
@@ -199,7 +213,12 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       Brep currBrep = Brep.CreateEdgeSurface(currChords);
       elementaryBreps.Add(currBrep);
       elementaryBrepTypes.Add(2);
-      graph[new Node(currBrep, 2, ComputePolyCenter(currBrep), new List<Point3d>() { branchPoint, branchPoint } )] = adjNodes;
+      Node newNode = new Node(currBrep, 2, ComputePolyCenter(currBrep), new List<Point3d>() { branchPoint, branchPoint });
+      graph[newNode] = adjNodes;
+      foreach (Node adjNode in adjNodes)
+      {
+        graph[adjNode].Add(newNode);
+      }
     }
 
     // Connect type 2 breps which share a medial axis segment.
@@ -216,7 +235,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         // We are only interested in purely type 2 segments.
         continue;
       }
-      Print("here");
+
       // Getting the branchpoints.
       Point3d startBp = medax.PointAtStart;
       Point3d endBp = medax.PointAtEnd;
@@ -234,7 +253,6 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         }
         if (currNode.delimitingPoints[0].DistanceTo(startBp) < 1.0 || currNode.delimitingPoints[0].DistanceTo(endBp) < 1.0)
         {
-          Print("here");
           toConnect.Add(currNode);
         }
       }
