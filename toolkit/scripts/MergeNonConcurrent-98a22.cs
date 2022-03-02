@@ -57,12 +57,8 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
+    
 
-    foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
-    {
-      Node currNode = keyVal.Key;
-
-    }
 
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
@@ -425,6 +421,22 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
         adjacencyMatrix[currIdx, neighIdx] = 1;
       }
     }
+  }
+
+  private List<Point3d> ConvexHullXY(List<Point3d> points)
+  {
+    // Find most left point.
+  }
+
+  private int Orientation(Point3d p, Point3d q, Point3d r)
+  {
+    double val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+
+    if (val == 0.0)
+    {
+      return 0; // collinear
+    }
+    return (val > 0) ? 1 : 2; // clock or counterclock wise
   }
   #endregion
 }
