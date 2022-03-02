@@ -230,7 +230,6 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
     List<double> angles = new List<double>();
     foreach (Vector3d connector in connectors)
     {
-      Print(AngleToXY(connector).ToString());
       angles.Add(AngleToXY(connector));
     }
 
