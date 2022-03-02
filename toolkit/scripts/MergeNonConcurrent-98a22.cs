@@ -57,6 +57,86 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
+    Dictionary<Node, bool> globalVisited = new Dictionary<Node, bool>();
+    foreach (KeyValuePair<Node, List<Node>> keyValuePair in graph)
+    {
+      globalVisited[keyValuePair.Key] = false;
+    }
+    foreach (KeyValuePair<Node, List<Node>> keyValuePair in graph)
+    {
+      Node initNode = keyValuePair.Key;
+      if (initNode.type != 2)
+      {
+        continue;
+      }
+      if (initNode.brep == null)
+      {
+        continue;
+      }
+      if (globalVisited[initNode])
+      {
+        continue;
+      }
+
+      Stack<Node> stack = new Stack<Node>();
+      foreach (Node neighbor in graph[initNode])
+      {
+        stack.Push(neighbor);
+      }
+      int cnt = 0;
+      Dictionary<Node, Node> predecessor = new Dictionary<Node, Node>();
+      predecessor[initNode] = new Node(null, -1, Point3d.Origin, null); // Dummy predecessor for the start node.
+      foreach (Node neighbor in graph[initNode])
+      {
+        predecessor[neighbor] = initNode;
+      }
+      List<Node> currVisited = new List<Node>() { initNode }; // Contains all the nodes that were visited in this run.
+      while (stack.Count != 0)
+      {
+        cnt++;
+        if (cnt == 10000)
+        {
+          throw new Exception("Probably stuck in a while loop.");
+        }
+        Node currNode = stack.Pop();
+        if (currVisited.Contains(currNode))
+        {
+          continue;
+        }
+        currVisited.Add(currNode);
+        if (currNode.type != 0)
+        {
+          // Only type 0 segments are allowed to stack neighbors.
+          continue;
+        }
+        foreach (Node currNeighbor in graph[currNode])
+        {
+          predecessor[currNeighbor] = currNode;
+          stack.Push(currNeighbor);
+        }
+      }
+
+      // Find all nodes in currVisited that are non-current (have only one neighbor). These are leaves of branches that can potentially be joined.
+      List<Node> joinable = new List<Node>();
+      foreach (Node visited in currVisited)
+      {
+        if (graph[visited].Count != 1)
+        {
+          // This is not leave.
+          continue;
+        }
+
+        // Backtrack.
+        Node tracker = visited;
+        while (tracker.type != -1)
+        {
+          break;
+          joinable.Add(tracker);
+          tracker = predecessor[tracker];
+        }
+      }
+
+    }
 
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
@@ -443,14 +523,8 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     List<Point3d> hull = new List<Point3d>();
     int last = startIdx;
     int next;
-    int cnt = 0;
     do
     {
-      cnt++;
-      if (cnt == 10000)
-      {
-        throw new Exception("Probably stuck in a while loop.");
-      }
       hull.Add(points[last]);
       next = (last + 1) % points.Count;
       for (int i = 0; i < points.Count; i++)

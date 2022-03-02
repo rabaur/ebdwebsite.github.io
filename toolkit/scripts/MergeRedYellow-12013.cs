@@ -58,10 +58,6 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
 
     // Join all bipartite subgraphs which only consist of type 0 and type 2 nodes and the type 2 nodes are not concurrent, i.e. have at most 2 type 2 neighbors (ignoring type 1 neighbors).
     Dictionary<Node, bool> visited = new Dictionary<Node, bool>(); // Indicated whether a node was already visited.
-    List<Brep> mergedBreps = new List<Brep>();
-    List<Curve> curves = new List<Curve>();
-    List<Brep> joinable = new List<Brep>();
-    List<Point3d> extremal = new List<Point3d>();
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
