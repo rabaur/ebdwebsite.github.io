@@ -57,8 +57,6 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
-    
-
 
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
@@ -425,7 +423,48 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
 
   private List<Point3d> ConvexHullXY(List<Point3d> points)
   {
+    // If we have less than 4 points, the hull is trivially convex.
+    if (points.Count <= 3)
+    {
+      return points;
+    }
+
     // Find most left point.
+    int startIdx = 0;
+    for (int i = 1; i < points.Count; i++)
+    {
+      if (points[i].X < points[startIdx].X)
+      {
+        startIdx = i;
+      }
+    }
+
+    // Wrapping.
+    List<Point3d> hull = new List<Point3d>();
+    int last = startIdx;
+    int next;
+    int cnt = 0;
+    do
+    {
+      cnt++;
+      if (cnt == 10000)
+      {
+        throw new Exception("Probably stuck in a while loop.");
+      }
+      hull.Add(points[last]);
+      next = (last + 1) % points.Count;
+      for (int i = 0; i < points.Count; i++)
+      {
+        if (Orientation(points[last], points[i], points[next]) == 2)
+        {
+          // The current segment is a right turn.
+          next = i;
+        }
+      }
+      last = next;
+    }
+    while (last != startIdx);
+    return hull;
   }
 
   private int Orientation(Point3d p, Point3d q, Point3d r)
