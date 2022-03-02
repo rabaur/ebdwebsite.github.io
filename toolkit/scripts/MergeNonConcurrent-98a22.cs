@@ -52,90 +52,40 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut)
+  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut, ref object Weird, ref object ToMerge)
   {
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
     Dictionary<Node, bool> globalVisited = new Dictionary<Node, bool>();
-    foreach (KeyValuePair<Node, List<Node>> keyValuePair in graph)
+    foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
-      globalVisited[keyValuePair.Key] = false;
+      globalVisited[keyVal.Key] = false;
     }
-    foreach (KeyValuePair<Node, List<Node>> keyValuePair in graph)
+    foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
-      Node initNode = keyValuePair.Key;
-      if (initNode.type != 2)
+      Node initNode = keyVal.Key;
+      if (initNode.type != 2 || graph[initNode].Count > 1)
       {
         continue;
       }
-      if (initNode.brep == null)
-      {
-        continue;
-      }
-      if (globalVisited[initNode])
-      {
-        continue;
-      }
-
-      Stack<Node> stack = new Stack<Node>();
-      foreach (Node neighbor in graph[initNode])
-      {
-        stack.Push(neighbor);
-      }
-      int cnt = 0;
-      Dictionary<Node, Node> predecessor = new Dictionary<Node, Node>();
-      predecessor[initNode] = new Node(null, -1, Point3d.Origin, null); // Dummy predecessor for the start node.
-      foreach (Node neighbor in graph[initNode])
-      {
-        predecessor[neighbor] = initNode;
-      }
-      List<Node> currVisited = new List<Node>() { initNode }; // Contains all the nodes that were visited in this run.
-      while (stack.Count != 0)
-      {
-        cnt++;
-        if (cnt == 10000)
-        {
-          throw new Exception("Probably stuck in a while loop.");
-        }
-        Node currNode = stack.Pop();
-        if (currVisited.Contains(currNode))
-        {
-          continue;
-        }
-        currVisited.Add(currNode);
-        if (currNode.type != 0)
-        {
-          // Only type 0 segments are allowed to stack neighbors.
-          continue;
-        }
-        foreach (Node currNeighbor in graph[currNode])
-        {
-          predecessor[currNeighbor] = currNode;
-          stack.Push(currNeighbor);
-        }
-      }
-
-      // Find all nodes in currVisited that are non-current (have only one neighbor). These are leaves of branches that can potentially be joined.
       List<Node> joinable = new List<Node>();
-      foreach (Node visited in currVisited)
+      Queue<Node> queue = new Queue<Node>();
+      queue.Enqueue(initNode);
+      while (queue.Count != 0)
       {
-        if (graph[visited].Count != 1)
+        Node currNode = queue.Dequeue();
+        if (globalVisited[currNode])
         {
-          // This is not leave.
           continue;
         }
-
-        // Backtrack.
-        Node tracker = visited;
-        while (tracker.type != -1)
+        joinable.Add(currNode);
+        globalVisited[currNode] = true;
+        foreach (Node neighbor in graph[currNode])
         {
-          break;
-          joinable.Add(tracker);
-          tracker = predecessor[tracker];
+
         }
       }
-
     }
 
     // Deconstruct graph.
@@ -298,6 +248,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     // Find neighborhood of nodes to be contracted (without the nodes themselves).
     // TODO: Make more efficient by tracking the neighbors that were already added (instead of invoking Contains every time.)
     List<Node> neighbors = new List<Node>();
+
     foreach (Node contract in toContract)
     {
       foreach (Node neighbor in graph[contract])
@@ -440,7 +391,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       {
         msg += redundant[i].ToString() + ", ";
       }
-      throw new Exception("Merged surface was null");
+      throw new Exception("Merged surface was null: " + msg + ", " + nodes.Count);
     }
     if (res.Length != 1)
     {
@@ -499,6 +450,31 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
         adjacencyMatrix[currIdx, neighIdx] = 1;
       }
     }
+  }
+
+  private List<Point3d> GetUniqueCorners(List<Brep> breps)
+  {
+    List<Point3d> corners = new List<Point3d>();
+    foreach (Brep brep in breps)
+    {
+      foreach (BrepVertex bVert in brep.Vertices)
+      {
+        bool tooClose = false;
+        foreach (Point3d added in corners)
+        {
+          if (added.DistanceTo(bVert.Location) < 0.1)
+          {
+            tooClose = true;
+            break;
+          }
+        }
+        if (!tooClose)
+        {
+          corners.Add(bVert.Location);
+        }
+      }
+    }
+    return corners;
   }
 
   private List<Point3d> ConvexHullXY(List<Point3d> points)

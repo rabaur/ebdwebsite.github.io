@@ -52,7 +52,7 @@ public abstract class Script_Instance_7faaf : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut)
+  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix)
   {
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
