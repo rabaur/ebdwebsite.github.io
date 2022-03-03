@@ -165,8 +165,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       medax2Node[medax] = new List<Node>() { nodes[0], nodes[nodes.Count - 1] };
     }
 
-    // Now we need to add the surfaces that correspond to branchpoints.
-    List<Curve> checkLines = new List<Curve>();
+    // Add the surfaces that correspond to branchpoints.
     foreach (Point3d branchPoint in BranchPointList)
     {
       List<Curve> adjMedaxs = new List<Curve>();
@@ -205,12 +204,50 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
           }
         }
       }
-      List<Curve> currChords = new List<Curve>();
+
+      // Get the endpoints of all chords, as they delimit the newly created face.
+      List<Point3d> chordEnds = new List<Point3d>();
       foreach (Chord chord in adjChords)
       {
-        currChords.Add(chord.line);
+        chordEnds.Add(chord.line.PointAtStart);
+        chordEnds.Add(chord.line.PointAtEnd);
       }
-      Brep currBrep = Brep.CreateEdgeSurface(currChords);
+
+      // Make the corners unique, such that we do not have double corners.
+      List<Point3d> uniqueChordEnds = new List<Point3d>();
+      foreach (Point3d chordEnd in chordEnds)
+      {
+        bool tooClose = false;
+        foreach (Point3d added in uniqueChordEnds)
+        {
+          if (added.DistanceTo(chordEnd) < 0.1)
+          {
+            tooClose = true;
+            break;
+          }
+        }
+        if (!tooClose)
+        {
+          uniqueChordEnds.Add(chordEnd);
+        }
+      }
+
+      // Determine convex hull in order to get points in correct order to generate boundary.
+      List<Point3d> hull = ConvexHullXY(uniqueChordEnds);
+
+      // Generate the boundary edges.
+      List<LineCurve> edges = new List<LineCurve>();
+      for (int i = 0; i < hull.Count; i++)
+      {
+        edges.Add(new LineCurve(hull[i], hull[(i + 1) % hull.Count]));
+      }
+
+      Brep[] currBreps = Brep.CreatePlanarBreps(edges, RhinoMath.SqrtEpsilon);
+      if (currBreps.Length != 1)
+      {
+        throw new Exception("Too little or too many surfaces generated");
+      }
+      Brep currBrep = currBreps[0];
       elementaryBreps.Add(currBrep);
       elementaryBrepTypes.Add(2);
       Node newNode = new Node(currBrep, 2, ComputePolyCenter(currBrep), new List<Point3d>() { branchPoint, branchPoint });
@@ -544,6 +581,82 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         adjacencyMatrix[currIdx, neighIdx] = 1;
       }
     }
+  }
+
+  private List<Point3d> GetUniqueCorners(List<Brep> breps)
+  {
+    List<Point3d> corners = new List<Point3d>();
+    foreach (Brep brep in breps)
+    {
+      foreach (BrepVertex bVert in brep.Vertices)
+      {
+        bool tooClose = false;
+        foreach (Point3d added in corners)
+        {
+          if (added.DistanceTo(bVert.Location) < 0.1)
+          {
+            tooClose = true;
+            break;
+          }
+        }
+        if (!tooClose)
+        {
+          corners.Add(bVert.Location);
+        }
+      }
+    }
+    return corners;
+  }
+
+  private List<Point3d> ConvexHullXY(List<Point3d> points)
+  {
+    // If we have less than 4 points, the hull is trivially convex.
+    if (points.Count <= 3)
+    {
+      return points;
+    }
+
+    // Find most left point.
+    int startIdx = 0;
+    for (int i = 1; i < points.Count; i++)
+    {
+      if (points[i].X < points[startIdx].X)
+      {
+        startIdx = i;
+      }
+    }
+
+    // Wrapping.
+    List<Point3d> hull = new List<Point3d>();
+    int last = startIdx;
+    int next;
+    do
+    {
+      hull.Add(points[last]);
+      next = (last + 1) % points.Count;
+      for (int i = 0; i < points.Count; i++)
+      {
+        if (Orientation(points[last], points[i], points[next]) == 2)
+        {
+          // The current segment is a right turn.
+          next = i;
+        }
+      }
+      last = next;
+    }
+    while (last != startIdx);
+    return hull;
+  }
+
+  private int Orientation(Point3d p, Point3d q, Point3d r)
+  {
+    double val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+
+    if (val == 0.0)
+    {
+      return 0; // collinear
+    }
+    return (val > 0) ? 1 : 2; // clock or counterclock wise
   }
   #endregion
 }

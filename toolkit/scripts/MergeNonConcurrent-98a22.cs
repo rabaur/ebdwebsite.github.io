@@ -58,6 +58,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
     Dictionary<Node, bool> globalVisited = new Dictionary<Node, bool>();
+    List<Brep> toMerge = new List<Brep>();
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
       globalVisited[keyVal.Key] = false;
@@ -66,6 +67,10 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     {
       Node initNode = keyVal.Key;
       if (initNode.type != 2 || graph[initNode].Count > 1)
+      {
+        continue;
+      }
+      if (globalVisited[initNode])
       {
         continue;
       }
@@ -83,11 +88,29 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
         globalVisited[currNode] = true;
         foreach (Node neighbor in graph[currNode])
         {
-
+          List<Brep> potentialBreps = new List<Brep>();
+          foreach (Node join in joinable)
+          {
+            potentialBreps.Add(join.brep);
+          }
+          potentialBreps.Add(neighbor.brep);
+          if (graph[neighbor].Count <= 2 && IsConvex(GetUniqueCorners(potentialBreps)))
+          {
+            queue.Enqueue(neighbor);
+          }
         }
       }
+      foreach (Node join in joinable)
+      {
+        toMerge.Add(join.brep);
+      }
+      if (joinable.Count <= 1)
+      {
+        continue;
+      }
+      ContractNodes(graphCopy, joinable, 2);
     }
-
+    ToMerge = toMerge;
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
     List<int> outTypes = new List<int>();
@@ -407,10 +430,18 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
       Node node = keyVal.Key;
+      if (node.brep == null)
+      {
+        continue;
+      }
       List<Node> neighbors = keyVal.Value;
       nodeLocs.Add(node.location);
       foreach (Node neighbor in neighbors)
       {
+        if (neighbor.brep == null)
+        {
+          continue;
+        }
         edges.Add(new LineCurve(node.location, neighbor.location));
       }
     }
@@ -515,6 +546,46 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     }
     while (last != startIdx);
     return hull;
+  }
+
+  private bool IsConvex(List<Point3d> points)
+  {
+    List<Point3d> hull = ConvexHullXY(points);
+    Point3d center = Point3d.Origin;
+    foreach (Point3d point in hull)
+    {
+      center += point;
+    }
+    center /= hull.Count;
+    Point3d[] sortedHull = SortPointsWithAngle(center, hull);
+    List<LineCurve> edges = new List<LineCurve>();
+    for (int i = 0; i < sortedHull.Length; i++)
+    {
+      edges.Add(new LineCurve(sortedHull[i], sortedHull[(i + 1) % sortedHull.Length]));
+    }
+    foreach (Point3d point in points)
+    {
+      double closestParam;
+      double minDist = double.MaxValue;
+      LineCurve clostestCurve = edges[0];
+      foreach (LineCurve edge in edges)
+      {
+        double currParam;
+        edge.ClosestPoint(point, out currParam);
+        if (edge.PointAt(currParam).DistanceTo(point) < minDist)
+        {
+          minDist = edge.PointAt(currParam).DistanceTo(point);
+          closestParam = currParam;
+          clostestCurve = edge;
+        }
+      }
+      Print(minDist.ToString());
+      if (minDist > 1.0)
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   private int Orientation(Point3d p, Point3d q, Point3d r)

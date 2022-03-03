@@ -56,6 +56,9 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
   private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, int idx1, int idx2, int pairIdx, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs, ref object pair, ref object OminousNeigbors, ref object JoinedCurves)
   {
 
+    const double INTERSECTION_TOL = 0.1;
+    const double JOIN_TOL = 0.1;
+
     // It often happens that the curves are self-overlapping, especially when they are branching out towards a corner.
     // To get rid of these overlaps, the curves are first broken in extremal points close to corner locations.
     List<Curve> splitSegments = SplitAtCorners(SegmentCurveList, CornerPointList, BranchPointList, CornerTol);
@@ -71,7 +74,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         Curve seg1 = splitSegments[j];
 
         // Intersection test.
-        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 0.01, 0.01);
+        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, INTERSECTION_TOL, INTERSECTION_TOL);
 
         // No intersections.
         if (intersects == null)
@@ -79,20 +82,11 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           continue;
         }
 
-        if (i == 122 && intersects.Count != 0)
-        {
-          Print(j.ToString());
-        }
-
         // Check for overlaps.
         foreach (IntersectionEvent intersect in intersects)
         {
           if (intersect.IsPoint)
           {
-            if (i == 122 && j == 245)
-            {
-              Print("122 and 245 intersect.");
-            }
             intersectionPairs.Add(new List<Curve> { seg0, seg1 });
             if (!IsCurveEndPoint(seg0, intersect.ParameterA, RhinoMath.SqrtEpsilon))
             {
@@ -116,10 +110,6 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           }
           else // Intersection is overlap.
           {
-            if (i == 122 && j == 245)
-            {
-              Print("122 and 245 overlap.");
-            }
             // Check if the first segment is completely covered by the second one.
             if (intersect.OverlapA.Min <= seg0.Domain.Min + RhinoMath.SqrtEpsilon && seg0.Domain.Max - RhinoMath.SqrtEpsilon <= intersect.OverlapA.Max)
             {
@@ -195,7 +185,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         {
           continue;
         }
-        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, 1.0, 1.0);
+        CurveIntersections intersects = Intersection.CurveCurve(seg0, seg1, INTERSECTION_TOL, INTERSECTION_TOL);
 
         // No intersections between curves.
         if (intersects == null)
@@ -207,7 +197,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         foreach (IntersectionEvent intersect in intersects)
         {
           Point3d intersectionPoint = intersect.PointA;
-          if (!ContainsPointParallel(intersectionPoint, BranchPointList, 1.0))
+          if (!ContainsPointParallel(intersectionPoint, BranchPointList, INTERSECTION_TOL))
           {
             segmentGraph[seg0].Add(seg1);
           }
@@ -256,7 +246,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           queue.Enqueue(neighbor);
         }
       }
-      Curve[] joinedConnectedComponent = Curve.JoinCurves(connectedComponent, 1.0);
+      Curve[] joinedConnectedComponent = Curve.JoinCurves(connectedComponent, JOIN_TOL);
       if (joinedConnectedComponent.Length > 1)
       {
         JoinedCurves = joinedConnectedComponent;
