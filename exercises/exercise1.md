@@ -8,7 +8,7 @@ permalink: /exercise1/
 <!--[Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %})\-->
 <!--[Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})\-->
 <!--[Final Project]({{ site.baseurl }}{% link final_project.md %})\-->
-<!--[Software]({{ site.baseurl }}{% link software.md %})-->
+[Software]({{ site.baseurl }}{% link software.md %})
 
 # Exercise 1: Reading on Evidence-Based Design for Healthcare  
 
