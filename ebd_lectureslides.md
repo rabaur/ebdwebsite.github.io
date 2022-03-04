@@ -11,3 +11,4 @@ permalink: /ebd_lectureslides/
 | Lecture | Date       | Slides                                                      | Recording                                                   |
 | ------- | ---------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
 |       1 | 25.02.2022 | [Link](https://polybox.ethz.ch/index.php/s/ulRM7VdTZGsb3lc) | [Link](https://polybox.ethz.ch/index.php/s/KeRecvRFOsInw2u) |
+|       2 | 04.03.2022 | No slides                                                   | [Link](https://polybox.ethz.ch/index.php/s/Lcs8EdHLJVv6DC7) |
