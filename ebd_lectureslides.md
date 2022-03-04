@@ -4,7 +4,7 @@ title: Evidence-based Design Lecture Slides
 permalink: /ebd_lectureslides/
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) [Software]({{ site.baseurl }}{% link software.md %})
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) | [Software]({{ site.baseurl }}{% link software.md %})
 
 # Evidence-based Design Lecture Slides
 
