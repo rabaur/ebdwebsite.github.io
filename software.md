@@ -4,12 +4,7 @@ title: Software
 permalink: /software/
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})\
-[Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %})\
-[Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})\
-[Final Project]({{ site.baseurl }}{% link final_project.md %})\
-[Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
-[Software]({{ site.baseurl }}{% link software.md %})
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) [Software]({{ site.baseurl }}{% link software.md %})
 
 # Software
 
