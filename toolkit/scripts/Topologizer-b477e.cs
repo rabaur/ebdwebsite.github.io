@@ -56,8 +56,8 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
   private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, int idx1, int idx2, int pairIdx, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs, ref object pair, ref object OminousNeigbors, ref object JoinedCurves)
   {
 
-    const double INTERSECTION_TOL = 0.1;
-    const double JOIN_TOL = 0.1;
+    const double INTERSECTION_TOL = 0.01;
+    const double JOIN_TOL = 0.01;
 
     // It often happens that the curves are self-overlapping, especially when they are branching out towards a corner.
     // To get rid of these overlaps, the curves are first broken in extremal points close to corner locations.
@@ -297,7 +297,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         double closestCornerParam;
         seg.ClosestPoint(corner, out closestCornerParam);
         Interval domain = seg.Domain;
-        if (corner.DistanceTo(seg.PointAt(closestCornerParam)) > 2 * cornerTol)
+        if (corner.DistanceTo(seg.PointAt(closestCornerParam)) > 1.5 * cornerTol)
         {
           continue;
         }

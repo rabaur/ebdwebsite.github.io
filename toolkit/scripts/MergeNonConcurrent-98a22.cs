@@ -52,13 +52,13 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut, ref object Weird, ref object ToMerge)
+  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut, ref object Weird)
   {
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
     Dictionary<Node, List<Node>> graphCopy = new Dictionary<Node, List<Node>>(graph);
     Dictionary<Node, bool> globalVisited = new Dictionary<Node, bool>();
-    List<Brep> toMerge = new List<Brep>();
+    
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
       globalVisited[keyVal.Key] = false;
@@ -94,15 +94,32 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
             potentialBreps.Add(join.brep);
           }
           potentialBreps.Add(neighbor.brep);
-          if (graph[neighbor].Count <= 2 && IsConvex(GetUniqueCorners(potentialBreps)))
+          //---------------- BUGGY --------------------//
+          bool isConvex = false;
+          bool isSmall = false;
+          try
+          {
+            isConvex = IsConvex(GetUniqueCorners(potentialBreps));
+          }
+          catch (Exception e)
+          {
+            Print("convexconvexconvexconvex");
+          }
+          try
+          {
+            isSmall = graph[neighbor].Count <= 2;
+          }
+          catch (Exception e)
+          {
+            Print("strunzstrunzstrunzstrunz");
+            continue;
+          }
+          if (isSmall  && isConvex)
           {
             queue.Enqueue(neighbor);
           }
+          //---------------- BUGGY --------------------//
         }
-      }
-      foreach (Node join in joinable)
-      {
-        toMerge.Add(join.brep);
       }
       if (joinable.Count <= 1)
       {
@@ -110,7 +127,6 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       }
       ContractNodes(graphCopy, joinable, 2);
     }
-    ToMerge = toMerge;
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
     List<int> outTypes = new List<int>();
@@ -567,7 +583,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     {
       double closestParam;
       double minDist = double.MaxValue;
-      LineCurve clostestCurve = edges[0];
+      LineCurve closestCurve = edges[0];
       foreach (LineCurve edge in edges)
       {
         double currParam;
@@ -576,7 +592,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
         {
           minDist = edge.PointAt(currParam).DistanceTo(point);
           closestParam = currParam;
-          clostestCurve = edge;
+          closestCurve = edge;
         }
       }
       Print(minDist.ToString());
