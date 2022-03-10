@@ -54,7 +54,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix)
+  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object AfterJoinEdges)
   {
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
@@ -259,12 +259,12 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     }
 
     // Connect type 2 breps which share a medial axis segment.
+    List<Curve> afterJoin = new List<Curve>();
     foreach (Curve medax in MedialAxisCurveList)
     {
       List<SwitchPoint> switchPoints = medax2SwitchPoint[medax];
       if (switchPoints.Count != 2)
       {
-        // We are only interested in purely type 2 segments.
         continue;
       }
       if (!(switchPoints[0].nextType == 2 && switchPoints[1].prevType == 2))
@@ -288,7 +288,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         {
           continue;
         }
-        if (currNode.delimitingPoints[0].DistanceTo(startBp) < 1.0 || currNode.delimitingPoints[0].DistanceTo(endBp) < 1.0)
+        if (currNode.delimitingPoints[0].DistanceTo(startBp) < 0.1 || currNode.delimitingPoints[0].DistanceTo(endBp) < 0.1)
         {
           toConnect.Add(currNode);
         }

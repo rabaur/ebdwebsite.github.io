@@ -77,8 +77,14 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       List<Node> joinable = new List<Node>();
       Queue<Node> queue = new Queue<Node>();
       queue.Enqueue(initNode);
+      int cnt = 0;
       while (queue.Count != 0)
       {
+        cnt++;
+        if (cnt > 10000)
+        {
+          throw new Exception("Probably stuck in a while loop.");
+        }
         Node currNode = queue.Dequeue();
         if (globalVisited[currNode])
         {
@@ -114,7 +120,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
             Print("strunzstrunzstrunzstrunz");
             continue;
           }
-          if (isSmall  && isConvex)
+          if (isConvex)
           {
             queue.Enqueue(neighbor);
           }
