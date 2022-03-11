@@ -30,8 +30,8 @@ public class ProcessWalkthrough : MonoBehaviour
     private float intraSubconeDisplacementAngle;
 
     // Visualization-related public variables.
-    public float particleSize;
-    public float h;
+    public float particleSize = 1.0f;
+    public float h = 1.0f;
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
      * @param str       string representation of vector.
