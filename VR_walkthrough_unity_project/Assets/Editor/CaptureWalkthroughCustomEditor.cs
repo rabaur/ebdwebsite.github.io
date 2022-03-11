@@ -12,6 +12,9 @@ public class CaptureWalkthroughCustomEditor : Editor
         {
             Debug.Log("UWU. I was pressed.");
         }
-        EditorUtility.OpenFilePanel("Choose a folder to save data to");
+        if (GUILayout.Button("Load file to process."))
+        {
+            Debug.Log(EditorUtility.OpenFilePanel("Choose file to load data to visualize.", "CapturedData", "csv"));
+        }
     }
 }
