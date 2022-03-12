@@ -230,29 +230,33 @@ public class ProcessWalkthrough : MonoBehaviour
 
         // Write out position-color-relation.
         string heatmapPath = makeFileNameUnique(outDirHeatmap, outFileNameHeatmap, "csv");
-        StreamWriter heatmapFile = new StreamWriter(heatmapPath);
-        for (int i = 0; i < hits.Count; i++)
+        using (StreamWriter heatmapFile = new StreamWriter(heatmapPath))
         {
-            heatmapFile.WriteLine(hits[i]+","+colors[i]);
+            for (int i = 0; i < hits.Count; i++)
+            {
+                heatmapFile.WriteLine(hits[i]+","+colors[i]);
+            }
         }
-        heatmapFile.Close();
 
         // Write out statistics.
         string statisticsPath = makeFileNameUnique(outDirStatistic, outFileNameStatistic, "csv");
-        StreamWriter statisticsFile = new StreamWriter(statisticsPath);
+
+        // Determine the total number of hits.
         int totalHits = 0;
         for (int i = 0; i < hitsPerLayer.Length; i++)
         {
             totalHits += hitsPerLayer[i];
         }
-        for (int i = 0; i < hitsPerLayer.Length; i++)
+        using (StreamWriter statisticsFile = new StreamWriter(statisticsPath))
         {
-            if (hitsPerLayer[i] != 0)
+            for (int i = 0; i < hitsPerLayer.Length; i++)
             {
-                statisticsFile.WriteLine(LayerMask.LayerToName(i)+","+(((float) hitsPerLayer[i]) / ((float) totalHits)));
+                if (hitsPerLayer[i] != 0)
+                {
+                    statisticsFile.WriteLine(LayerMask.LayerToName(i)+ "," +(((float) hitsPerLayer[i]) / ((float) totalHits)));
+                }
             }
         }
-        statisticsFile.Close();
     }
 
     /* If wants to use precomputed particles and colors. */
