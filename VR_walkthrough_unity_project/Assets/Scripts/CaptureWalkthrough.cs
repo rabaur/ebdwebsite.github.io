@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Linq;
+using System.IO;
 
 public class CaptureWalkthrough : MonoBehaviour
 {
     public float sampleInterval = 0.1f;             // How many seconds have to pass until new sample is taken.
     public string fileName;                         // Name of file the samples get written to.
+    public bool useCustomSubDirectory = false;
+    public string directory = "RawData/Default";
     public GameObject view;                         // The actual view.
     private List<Vector3> positions;                // List of all positions.
     private List<Vector3> directions;               // List of all directions.
@@ -21,6 +24,10 @@ public class CaptureWalkthrough : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (!Directory.Exists("RawData/Default"))
+        {
+            Directory.CreateDirectory("RawData/Default");
+        }
         // Checking that camera is present.
         bool hasCamera = false;
         for (int i = 0; i < gameObject.transform.childCount; i++)
