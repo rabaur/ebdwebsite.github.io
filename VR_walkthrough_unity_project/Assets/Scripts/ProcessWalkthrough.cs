@@ -33,6 +33,11 @@ public class ProcessWalkthrough : MonoBehaviour
     public float particleSize = 1.0f;
     public float h = 1.0f;
 
+    public bool useAllFilesInDirectory = false;
+    public string rawDataDirectory = "RawData/Default";
+    public string rawDataFileName = "default";
+    public string processedDataFileName = "ProcessedData/default";
+
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
      * @param str       string representation of vector.
      * @out             Vector3 representation of input string.
