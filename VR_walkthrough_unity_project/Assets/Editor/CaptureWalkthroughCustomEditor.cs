@@ -6,15 +6,19 @@ public class CaptureWalkthroughCustomEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        CaptureWalkthrough captureWalkthrough = (CaptureWalkthrough) target;
 
-        if (GUILayout.Button("Press me!"))
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Choose file")) 
         {
-            Debug.Log("UWU. I was pressed.");
+            string fileName = EditorUtility.SaveFilePanel("Choose file", "RawData", "default", "csv");
+            captureWalkthrough.fileName = fileName;
         }
-        if (GUILayout.Button("Load file to process."))
-        {
-            Debug.Log(EditorUtility.OpenFilePanel("Choose file to load data to visualize.", "CapturedData", "csv"));
-        }
+        GUILayout.Label(captureWalkthrough.fileName);
+
+        GUILayout.EndHorizontal();
+
+        captureWalkthrough.sampleInterval = EditorGUILayout.Slider("Sample Interval", captureWalkthrough.sampleInterval, 0.1f, 1.0f);
     }
 }
