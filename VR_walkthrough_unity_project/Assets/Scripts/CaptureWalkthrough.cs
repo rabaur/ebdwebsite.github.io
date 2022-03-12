@@ -45,7 +45,7 @@ public class CaptureWalkthrough : MonoBehaviour
         xAngle = new List<float>();
         time = new List<float>();
 
-        fileName = makeFileNameUnique(fileName);
+        fileName = MakeFileNameUnique(fileName);
 
         Debug.Log("Writing raw data to " + fileName);
 
@@ -90,28 +90,26 @@ public class CaptureWalkthrough : MonoBehaviour
         }      
     }
 
-    string makeFileNameUnique(string fileName)
+    private string MakeFileNameUnique(string path)
     {
-        
-        // Check if specified file exists yet and if user wants to overwrite.
-        if (File.Exists(fileName))
+        // If the file does not exist yet, we can just return the input path.
+        if (!File.Exists(path))
         {
-            /* In this case we need to make the filename unique.
-             * We will achiece that by:
-             * foldername + sep + filename + . + format -> foldername + sep + filename + _x + . format
-             * x will be increased in case of multiple overwrites.
-             */
-            
-            // Check if there was a previous overwrite and get highest identifier.
-            int id = 0;
-            while (File.Exists(fileName + "_" + id.ToString() + ".csv"))
-            {
-                id++;
-            }
-
-            // Now we have found a unique identifier and create the new name.
-            fileName = fileName.Split(Path.DirectorySeparatorChar).Last().Split('.').First() + "_" + id.ToString() + ".csv";
+            return path;
         }
-        return fileName;
+
+        string[] splitPath = path.Split('/');
+        string pathWithoutFileName = "";
+        for (int i = 0; i < splitPath.Length - 1; i++) {
+            pathWithoutFileName += splitPath[i] + "/";
+        }
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
+        string extension = Path.GetExtension(path);
+        int wildCard = 0;
+        while (File.Exists(pathWithoutFileName + fileNameWithoutExtension + "_" + wildCard.ToString() + extension))
+        {
+            wildCard++;
+        }
+        return pathWithoutFileName + fileNameWithoutExtension + "_" + wildCard.ToString() + extension;
     }
 }
