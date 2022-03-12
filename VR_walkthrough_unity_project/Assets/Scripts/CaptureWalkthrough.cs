@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System.Linq;
 
 public class CaptureWalkthrough : MonoBehaviour
 {
@@ -44,6 +45,8 @@ public class CaptureWalkthrough : MonoBehaviour
         xAngle = new List<float>();
         time = new List<float>();
 
+        fileName = makeFileNameUnique(fileName);
+
         Debug.Log("Writing raw data to " + fileName);
 
         // Set the time of the last sample to the moment the game starts.
@@ -85,5 +88,30 @@ public class CaptureWalkthrough : MonoBehaviour
                 openFile.WriteLine(rights[i].ToString());
             }
         }      
+    }
+
+    string makeFileNameUnique(string fileName)
+    {
+        
+        // Check if specified file exists yet and if user wants to overwrite.
+        if (File.Exists(fileName))
+        {
+            /* In this case we need to make the filename unique.
+             * We will achiece that by:
+             * foldername + sep + filename + . + format -> foldername + sep + filename + _x + . format
+             * x will be increased in case of multiple overwrites.
+             */
+            
+            // Check if there was a previous overwrite and get highest identifier.
+            int id = 0;
+            while (File.Exists(fileName + "_" + id.ToString() + ".csv"))
+            {
+                id++;
+            }
+
+            // Now we have found a unique identifier and create the new name.
+            fileName = fileName.Split(Path.DirectorySeparatorChar).Last().Split('.').First() + "_" + id.ToString() + ".csv";
+        }
+        return fileName;
     }
 }
