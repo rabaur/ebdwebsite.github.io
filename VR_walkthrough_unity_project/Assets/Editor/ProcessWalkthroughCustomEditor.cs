@@ -73,9 +73,10 @@ public class ProcessWalkthroughCustomEditor : Editor
         // If not all files are chosen, a specific file need to be indicated.
         if (GUILayout.Button("Choose raw data file", GUILayout.Width(buttonWidth))) 
         {
+            Debug.Log("here");
             processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
-            processor.outProcessedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
-            processor.outSummarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
+            processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+            processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         GUILayout.Label(Path.GetFileName(processor.rawDataFileName));

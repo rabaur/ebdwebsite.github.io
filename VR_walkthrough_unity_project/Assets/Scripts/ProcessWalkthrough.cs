@@ -183,7 +183,9 @@ public class ProcessWalkthrough : MonoBehaviour
 
         if (generateData)
         {
+            Debug.Log("Generating data.");
             CreateHeatMap();
+            Debug.Log(positions == null);
         }
         else
         {
@@ -196,8 +198,12 @@ public class ProcessWalkthrough : MonoBehaviour
         }
         if (visualizeHeatmap)
         {
-            Debug.Log(colors.Length);
             CreateParticles();
+        }
+        if (visualizeTrajectory)
+        {
+            Debug.Log(positions.Length);
+            VisualizeTrajectory(new List<Vector3>(positions), trajectoryGradient, 0.1f);
         }
     }
 
@@ -215,13 +221,13 @@ public class ProcessWalkthrough : MonoBehaviour
     {
         // Reading in the data from a walkthough.
         string[] data = File.ReadAllLines(rawDataFileName);
-        Vector3[] positions = new Vector3[data.Length / 4];
+        Vector3[] trajectoryPositions = new Vector3[data.Length / 4];
         Vector3[] directions = new Vector3[data.Length / 4];
         Vector3[] ups = new Vector3[data.Length / 4];
         Vector3[] rights = new Vector3[data.Length / 4];
         for (int i = 0; i < data.Length / 4; i++)
         {
-            positions[i] = str2Vec(data[4 * i + 0]);
+            trajectoryPositions[i] = str2Vec(data[4 * i + 0]);
             directions[i] = str2Vec(data[4 * i + 1]);
             ups[i] = str2Vec(data[4 * i + 2]);
             rights[i] = str2Vec(data[4 * i + 3]);
@@ -234,7 +240,7 @@ public class ProcessWalkthrough : MonoBehaviour
         hitsPerLayer = new int[32];
         for (int i = 0; i < data.Length / 4; i++)
         {
-            hits.AddRange(castAndCollide(positions[i], directions[i], ups[i], rights[i], ref hitsPerLayer));
+            hits.AddRange(castAndCollide(trajectoryPositions[i], directions[i], ups[i], rights[i], ref hitsPerLayer));
         }
 
         int n = hits.Count;
@@ -332,5 +338,16 @@ public class ProcessWalkthrough : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void VisualizeTrajectory(List<Vector3> positions, Gradient gradient, float trajectoryWidth)
+    {
+        // Setting up the visualization things.
+        LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.colorGradient = gradient;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.widthMultiplier = trajectoryWidth;
+        lineRenderer.positionCount = positions.Count;
+        lineRenderer.SetPositions(positions.ToArray());
     }
 }
