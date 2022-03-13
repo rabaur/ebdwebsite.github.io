@@ -45,12 +45,47 @@ public class ProcessWalkthrough : MonoBehaviour
     private int[] hitsPerLayer;
     public bool visualizeHeatmap = false;
     public bool visualizeTrajectory = false;
-    private Vector3[] positions;
+    private Vector3[] particlePositions;
     public Gradient trajectoryGradient;
     public bool visualizeShortestPath = false;
     public bool inferStartLocation = true;
     public Transform startLocation;
     public Transform endLocation;
+    private Vector3[] trajectoryPositions;
+    private Vector3[] trajectoryDirections;
+    private Vector3[] trajectoryUpVectors;
+    private Vector3[] trajectoryRightVectors;
+    public bool reuseHeatmap = true;
+    public float pathWidth = 0.1f;
+    private GameObject lineRendererParent;
+    private LineRenderer lineRenderer;
+
+    void Start()
+    {
+        outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
+        outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
+        ReadRawFile();
+        if (visualizeHeatmap)
+        {
+            if (reuseHeatmap)
+            {
+                LoadHeatMap();
+            }
+            else
+            {
+                CreateHeatMap();
+                SaveProcessedDataFile();
+                SaveStatisticDataFile();
+            }
+            CreateParticles();
+        }
+        if (visualizeTrajectory)
+        {
+            lineRendererParent = new GameObject();
+            lineRenderer = lineRendererParent.AddComponent<LineRenderer>();
+            VisualizeTrajectory(lineRenderer, new List<Vector3>(trajectoryPositions), trajectoryGradient, pathWidth);
+        }
+    }
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
      * @param str       string representation of vector.
@@ -164,10 +199,10 @@ public class ProcessWalkthrough : MonoBehaviour
 
     void CreateParticles() 
     {
-        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[positions.Length];
+        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[particlePositions.Length];
         for (int i = 0; i < particles.Length; i++)
         {
-            particles[i].position = positions[i];
+            particles[i].position = particlePositions[i];
             particles[i].velocity = Vector3.zero;
             particles[i].size = particleSize;
             particles[i].color = heatmapGradient.Evaluate(colors[i]);
@@ -176,34 +211,11 @@ public class ProcessWalkthrough : MonoBehaviour
         partSys.SetParticles(particles, particles.Length);
     }
 
-    void Start()
+    void Update()
     {
-        outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
-        outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
-
-        if (generateData)
-        {
-            Debug.Log("Generating data.");
-            CreateHeatMap();
-            Debug.Log(positions == null);
-        }
-        else
-        {
-            LoadHeatMap();
-        }
-        if (generateData)
-        {
-            SaveProcessedDataFile();
-            SaveStatisticDataFile();
-        }
-        if (visualizeHeatmap)
-        {
-            CreateParticles();
-        }
         if (visualizeTrajectory)
         {
-            Debug.Log(positions.Length);
-            VisualizeTrajectory(new List<Vector3>(positions), trajectoryGradient, 0.1f);
+            VisualizeTrajectory(lineRenderer, new List<Vector3>(trajectoryPositions), trajectoryGradient, pathWidth);
         }
     }
 
@@ -215,6 +227,23 @@ public class ProcessWalkthrough : MonoBehaviour
             return "all_files_in_" + splitRawDataDirectory[splitRawDataDirectory.Length - 1] + "_" + type + ".csv";
         }
         return Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
+    }
+
+    private void ReadRawFile()
+    {
+        // Reading in the data from a walkthough.
+        string[] data = File.ReadAllLines(rawDataFileName);
+        trajectoryPositions = new Vector3[data.Length / 4];
+        trajectoryDirections = new Vector3[data.Length / 4];
+        trajectoryUpVectors = new Vector3[data.Length / 4];
+        trajectoryRightVectors = new Vector3[data.Length / 4];
+        for (int i = 0; i < data.Length / 4; i++)
+        {
+            trajectoryPositions[i] = str2Vec(data[4 * i + 0]);
+            trajectoryDirections[i] = str2Vec(data[4 * i + 1]);
+            trajectoryUpVectors[i] = str2Vec(data[4 * i + 2]);
+            trajectoryRightVectors[i] = str2Vec(data[4 * i + 3]);
+        }
     }
 
     private void CreateHeatMap()
@@ -289,21 +318,21 @@ public class ProcessWalkthrough : MonoBehaviour
         {
             colors[i] = (avgDistances[i] - min) / range;
         }
-        positions = hits.ToArray();
+        particlePositions = hits.ToArray();
     }
 
     private void LoadHeatMap()
     {
         // Reading in the heatmap-data from prior processing and creating arrays for positions and colors \in [0, 1].
         string[] allLines = File.ReadAllLines(inProcessedDataFileName);
-        positions = new Vector3[allLines.Length];
+        particlePositions = new Vector3[allLines.Length];
         colors = new float[allLines.Length];
         for (int i = 0; i < allLines.Length; i++)
         {
             string[] line = allLines[i].Split(',');
             if (line.Length == 4)
             {
-                positions[i] = str2Vec(line[0] + "," + line[1] + "," + line[2]);
+                particlePositions[i] = str2Vec(line[0] + "," + line[1] + "," + line[2]);
                 colors[i] = float.Parse(line[3]);
             }
         }
@@ -340,10 +369,9 @@ public class ProcessWalkthrough : MonoBehaviour
         }
     }
 
-    private void VisualizeTrajectory(List<Vector3> positions, Gradient gradient, float trajectoryWidth)
+    private void VisualizeTrajectory(LineRenderer lineRenderer, List<Vector3> positions, Gradient gradient, float trajectoryWidth)
     {
         // Setting up the visualization things.
-        LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.colorGradient = gradient;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
         lineRenderer.widthMultiplier = trajectoryWidth;

@@ -30,11 +30,7 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         GUILayout.Label("File Input and Output", EditorStyles.boldLabel);
 
-        processor.generateData = GUILayout.Toggle(processor.generateData, "Generate data from raw data file");
-
         EditorGUILayout.Space();
-
-        EditorGUI.BeginDisabledGroup(!processor.generateData);
 
         GUILayout.BeginHorizontal();
 
@@ -67,7 +63,6 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         GUILayout.EndHorizontal();
 
-        EditorGUI.BeginDisabledGroup(processor.useAllFilesInDirectory);
 
         GUILayout.BeginHorizontal();
         // If not all files are chosen, a specific file need to be indicated.
@@ -81,7 +76,6 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         GUILayout.Label(Path.GetFileName(processor.rawDataFileName));
         GUILayout.EndHorizontal();
-        EditorGUI.EndDisabledGroup();
 
         GUILayout.BeginHorizontal();
 
@@ -94,31 +88,6 @@ public class ProcessWalkthroughCustomEditor : Editor
         GUILayout.Label("Summarized data file name: " + Path.GetFileName(processor.outSummarizedDataFileName));
 
         GUILayout.EndHorizontal();
-
-        EditorGUI.EndDisabledGroup();
-
-        EditorGUILayout.Space();
-
-        EditorGUI.BeginDisabledGroup(processor.generateData);
-        if (GUILayout.Button("Choose processed data file")) {
-            processor.inProcessedDataFileName = EditorUtility.OpenFilePanel("Choose processed data file", "ProcessedData", "csv");
-
-            // Find corresponding statistic file.
-            string fileNameOnly = Path.GetFileNameWithoutExtension(processor.inProcessedDataFileName);
-            string[] splitFileNameOnly = fileNameOnly.Split('_');
-
-            string inStatisticFileName = "";
-            for (int i = 0; i < processor.inProcessedDataFileName.Split('/').Length - 1; i++)
-            {
-                inStatisticFileName += processor.inProcessedDataFileName.Split('/')[i] + "/";
-            }
-            inStatisticFileName += splitFileNameOnly[0] + "_summarized.csv";
-            processor.inSummarizedDataFileName = inStatisticFileName;
-        }
-
-        GUILayout.Label("Reusing processed data file: " + Path.GetFileName(processor.inProcessedDataFileName));
-        GUILayout.Label("Reusing statistic data file: " + Path.GetFileName(processor.inSummarizedDataFileName));
-        EditorGUI.EndDisabledGroup();
 
         EditorGUILayout.Space();
 
@@ -135,18 +104,21 @@ public class ProcessWalkthroughCustomEditor : Editor
         if (EditorGUILayout.BeginFadeGroup(visualizeHeatmapAnimBool.faded))
         {
             EditorGUI.indentLevel += 2;
-            processor.raysPerRaycast = EditorGUILayout.IntSlider("Rays per Raycast", processor.raysPerRaycast, 1, 200);
-            processor.particleSize = EditorGUILayout.Slider("Particle Size", processor.particleSize, 0.1f, 5.0f);
-            processor.h = EditorGUILayout.Slider("Blur", processor.h, 0.1f, 10.0f);
+            processor.reuseHeatmap = EditorGUILayout.ToggleLeft("Use processed data file", processor.reuseHeatmap);
+            EditorGUI.BeginDisabledGroup(processor.reuseHeatmap);
+                processor.raysPerRaycast = EditorGUILayout.IntSlider("Rays per Raycast", processor.raysPerRaycast, 1, 200);
+                processor.particleSize = EditorGUILayout.Slider("Particle Size", processor.particleSize, 0.1f, 5.0f);
+                processor.h = EditorGUILayout.Slider("Blur", processor.h, 0.1f, 10.0f);
 
-            EditorGUI.BeginChangeCheck();
-            SerializedObject serializedGradient1 = new SerializedObject(target);
-            SerializedProperty colorGradient1 = serializedGradient1.FindProperty("heatmapGradient");
-            EditorGUILayout.PropertyField(colorGradient1, true);
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedGradient1.ApplyModifiedProperties();
-            }
+                EditorGUI.BeginChangeCheck();
+                SerializedObject serializedGradient1 = new SerializedObject(target);
+                SerializedProperty colorGradient1 = serializedGradient1.FindProperty("heatmapGradient");
+                EditorGUILayout.PropertyField(colorGradient1, true);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedGradient1.ApplyModifiedProperties();
+                }
+            EditorGUI.EndDisabledGroup();
             EditorGUI.indentLevel -= 2;
         }
         EditorGUILayout.EndFadeGroup();
@@ -167,6 +139,7 @@ public class ProcessWalkthroughCustomEditor : Editor
             {
                 serializedGradient.ApplyModifiedProperties();
             }
+            processor.pathWidth = EditorGUILayout.Slider("Trajectory Width", processor.pathWidth, 0.01f, 1.0f);
             processor.visualizeShortestPath = EditorGUILayout.ToggleLeft("Visualize Shortest Path", processor.visualizeShortestPath);
             visualizeShortestPathBool.target = processor.visualizeShortestPath;
             if (EditorGUILayout.BeginFadeGroup(visualizeShortestPathBool.faded))
