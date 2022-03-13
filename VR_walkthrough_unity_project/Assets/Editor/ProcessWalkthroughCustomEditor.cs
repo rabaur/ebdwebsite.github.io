@@ -13,6 +13,8 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         ProcessWalkthrough processor = (ProcessWalkthrough) target;
 
+        GUILayout.Label("File Input and Output", EditorStyles.boldLabel);
+
         processor.generateData = GUILayout.Toggle(processor.generateData, "Generate data from raw data file");
 
         EditorGUILayout.Space();
@@ -28,8 +30,8 @@ public class ProcessWalkthroughCustomEditor : Editor
             {
                 processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
             }
-            processor.outProcessedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
-            processor.outPummarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
+            processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+            processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         string[] splitRawDataPath = processor.rawDataDirectory.Split('/');
@@ -44,8 +46,8 @@ public class ProcessWalkthroughCustomEditor : Editor
                 // The toggle was previously on, but is now switched off. In this case we need to choose a specific file.
                 processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
             }
-            processor.outProcessedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
-            processor.outPummarizedDataFileName = processor.outPummarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
+            processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+            processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         GUILayout.EndHorizontal();
@@ -58,7 +60,7 @@ public class ProcessWalkthroughCustomEditor : Editor
         {
             processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
             processor.outProcessedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
-            processor.outPummarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
+            processor.outSummarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         GUILayout.Label(Path.GetFileName(processor.rawDataFileName));
@@ -73,7 +75,7 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         GUILayout.BeginHorizontal();
 
-        GUILayout.Label("Summarized data file name: " + Path.GetFileName(processor.outPummarizedDataFileName));
+        GUILayout.Label("Summarized data file name: " + Path.GetFileName(processor.outSummarizedDataFileName));
 
         GUILayout.EndHorizontal();
 
@@ -95,11 +97,44 @@ public class ProcessWalkthroughCustomEditor : Editor
                 inStatisticFileName += processor.inProcessedDataFileName.Split('/')[i] + "/";
             }
             inStatisticFileName += splitFileNameOnly[0] + "_summarized.csv";
-            processor.inStatisticFileName = inStatisticFileName;
+            processor.inSummarizedDataFileName = inStatisticFileName;
         }
 
         GUILayout.Label("Reusing processed data file: " + Path.GetFileName(processor.inProcessedDataFileName));
-        GUILayout.Label("Reusing statistic data file: " + Path.GetFileName(processor.inStatisticFileName));
+        GUILayout.Label("Reusing statistic data file: " + Path.GetFileName(processor.inSummarizedDataFileName));
+        EditorGUI.EndDisabledGroup();
+
+        EditorGUILayout.Space();
+
+        GUILayout.Label("Visualizations", EditorStyles.boldLabel);
+
+        processor.visualizeHeatmap = GUILayout.Toggle(processor.visualizeHeatmap, " Heatmap");
+
+        if (processor.visualizeHeatmap)
+        {
+            EditorGUI.indentLevel += 2;
+            processor.raysPerRaycast = EditorGUILayout.IntSlider("Rays per Raycast", processor.raysPerRaycast, 1, 200);
+            processor.particleSize = EditorGUILayout.Slider("Particle Size", processor.particleSize, 0.1f, 5.0f);
+            processor.h = EditorGUILayout.Slider("Blur", processor.h, 0.1f, 10.0f);
+
+            EditorGUI.BeginChangeCheck();
+            SerializedObject serializedGradient = new SerializedObject(target);
+            SerializedProperty colorGradient = serializedGradient.FindProperty("gradient");
+            EditorGUILayout.PropertyField(colorGradient, true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedGradient.ApplyModifiedProperties();
+            }
+            EditorGUI.indentLevel -= 2;
+        }
+
+        EditorGUI.BeginDisabledGroup(!processor.generateData);
+        processor.visualizeTrajectory = GUILayout.Toggle(processor.visualizeTrajectory, new GUIContent("Trajectory", "Enable \"Generate data from raw data file\" to use this option"));
+        if (processor.visualizeTrajectory)
+        {
+            EditorGUI.indentLevel += 2;
+            EditorGUI.indentLevel -= 2;
+        }
         EditorGUI.EndDisabledGroup();
     }
 }
