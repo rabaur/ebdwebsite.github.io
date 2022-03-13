@@ -5,13 +5,28 @@ using System.IO;
 [CustomEditor(typeof(ProcessWalkthrough))]
 public class ProcessWalkthroughCustomEditor : Editor
 {
+    UnityEditor.AnimatedValues.AnimBool visualizeTrajectoryAnimBool;
+    UnityEditor.AnimatedValues.AnimBool visualizeHeatmapAnimBool;
+    UnityEditor.AnimatedValues.AnimBool visualizeShortestPathBool;
+    ProcessWalkthrough processor;
+    int buttonWidth = 210;
+
+    private void OnEnable()
+    {
+        processor = (ProcessWalkthrough) target;
+        visualizeTrajectoryAnimBool = new UnityEditor.AnimatedValues.AnimBool(processor.visualizeTrajectory);
+        visualizeHeatmapAnimBool = new UnityEditor.AnimatedValues.AnimBool(processor.visualizeHeatmap);
+        visualizeShortestPathBool = new UnityEditor.AnimatedValues.AnimBool(processor.visualizeShortestPath);
+    }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-        int buttonWidth = 210;
+        EditorGUILayout.Space();
 
-        ProcessWalkthrough processor = (ProcessWalkthrough) target;
+        EditorGUI.DrawRect(EditorGUILayout.GetControlRect(false, 1), Color.gray);
+
+        EditorGUILayout.Space();
 
         GUILayout.Label("File Input and Output", EditorStyles.boldLabel);
 
@@ -106,11 +121,17 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         EditorGUILayout.Space();
 
+        EditorGUI.DrawRect(EditorGUILayout.GetControlRect(false, 1), Color.gray);
+
+        EditorGUILayout.Space();
+
         GUILayout.Label("Visualizations", EditorStyles.boldLabel);
 
-        processor.visualizeHeatmap = GUILayout.Toggle(processor.visualizeHeatmap, " Heatmap");
+        EditorGUILayout.Space();
 
-        if (processor.visualizeHeatmap)
+        processor.visualizeHeatmap = GUILayout.Toggle(processor.visualizeHeatmap, " Heatmap");
+        visualizeHeatmapAnimBool.target = processor.visualizeHeatmap;
+        if (EditorGUILayout.BeginFadeGroup(visualizeHeatmapAnimBool.faded))
         {
             EditorGUI.indentLevel += 2;
             processor.raysPerRaycast = EditorGUILayout.IntSlider("Rays per Raycast", processor.raysPerRaycast, 1, 200);
@@ -118,23 +139,51 @@ public class ProcessWalkthroughCustomEditor : Editor
             processor.h = EditorGUILayout.Slider("Blur", processor.h, 0.1f, 10.0f);
 
             EditorGUI.BeginChangeCheck();
+            SerializedObject serializedGradient1 = new SerializedObject(target);
+            SerializedProperty colorGradient1 = serializedGradient1.FindProperty("heatmapGradient");
+            EditorGUILayout.PropertyField(colorGradient1, true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedGradient1.ApplyModifiedProperties();
+            }
+            EditorGUI.indentLevel -= 2;
+        }
+        EditorGUILayout.EndFadeGroup();
+
+        EditorGUILayout.Space();
+
+        EditorGUI.BeginDisabledGroup(!processor.generateData);
+        processor.visualizeTrajectory = GUILayout.Toggle(processor.visualizeTrajectory, new GUIContent("Trajectory", "Enable \"Generate data from raw data file\" to use this option"));
+        visualizeTrajectoryAnimBool.target = processor.visualizeTrajectory;
+        if (EditorGUILayout.BeginFadeGroup(visualizeTrajectoryAnimBool.faded))
+        {
+            EditorGUI.indentLevel += 2;
+            EditorGUI.BeginChangeCheck();
             SerializedObject serializedGradient = new SerializedObject(target);
-            SerializedProperty colorGradient = serializedGradient.FindProperty("gradient");
+            SerializedProperty colorGradient = serializedGradient.FindProperty("trajectoryGradient");
             EditorGUILayout.PropertyField(colorGradient, true);
             if (EditorGUI.EndChangeCheck())
             {
                 serializedGradient.ApplyModifiedProperties();
             }
+            processor.visualizeShortestPath = EditorGUILayout.ToggleLeft("Visualize Shortest Path", processor.visualizeShortestPath);
+            visualizeShortestPathBool.target = processor.visualizeShortestPath;
+            if (EditorGUILayout.BeginFadeGroup(visualizeShortestPathBool.faded))
+            {
+                EditorGUI.indentLevel += 2;
+                processor.inferStartLocation = EditorGUILayout.ToggleLeft(new GUIContent("Infer start location", "Check this if you want the script to automatically infer where the agent has started."), processor.inferStartLocation);
+                EditorGUI.BeginDisabledGroup(processor.inferStartLocation);
+                {
+                    processor.startLocation = EditorGUILayout.ObjectField(new GUIContent("Start Location", "The gameobject that corresponds to the start location"), processor.startLocation, typeof(Transform), true) as Transform;
+                }
+                EditorGUI.EndDisabledGroup();
+                processor.endLocation = EditorGUILayout.ObjectField(new GUIContent("End Location", "The gameobject that corresponds to the end location"), processor.endLocation, typeof(Transform), true) as Transform;
+                EditorGUI.indentLevel -= 2;
+            }
             EditorGUI.indentLevel -= 2;
+            EditorGUILayout.EndFadeGroup();
         }
-
-        EditorGUI.BeginDisabledGroup(!processor.generateData);
-        processor.visualizeTrajectory = GUILayout.Toggle(processor.visualizeTrajectory, new GUIContent("Trajectory", "Enable \"Generate data from raw data file\" to use this option"));
-        if (processor.visualizeTrajectory)
-        {
-            EditorGUI.indentLevel += 2;
-            EditorGUI.indentLevel -= 2;
-        }
+        EditorGUILayout.EndFadeGroup();
         EditorGUI.EndDisabledGroup();
     }
 }

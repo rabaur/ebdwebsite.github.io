@@ -7,7 +7,7 @@ public class ProcessWalkthrough : MonoBehaviour
 {
     // Public variables.
     public LayerMask layerMask;
-    public Gradient gradient;
+    public Gradient heatmapGradient;
     public bool generateData = true;
 
     // IO-related public variables.
@@ -46,6 +46,11 @@ public class ProcessWalkthrough : MonoBehaviour
     public bool visualizeHeatmap = false;
     public bool visualizeTrajectory = false;
     private Vector3[] positions;
+    public Gradient trajectoryGradient;
+    public bool visualizeShortestPath = false;
+    public bool inferStartLocation = true;
+    public Transform startLocation;
+    public Transform endLocation;
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
      * @param str       string representation of vector.
@@ -165,7 +170,7 @@ public class ProcessWalkthrough : MonoBehaviour
             particles[i].position = positions[i];
             particles[i].velocity = Vector3.zero;
             particles[i].size = particleSize;
-            particles[i].color = gradient.Evaluate(colors[i]);
+            particles[i].color = heatmapGradient.Evaluate(colors[i]);
         }
         ParticleSystem partSys = GetComponent<ParticleSystem>();
         partSys.SetParticles(particles, particles.Length);
