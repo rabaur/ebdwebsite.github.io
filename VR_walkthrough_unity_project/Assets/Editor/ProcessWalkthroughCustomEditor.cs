@@ -18,12 +18,29 @@ public class ProcessWalkthroughCustomEditor : Editor
         if (GUILayout.Button("Choose raw data directory", GUILayout.Width(buttonWidth)))
         {
             processor.rawDataDirectory = EditorUtility.OpenFolderPanel("Choose directory containing raw data", "RawData", "Default");
+            if (!processor.useAllFilesInDirectory)
+            {
+                processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+            }
+            processor.processedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+            processor.summarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         string[] splitRawDataPath = processor.rawDataDirectory.Split('/');
         GUILayout.Label(splitRawDataPath[splitRawDataPath.Length - 2] + '/' + splitRawDataPath[splitRawDataPath.Length - 1]);
 
+        EditorGUI.BeginChangeCheck();
         processor.useAllFilesInDirectory = GUILayout.Toggle(processor.useAllFilesInDirectory, " Use all");
+        if (EditorGUI.EndChangeCheck())
+        {
+            if (!processor.useAllFilesInDirectory)
+            {
+                // The toggle was previously on, but is now switched off. In this case we need to choose a specific file.
+                processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+            }
+            processor.processedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+            processor.summarizedDataFileName = processor.summarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
+        }
 
         GUILayout.EndHorizontal();
 
@@ -34,15 +51,24 @@ public class ProcessWalkthroughCustomEditor : Editor
         if (GUILayout.Button("Choose raw data file", GUILayout.Width(buttonWidth))) 
         {
             processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+            processor.processedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+            processor.summarizedDataFileName = processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         GUILayout.Label(Path.GetFileName(processor.rawDataFileName));
         GUILayout.EndHorizontal();
         EditorGUI.EndDisabledGroup();
 
-        if (GUILayout.Button("Choose processed data file name", GUILayout.Width(buttonWidth)))
-        {
-            processor.processedDataFileName = EditorUtility.SaveFilePanel("Choose processed data file name", "ProcessedData", "default", "csv");
-        }
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label(Path.GetFileName(processor.processedDataFileName));
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label(Path.GetFileName(processor.summarizedDataFileName));
+
+        GUILayout.EndHorizontal();
     }
 }

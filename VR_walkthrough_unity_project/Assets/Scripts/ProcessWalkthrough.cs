@@ -35,8 +35,9 @@ public class ProcessWalkthrough : MonoBehaviour
 
     public bool useAllFilesInDirectory = false;
     public string rawDataDirectory = "RawData/Default";
-    public string rawDataFileName = "default";
-    public string processedDataFileName = "ProcessedData/default";
+    public string rawDataFileName = "RawData/Default/default.csv";
+    public string processedDataFileName;
+    public string summarizedDataFileName;
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
      * @param str       string representation of vector.
@@ -151,9 +152,6 @@ public class ProcessWalkthrough : MonoBehaviour
     /* In case new configuration of particles should be generated. */
     void generate()
     {
-        // Initializing the variables needed for raycast calculations.
-        outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
-        outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
 
         // Reading in the data from a walkthough.
         string[] data = File.ReadAllLines(inPathWalkthrough);
@@ -299,6 +297,9 @@ public class ProcessWalkthrough : MonoBehaviour
 
     void Start()
     {
+        outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
+        outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
+
         // Use data from previous processing.
         if (reuseData)
         {
@@ -311,9 +312,14 @@ public class ProcessWalkthrough : MonoBehaviour
             generate();
         }
     }
-    // Update is called once per frame
-    void Update()
+
+    public string CreateDerivedDataFileName(string rawDataDirectory, string rawDataFileName, string type)
     {
-        
+        if (useAllFilesInDirectory)
+        {
+            string[] splitRawDataDirectory = rawDataDirectory.Split('/');
+            return "all_files_in_" + splitRawDataDirectory[splitRawDataDirectory.Length - 1] + "_" + type + ".csv";
+        }
+        return Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
     }
 }
