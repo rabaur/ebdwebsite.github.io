@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.AI;
 
 public class ProcessWalkthrough : MonoBehaviour
 {
@@ -59,11 +59,14 @@ public class ProcessWalkthrough : MonoBehaviour
     public float pathWidth = 0.1f;
     private GameObject lineRendererParent;
     private LineRenderer lineRenderer;
+    private GameObject shortestPathLinerendererParent;
+    private LineRenderer shortestPathLinerenderer;
 
     void Start()
     {
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
+
         ReadRawFile();
         if (visualizeHeatmap)
         {
@@ -82,8 +85,32 @@ public class ProcessWalkthrough : MonoBehaviour
         if (visualizeTrajectory)
         {
             lineRendererParent = new GameObject();
+            lineRendererParent.hideFlags = HideFlags.HideInHierarchy;
             lineRenderer = lineRendererParent.AddComponent<LineRenderer>();
             VisualizeTrajectory(lineRenderer, new List<Vector3>(trajectoryPositions), trajectoryGradient, pathWidth);
+            if (visualizeShortestPath)
+            {
+                Vector3 startPos = inferStartLocation ? trajectoryPositions[0] : startLocation.position;
+                Vector3 endPos = endLocation.position;
+
+                // startPos and endPos do not necessarily lie on the NavMesh. Finding path between them might fail.
+                NavMeshHit startHit;
+                NavMesh.SamplePosition(startPos, out startHit, 100.0f, NavMesh.AllAreas);  // Hardcoded to 100 units of maximal distance.
+                startPos = startHit.position;
+                NavMeshHit endHit;
+                NavMesh.SamplePosition(endPos, out endHit, 100.0f, NavMesh.AllAreas);
+                endPos = endHit.position;
+
+                // Creating linerenderer for shortest path.
+                shortestPathLinerendererParent = new GameObject();
+                shortestPathLinerendererParent.hideFlags = HideFlags.HideInHierarchy;
+                shortestPathLinerenderer = shortestPathLinerendererParent.AddComponent<LineRenderer>();
+
+                // Create shortest path.
+                NavMeshPath navMeshPath = new NavMeshPath();
+                NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
+                VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), trajectoryGradient, pathWidth);
+            }
         }
     }
 
