@@ -8,7 +8,7 @@ public class ProcessWalkthrough : MonoBehaviour
     // Public variables.
     public LayerMask layerMask;
     public Gradient gradient;
-    public bool reuseData;
+    public bool generateData = true;
 
     // IO-related public variables.
     public string inPathWalkthrough;
@@ -36,8 +36,13 @@ public class ProcessWalkthrough : MonoBehaviour
     public bool useAllFilesInDirectory = false;
     public string rawDataDirectory = "RawData/Default";
     public string rawDataFileName = "RawData/Default/default.csv";
-    public string processedDataFileName;
-    public string summarizedDataFileName;
+    public string outProcessedDataFileName;
+    public string outPummarizedDataFileName;
+    public string inProcessedDataFileName;
+    public string inStatisticFileName;
+    private List<Vector3> hits;
+    private float[] colors;
+    private int[] hitsPerLayer;
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
      * @param str       string representation of vector.
@@ -154,7 +159,7 @@ public class ProcessWalkthrough : MonoBehaviour
     {
 
         // Reading in the data from a walkthough.
-        string[] data = File.ReadAllLines(inPathWalkthrough);
+        string[] data = File.ReadAllLines(rawDataFileName);
         Vector3[] positions = new Vector3[data.Length / 4];
         Vector3[] directions = new Vector3[data.Length / 4];
         Vector3[] ups = new Vector3[data.Length / 4];
@@ -168,7 +173,7 @@ public class ProcessWalkthrough : MonoBehaviour
         }
 
         // Will hold all the positions where the rays hit.
-        List<Vector3> hits = new List<Vector3>();
+        hits = new List<Vector3>();
 
         // Unity generates 32 layers per default.
         int[] hitsPerLayer = new int[32];
@@ -208,14 +213,8 @@ public class ProcessWalkthrough : MonoBehaviour
             }
             avgDistances[i] = avg / (C * h);
         }
-        /*
-        for (int i = 0; i < n; i++)
-        {
-            avgDistances[i] /= n;
-        }
-        */
         float min = float.MaxValue;
-        float max = 0;
+        float max = 0.0f;
         for (int i = 0; i < n; i++)
         {
             min = avgDistances[i] < min ? avgDistances[i] : min;
@@ -230,6 +229,10 @@ public class ProcessWalkthrough : MonoBehaviour
             colors[i] = (avgDistances[i] - min) / range;
         }
         createParticles(hits.ToArray(), colors, particleSize);
+
+        /*---------------------------
+        Encapsulate code up until here into GenerateParticles function.
+        -----------------------------*/
 
         // Write out position-color-relation.
         string heatmapPath = makeFileNameUnique(outDirHeatmap, outFileNameHeatmap, "csv");
@@ -300,16 +303,19 @@ public class ProcessWalkthrough : MonoBehaviour
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
 
-        // Use data from previous processing.
-        if (reuseData)
+        if (generateData)
         {
-            reuse();
+            CreateHeatMap();
         }
-
-        // Generate new data and write it to file.
         else
         {
-            generate();
+            LoadHeatMap();
+        }
+
+        if (generateData)
+        {
+            SaveProcessedDataFile();
+            SaveStatisticDataFile();
         }
     }
 
@@ -321,5 +327,129 @@ public class ProcessWalkthrough : MonoBehaviour
             return "all_files_in_" + splitRawDataDirectory[splitRawDataDirectory.Length - 1] + "_" + type + ".csv";
         }
         return Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
+    }
+
+    private void CreateHeatMap()
+    {
+        // Reading in the data from a walkthough.
+        string[] data = File.ReadAllLines(rawDataFileName);
+        Vector3[] positions = new Vector3[data.Length / 4];
+        Vector3[] directions = new Vector3[data.Length / 4];
+        Vector3[] ups = new Vector3[data.Length / 4];
+        Vector3[] rights = new Vector3[data.Length / 4];
+        for (int i = 0; i < data.Length / 4; i++)
+        {
+            positions[i] = str2Vec(data[4 * i + 0]);
+            directions[i] = str2Vec(data[4 * i + 1]);
+            ups[i] = str2Vec(data[4 * i + 2]);
+            rights[i] = str2Vec(data[4 * i + 3]);
+        }
+
+        // Will hold all the positions where the rays hit.
+        List<Vector3> hits = new List<Vector3>();
+
+        // Unity generates 32 layers per default.
+        hitsPerLayer = new int[32];
+        for (int i = 0; i < data.Length / 4; i++)
+        {
+            hits.AddRange(castAndCollide(positions[i], directions[i], ups[i], rights[i], ref hitsPerLayer));
+        }
+
+        int n = hits.Count;
+        
+        // Calculate the distances between each hit.
+        List<float> distances = new List<float>();
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = i + 1; j < n; j++)
+            {
+                distances.Add(Vector3.Distance(hits[j], hits[i]));
+            }
+        }
+
+        float[] avgDistances = new float[hits.Count];
+        for (int i = 0; i < n; i++)
+        {
+            float avg = 0;
+            int offset = 0;
+            int C = 0;
+            for (int j = 1; j <= i; j++)
+            {
+                avg += Mathf.Exp(-distances[offset + i - j] / h);
+                offset += n - j;
+                C++;
+            }
+            for (int j = 0; j < n - i - 1; j++)
+            {
+                avg += Mathf.Exp(-distances[offset + j] / h);
+                C++;
+            }
+            avgDistances[i] = avg / (C * h);
+        }
+        float min = float.MaxValue;
+        float max = 0.0f;
+        for (int i = 0; i < n; i++)
+        {
+            min = avgDistances[i] < min ? avgDistances[i] : min;
+            max = avgDistances[i] > max ? avgDistances[i] : max;
+        }
+
+        float range = max - min;
+
+        colors = new float[hits.Count];
+        for (int i = 0; i < hits.Count; i++)
+        {
+            colors[i] = (avgDistances[i] - min) / range;
+        }
+        createParticles(hits.ToArray(), colors, particleSize);
+    }
+
+    private void LoadHeatMap()
+    {
+        // Reading in the heatmap-data from prior processing and creating arrays for positions and colors \in [0, 1].
+        string[] allLines = File.ReadAllLines(inProcessedDataFileName);
+        Vector3[] positions = new Vector3[allLines.Length];
+        float[] colors = new float[allLines.Length];
+        for (int i = 0; i < allLines.Length; i++)
+        {
+            string[] line = allLines[i].Split(',');
+            if (line.Length == 4)
+            {
+                positions[i] = str2Vec(line[0] + "," + line[1] + "," + line[2]);
+                colors[i] = float.Parse(line[3]);
+            }
+        }
+        createParticles(positions, colors, particleSize);
+    }
+
+    private void SaveProcessedDataFile()
+    {
+        using (StreamWriter processedDataFile = new StreamWriter(outProcessedDataFileName))
+        {
+            for (int i = 0; i < hits.Count; i++)
+            {
+                processedDataFile.WriteLine(hits[i]+","+colors[i]);
+            }
+        }
+    }
+
+    private void SaveStatisticDataFile()
+    {
+        // Determine the total number of hits.
+        int totalHits = 0;
+        for (int i = 0; i < hitsPerLayer.Length; i++)
+        {
+            totalHits += hitsPerLayer[i];
+        }
+        using (StreamWriter statisticDataFile = new StreamWriter(outFileNameStatistic))
+        {
+            for (int i = 0; i < hitsPerLayer.Length; i++)
+            {
+                if (hitsPerLayer[i] != 0)
+                {
+                    statisticDataFile.WriteLine(LayerMask.LayerToName(i)+ "," +(((float) hitsPerLayer[i]) / ((float) totalHits)));
+                }
+            }
+        }
     }
 }
