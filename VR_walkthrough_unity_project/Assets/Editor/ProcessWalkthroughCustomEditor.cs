@@ -20,7 +20,7 @@ public class ProcessWalkthroughCustomEditor : Editor
     }
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        // base.OnInspectorGUI();
 
         EditorGUILayout.Space();
 

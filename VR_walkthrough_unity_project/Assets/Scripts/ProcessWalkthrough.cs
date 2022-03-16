@@ -62,11 +62,16 @@ public class ProcessWalkthrough : MonoBehaviour
     private LineRenderer lineRenderer;
     private GameObject shortestPathLinerendererParent;
     private LineRenderer shortestPathLinerenderer;
+    private int numFiles;
 
     void Start()
     {
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
+        trajectoryPositions = new List<Vector3[]>();
+        trajectoryForwardDirections = new List<Vector3[]>();
+        trajectoryUpDirections = new List<Vector3[]>();
+        trajectoryRightDirections = new List<Vector3[]>();
 
         // Create a list of filenames for the raw data files to be read. If <useAllFilesInDirectory> is false, then this
         // list will consist of only one file. Otherwise all files in that directory will be added.
@@ -82,6 +87,8 @@ public class ProcessWalkthrough : MonoBehaviour
             rawDataFileNames.Add(rawDataFileName);
         }
 
+        numFiles = rawDataFileNames.Count;
+
         // TODO: Remove after debug.
         foreach (string fileName in rawDataFileNames)
             Debug.Log(fileName);
@@ -90,14 +97,12 @@ public class ProcessWalkthrough : MonoBehaviour
         foreach (string fileName in rawDataFileNames)
         {
             (Vector3[], Vector3[], Vector3[], Vector3[]) parsedData = ReadRawFile(fileName);
-            Debug.Log(parsedData.Item1.Length);
-            Debug.Log(parsedData.Item2.Length);
-            Debug.Log(parsedData.Item3.Length);
-            Debug.Log(parsedData.Item4.Length);
+            trajectoryPositions.Add(parsedData.Item1);
+            trajectoryForwardDirections.Add(parsedData.Item2);
+            trajectoryUpDirections.Add(parsedData.Item3);
+            trajectoryRightDirections.Add(parsedData.Item4);
         }        
 
-        /*
-        ReadRawFile(rawDataFileNames[0]);
         if (visualizeHeatmap)
         {
             if (reuseHeatmap)
@@ -114,35 +119,37 @@ public class ProcessWalkthrough : MonoBehaviour
         }
         if (visualizeTrajectory)
         {
-            lineRendererParent = new GameObject();
-            lineRendererParent.hideFlags = HideFlags.HideInHierarchy;
-            lineRenderer = lineRendererParent.AddComponent<LineRenderer>();
-            VisualizeTrajectory(lineRenderer, new List<Vector3>(trajectoryPositions), trajectoryGradient, pathWidth);
-            if (visualizeShortestPath)
+            foreach (Vector3[] currPositions in trajectoryPositions)
             {
-                Vector3 startPos = inferStartLocation ? trajectoryPositions[0] : startLocation.position;
-                Vector3 endPos = endLocation.position;
+                lineRendererParent = new GameObject();
+                lineRendererParent.hideFlags = HideFlags.HideInHierarchy;
+                lineRenderer = lineRendererParent.AddComponent<LineRenderer>();
+                VisualizeTrajectory(lineRenderer, new List<Vector3>(currPositions), trajectoryGradient, pathWidth);
+                if (visualizeShortestPath)
+                {
+                    Vector3 startPos = inferStartLocation ? currPositions[0] : startLocation.position;
+                    Vector3 endPos = endLocation.position;
 
-                // startPos and endPos do not necessarily lie on the NavMesh. Finding path between them might fail.
-                NavMeshHit startHit;
-                NavMesh.SamplePosition(startPos, out startHit, 100.0f, NavMesh.AllAreas);  // Hardcoded to 100 units of maximal distance.
-                startPos = startHit.position;
-                NavMeshHit endHit;
-                NavMesh.SamplePosition(endPos, out endHit, 100.0f, NavMesh.AllAreas);
-                endPos = endHit.position;
+                    // startPos and endPos do not necessarily lie on the NavMesh. Finding path between them might fail.
+                    NavMeshHit startHit;
+                    NavMesh.SamplePosition(startPos, out startHit, 100.0f, NavMesh.AllAreas);  // Hardcoded to 100 units of maximal distance.
+                    startPos = startHit.position;
+                    NavMeshHit endHit;
+                    NavMesh.SamplePosition(endPos, out endHit, 100.0f, NavMesh.AllAreas);
+                    endPos = endHit.position;
 
-                // Creating linerenderer for shortest path.
-                shortestPathLinerendererParent = new GameObject();
-                shortestPathLinerendererParent.hideFlags = HideFlags.HideInHierarchy;
-                shortestPathLinerenderer = shortestPathLinerendererParent.AddComponent<LineRenderer>();
+                    // Creating linerenderer for shortest path.
+                    shortestPathLinerendererParent = new GameObject();
+                    shortestPathLinerendererParent.hideFlags = HideFlags.HideInHierarchy;
+                    shortestPathLinerenderer = shortestPathLinerendererParent.AddComponent<LineRenderer>();
 
-                // Create shortest path.
-                NavMeshPath navMeshPath = new NavMeshPath();
-                NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
-                VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
+                    // Create shortest path.
+                    NavMeshPath navMeshPath = new NavMeshPath();
+                    NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
+                    VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
+                }
             }
         }
-        */
     }
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
@@ -165,7 +172,7 @@ public class ProcessWalkthrough : MonoBehaviour
      * @param horizontal        Vector corresponding to the horizontal axis of the cone.
      * @return                  List of vectors corresponding to the collisions of the cone-raycast with the environment.
      */
-    List<Vector3> castAndCollide(Vector3 viewPoint, Vector3 forward, Vector3 vertical, Vector3 horizontal, ref int[] hitsPerLayer)
+    List<Vector3> CastAndCollide(Vector3 viewPoint, Vector3 forward, Vector3 vertical, Vector3 horizontal, ref int[] hitsPerLayer)
     {
         Vector3 hitPos = Vector3.zero;
         List<Vector3> results = new List<Vector3>();
@@ -271,12 +278,12 @@ public class ProcessWalkthrough : MonoBehaviour
 
     void Update()
     {
-        /*
         if (visualizeTrajectory)
         {
+            /*
             VisualizeTrajectory(lineRenderer, new List<Vector3>(trajectoryPositions), trajectoryGradient, pathWidth);
+            */
         }
-        */
     }
 
     public string CreateDerivedDataFileName(string rawDataDirectory, string rawDataFileName, string type)
@@ -310,31 +317,35 @@ public class ProcessWalkthrough : MonoBehaviour
 
     private void CreateHeatMap()
     {
-        // Reading in the data from a walkthough.
-        string[] data = File.ReadAllLines(rawDataFileName);
-        Vector3[] trajectoryPositions = new Vector3[data.Length / 4];
-        Vector3[] directions = new Vector3[data.Length / 4];
-        Vector3[] ups = new Vector3[data.Length / 4];
-        Vector3[] rights = new Vector3[data.Length / 4];
-        for (int i = 0; i < data.Length / 4; i++)
-        {
-            trajectoryPositions[i] = str2Vec(data[4 * i + 0]);
-            directions[i] = str2Vec(data[4 * i + 1]);
-            ups[i] = str2Vec(data[4 * i + 2]);
-            rights[i] = str2Vec(data[4 * i + 3]);
-        }
 
         // Will hold all the positions where the rays hit.
         hits = new List<Vector3>();
 
         // Unity generates 32 layers per default.
         hitsPerLayer = new int[32];
-        for (int i = 0; i < data.Length / 4; i++)
+        for (int i = 0; i < numFiles; i++)
         {
-            hits.AddRange(castAndCollide(trajectoryPositions[i], directions[i], ups[i], rights[i], ref hitsPerLayer));
+            Vector3[] currPositions = trajectoryPositions[i];
+            Vector3[] currForwardDirections = trajectoryForwardDirections[i];
+            Vector3[] currUpDirections = trajectoryUpDirections[i];
+            Vector3[] currRightDirections = trajectoryRightDirections[i];
+            Debug.Log(currPositions.Length);
+            for (int j = 0; j < currPositions.Length; j++)
+            {
+                hits.AddRange(
+                    CastAndCollide(
+                        currPositions[j],
+                        currForwardDirections[j],
+                        currUpDirections[j],
+                        currRightDirections[j],
+                        ref hitsPerLayer
+                    )
+                );
+            }
         }
 
         int n = hits.Count;
+        Debug.Log($"number of hits: {n}");
         
         // Calculate the distances between each hit.
         List<float> distances = new List<float>();
