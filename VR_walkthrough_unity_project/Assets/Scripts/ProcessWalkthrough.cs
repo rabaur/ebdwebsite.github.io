@@ -47,6 +47,7 @@ public class ProcessWalkthrough : MonoBehaviour
     public bool visualizeTrajectory = false;
     private Vector3[] particlePositions;
     public Gradient trajectoryGradient;
+    public Gradient shortestPathGradient;
     public bool visualizeShortestPath = false;
     public bool inferStartLocation = true;
     public Transform startLocation;
@@ -109,7 +110,7 @@ public class ProcessWalkthrough : MonoBehaviour
                 // Create shortest path.
                 NavMeshPath navMeshPath = new NavMeshPath();
                 NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
-                VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), trajectoryGradient, pathWidth);
+                VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
             }
         }
     }

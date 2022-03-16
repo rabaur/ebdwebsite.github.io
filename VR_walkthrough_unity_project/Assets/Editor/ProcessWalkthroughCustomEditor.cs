@@ -152,6 +152,16 @@ public class ProcessWalkthroughCustomEditor : Editor
                 }
                 EditorGUI.EndDisabledGroup();
                 processor.endLocation = EditorGUILayout.ObjectField(new GUIContent("End Location", "The gameobject that corresponds to the end location"), processor.endLocation, typeof(Transform), true) as Transform;
+
+                EditorGUI.BeginChangeCheck();
+                SerializedObject serializedGradient1 = new SerializedObject(target);
+                SerializedProperty shortestPathGradient = serializedGradient1.FindProperty("shortestPathGradient");
+                EditorGUILayout.PropertyField(shortestPathGradient, true);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedGradient1.ApplyModifiedProperties();
+                }
+
                 EditorGUI.indentLevel -= 2;
             }
             EditorGUI.indentLevel -= 2;
