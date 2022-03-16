@@ -52,10 +52,10 @@ public class ProcessWalkthrough : MonoBehaviour
     public bool inferStartLocation = true;
     public Transform startLocation;
     public Transform endLocation;
-    private Vector3[] trajectoryPositions;
-    private Vector3[] trajectoryDirections;
-    private Vector3[] trajectoryUpVectors;
-    private Vector3[] trajectoryRightVectors;
+    private List<Vector3[]> trajectoryPositions;
+    private List<Vector3[]> trajectoryForwardDirections;
+    private List<Vector3[]> trajectoryUpDirections;
+    private List<Vector3[]> trajectoryRightDirections;
     public bool reuseHeatmap = true;
     public float pathWidth = 0.1f;
     private GameObject lineRendererParent;
@@ -68,7 +68,36 @@ public class ProcessWalkthrough : MonoBehaviour
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
 
-        ReadRawFile();
+        // Create a list of filenames for the raw data files to be read. If <useAllFilesInDirectory> is false, then this
+        // list will consist of only one file. Otherwise all files in that directory will be added.
+        List<string> rawDataFileNames = new List<string>();
+        if (useAllFilesInDirectory)
+        {
+            // Read in all files in the directory.
+            rawDataFileNames = new List<string>(Directory.GetFiles(rawDataDirectory, "*.csv"));
+        }
+        else 
+        {
+            // Only get single file.
+            rawDataFileNames.Add(rawDataFileName);
+        }
+
+        // TODO: Remove after debug.
+        foreach (string fileName in rawDataFileNames)
+            Debug.Log(fileName);
+
+        // Parse each file and populate the positions and direction arrays.
+        foreach (string fileName in rawDataFileNames)
+        {
+            (Vector3[], Vector3[], Vector3[], Vector3[]) parsedData = ReadRawFile(fileName);
+            Debug.Log(parsedData.Item1.Length);
+            Debug.Log(parsedData.Item2.Length);
+            Debug.Log(parsedData.Item3.Length);
+            Debug.Log(parsedData.Item4.Length);
+        }        
+
+        /*
+        ReadRawFile(rawDataFileNames[0]);
         if (visualizeHeatmap)
         {
             if (reuseHeatmap)
@@ -113,6 +142,7 @@ public class ProcessWalkthrough : MonoBehaviour
                 VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
             }
         }
+        */
     }
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
@@ -241,10 +271,12 @@ public class ProcessWalkthrough : MonoBehaviour
 
     void Update()
     {
+        /*
         if (visualizeTrajectory)
         {
             VisualizeTrajectory(lineRenderer, new List<Vector3>(trajectoryPositions), trajectoryGradient, pathWidth);
         }
+        */
     }
 
     public string CreateDerivedDataFileName(string rawDataDirectory, string rawDataFileName, string type)
@@ -257,21 +289,23 @@ public class ProcessWalkthrough : MonoBehaviour
         return Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
     }
 
-    private void ReadRawFile()
+    private (Vector3[], Vector3[], Vector3[], Vector3[]) ReadRawFile(string rawDataFileName)
     {
         // Reading in the data from a walkthough.
         string[] data = File.ReadAllLines(rawDataFileName);
-        trajectoryPositions = new Vector3[data.Length / 4];
-        trajectoryDirections = new Vector3[data.Length / 4];
-        trajectoryUpVectors = new Vector3[data.Length / 4];
-        trajectoryRightVectors = new Vector3[data.Length / 4];
+        Vector3[] positions = new Vector3[data.Length / 4];
+        Vector3[] forwardDirections = new Vector3[data.Length / 4];
+        Vector3[] upDirections = new Vector3[data.Length / 4];
+        Vector3[] rightDirections = new Vector3[data.Length / 4];
         for (int i = 0; i < data.Length / 4; i++)
         {
-            trajectoryPositions[i] = str2Vec(data[4 * i + 0]);
-            trajectoryDirections[i] = str2Vec(data[4 * i + 1]);
-            trajectoryUpVectors[i] = str2Vec(data[4 * i + 2]);
-            trajectoryRightVectors[i] = str2Vec(data[4 * i + 3]);
+            positions[i] = str2Vec(data[4 * i + 0]);
+            forwardDirections[i] = str2Vec(data[4 * i + 1]);
+            upDirections[i] = str2Vec(data[4 * i + 2]);
+            rightDirections[i] = str2Vec(data[4 * i + 3]);
         }
+
+        return (positions, forwardDirections, upDirections, rightDirections);
     }
 
     private void CreateHeatMap()

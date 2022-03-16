@@ -84,15 +84,17 @@ public class CaptureWalkthrough : MonoBehaviour
     // Here the actual IO happens.
     void OnDestroy()
     {
-
-        // Normal file.
-        using (StreamWriter openFile = new StreamWriter(fileName)) 
+        // Need to make this check, otherwise a file gets overwritten and ObjectReferenceNotSet error on console.
+        if (this.enabled)
         {
-            for (int i = 0; i < positions.Count; i++) {
-                openFile.WriteLine(positions[i].ToString());
-                openFile.WriteLine(directions[i].ToString());
-                openFile.WriteLine(ups[i].ToString());
-                openFile.WriteLine(rights[i].ToString());
+            using (StreamWriter openFile = new StreamWriter(fileName)) 
+            {
+                for (int i = 0; i < positions.Count; i++) {
+                    openFile.WriteLine(positions[i].ToString());
+                    openFile.WriteLine(directions[i].ToString());
+                    openFile.WriteLine(ups[i].ToString());
+                    openFile.WriteLine(rights[i].ToString());
+                }
             }
         }      
     }

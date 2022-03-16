@@ -24,7 +24,13 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         EditorGUILayout.Space();
 
-        EditorGUI.DrawRect(EditorGUILayout.GetControlRect(false, 1), Color.gray);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                                                                                            //
+        // File IO                                                                                                    //
+        //                                                                                                            //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        HorizontalSeperator();
 
         EditorGUILayout.Space();
 
@@ -36,13 +42,17 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         if (GUILayout.Button("Choose raw data directory", GUILayout.Width(buttonWidth)))
         {
-            processor.rawDataDirectory = EditorUtility.OpenFolderPanel("Choose directory containing raw data", "RawData", "Default");
-            if (!processor.useAllFilesInDirectory)
+            string newRawDirectoryName = EditorUtility.OpenFolderPanel("Choose directory containing raw data", "RawData", "Default");
+            
+            if (newRawDirectoryName != "")
             {
-                processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+                if (!processor.useAllFilesInDirectory)
+                {
+                    processor.rawDataFileName = newRawDirectoryName;
+                }
+                processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+                processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
             }
-            processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
-            processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
 
         string[] splitRawDataPath = processor.rawDataDirectory.Split('/');
@@ -55,7 +65,14 @@ public class ProcessWalkthroughCustomEditor : Editor
             if (!processor.useAllFilesInDirectory)
             {
                 // The toggle was previously on, but is now switched off. In this case we need to choose a specific file.
-                processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+                string newRawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+                if (newRawDataFileName == "")
+                {
+                    // The user has aborted the file selection process, but we need to make sure that a valid file is chosen.
+                    // We will choose the first file in the directory by default for now.
+                    newRawDataFileName = Directory.GetFiles(processor.rawDataDirectory)[0];
+                }
+                processor.rawDataFileName = newRawDataFileName;
             }
             processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
             processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
@@ -68,8 +85,13 @@ public class ProcessWalkthroughCustomEditor : Editor
         // If not all files are chosen, a specific file need to be indicated.
         if (GUILayout.Button("Choose raw data file", GUILayout.Width(buttonWidth))) 
         {
-            Debug.Log("here");
-            processor.rawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+            string newRawDatafileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+            if (newRawDatafileName == "")
+            {
+                // The user has aborted the file-selection process. Revert to old file name.
+                newRawDatafileName = processor.rawDataFileName;
+            }
+            processor.rawDataFileName = newRawDatafileName;
             processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
             processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
         }
@@ -89,9 +111,25 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         GUILayout.EndHorizontal();
 
+        if (GUILayout.Button("Delete file", GUILayout.Width(buttonWidth)))
+        {
+            string fileNameToDelete = EditorUtility.OpenFilePanel("Delete file", "RawData", "csv");
+            
+            if (fileNameToDelete != "")
+            {
+                FileUtil.DeleteFileOrDirectory(fileNameToDelete);
+            }
+        }
+
         EditorGUILayout.Space();
 
-        EditorGUI.DrawRect(EditorGUILayout.GetControlRect(false, 1), Color.gray);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                                                                                            //
+        // Visualization                                                                                              //
+        //                                                                                                            //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        HorizontalSeperator();
 
         EditorGUILayout.Space();
 
@@ -169,5 +207,10 @@ public class ProcessWalkthroughCustomEditor : Editor
         }
         EditorGUILayout.EndFadeGroup();
         EditorGUI.EndDisabledGroup();
+    }
+
+    private void HorizontalSeperator()
+    {
+        EditorGUI.DrawRect(EditorGUILayout.GetControlRect(false, 1), Color.gray);
     }
 }

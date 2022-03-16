@@ -17,7 +17,14 @@ public class CaptureWalkthroughCustomEditor : Editor
 
         if (GUILayout.Button("Choose subdirectory"))
         {
-            capture.directory = EditorUtility.OpenFolderPanel("Choose subdirectory", "RawData", "Default");
+            string directoryName = EditorUtility.OpenFolderPanel("Choose subdirectory", "RawData", "Default");
+
+            // If the user cancels the action, an empty string will be returned. In that case we do not want to make 
+            // any modifications.
+            if (directoryName != "")
+            {
+                capture.directory = directoryName;
+            }
         }
 
         string[] splitDirectories = capture.directory.Split('/');
@@ -28,7 +35,14 @@ public class CaptureWalkthroughCustomEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             // Retrigger file name choice if directory was changed.
-            capture.fileName = capture.directory + "/" + Path.GetFileName(capture.fileName);
+            string fileName = capture.directory + "/" + Path.GetFileName(capture.fileName);
+            
+            // If the user cancels the action, an empty string will be returned. In that case we do not want to make 
+            // any modifications.
+            if (fileName != "")
+            {
+                capture.fileName = fileName;
+            }
         }
 
         EditorGUILayout.Space();
@@ -38,11 +52,28 @@ public class CaptureWalkthroughCustomEditor : Editor
         if (GUILayout.Button("Choose (base) file name")) 
         {
             string fileName = EditorUtility.SaveFilePanel("Select file name", capture.directory, "capture", "csv");
-            capture.fileName = fileName;
+            
+            // If the user cancels the action, an empty string will be returned. In that case we do not want to make 
+            // any modifications.
+            if (fileName != "")
+            {
+                capture.fileName = fileName;
+            }
         }
         GUILayout.Label(Path.GetFileName(capture.fileName));
 
         GUILayout.EndHorizontal();
+
+        EditorGUILayout.Space();
+
+        if (GUILayout.Button("Delete file"))
+        {
+            string fileNameToDelete = EditorUtility.OpenFilePanel("Delete file", "RawData", "csv");
+            if (fileNameToDelete != "")
+            {
+                FileUtil.DeleteFileOrDirectory(fileNameToDelete);
+            }
+        }
 
         EditorGUILayout.Space();
 
