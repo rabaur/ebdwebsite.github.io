@@ -56,6 +56,7 @@ public class ProcessWalkthrough : MonoBehaviour
     private List<Vector3[]> trajectoryForwardDirections;
     private List<Vector3[]> trajectoryUpDirections;
     private List<Vector3[]> trajectoryRightDirections;
+    private List<float[]> trajectoryTimes;
     public bool reuseHeatmap = true;
     public float pathWidth = 0.1f;
     private GameObject lineRendererParent;
@@ -65,6 +66,7 @@ public class ProcessWalkthrough : MonoBehaviour
     private int numFiles;
     public Material lineRendererMaterial;
     public Material heatmapMaterial;
+    private List<string> rawDataFileNames;
 
     void Start()
     {
@@ -87,7 +89,7 @@ public class ProcessWalkthrough : MonoBehaviour
 
         // Create a list of filenames for the raw data files to be read. If <useAllFilesInDirectory> is false, then this
         // list will consist of only one file. Otherwise all files in that directory will be added.
-        List<string> rawDataFileNames = new List<string>();
+        rawDataFileNames = new List<string>();
         if (useAllFilesInDirectory)
         {
             // Read in all files in the directory.
@@ -109,7 +111,7 @@ public class ProcessWalkthrough : MonoBehaviour
         // Parse each file and populate the positions and direction arrays.
         foreach (string fileName in rawDataFileNames)
         {
-            (Vector3[], Vector3[], Vector3[], Vector3[]) parsedData = ReadRawFile(fileName);
+            (Vector3[], Vector3[], Vector3[], Vector3[]) parsedData = ReadRawDataFile(fileName);
             trajectoryPositions.Add(parsedData.Item1);
             trajectoryForwardDirections.Add(parsedData.Item2);
             trajectoryUpDirections.Add(parsedData.Item3);
@@ -125,8 +127,7 @@ public class ProcessWalkthrough : MonoBehaviour
             else
             {
                 CreateHeatMap();
-                SaveProcessedDataFile();
-                WriteSummarizedDataFile();
+                WriteProcessedDataFile();
             }
             CreateParticles();
         }
@@ -163,6 +164,9 @@ public class ProcessWalkthrough : MonoBehaviour
                 }
             }
         }
+
+        // Always write summary. However fill invalid values with Nan if don't make sense.
+        WriteSummarizedDataFile();
     }
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
@@ -309,22 +313,27 @@ public class ProcessWalkthrough : MonoBehaviour
         return Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
     }
 
-    private (Vector3[], Vector3[], Vector3[], Vector3[]) ReadRawFile(string rawDataFileName)
+    private (Vector3[], Vector3[], Vector3[], Vector3[]) ReadRawDataFile(string rawDataFileName)
     {
         // Reading in the data from a walkthough.
         string[] data = File.ReadAllLines(rawDataFileName);
-        Vector3[] positions = new Vector3[data.Length / 4];
-        Vector3[] forwardDirections = new Vector3[data.Length / 4];
-        Vector3[] upDirections = new Vector3[data.Length / 4];
-        Vector3[] rightDirections = new Vector3[data.Length / 4];
-        for (int i = 0; i < data.Length / 4; i++)
-        {
-            positions[i] = str2Vec(data[4 * i + 0]);
-            forwardDirections[i] = str2Vec(data[4 * i + 1]);
-            upDirections[i] = str2Vec(data[4 * i + 2]);
-            rightDirections[i] = str2Vec(data[4 * i + 3]);
-        }
 
+        Vector3[] positions = new Vector3[data.Length];
+        Vector3[] forwardDirections = new Vector3[data.Length];
+        Vector3[] upDirections = new Vector3[data.Length];
+        Vector3[] rightDirections = new Vector3[data.Length];
+        float[] times = new float[data.Length];
+        for (int i = 0; i < data.Length; i++)
+        {
+            // Split string at comma.
+            string[] splitLine = data[i].Split(',');
+            times[i] = float.Parse(splitLine[0]);
+            positions[i] = new Vector3(float.Parse(splitLine[1]), float.Parse(splitLine[2]), float.Parse(splitLine[3]));
+            forwardDirections[i] = new Vector3(float.Parse(splitLine[4]), float.Parse(splitLine[5]), float.Parse(splitLine[6]));
+            upDirections[i] = new Vector3(float.Parse(splitLine[7]), float.Parse(splitLine[8]), float.Parse(splitLine[9]));
+            rightDirections[i] = new Vector3(float.Parse(splitLine[10]), float.Parse(splitLine[11]), float.Parse(splitLine[12]));
+        }
+        Debug.Log(positions.Length);
         return (positions, forwardDirections, upDirections, rightDirections);
     }
 
@@ -425,7 +434,7 @@ public class ProcessWalkthrough : MonoBehaviour
         }
     }
 
-    private void SaveProcessedDataFile()
+    private void WriteProcessedDataFile()
     {
         using (StreamWriter processedDataFile = new StreamWriter(outProcessedDataFileName))
         {
@@ -436,13 +445,67 @@ public class ProcessWalkthrough : MonoBehaviour
         }
     }
 
-    private void WriteSummarizedDataFile()
+    private async void WriteSummarizedDataFile()
     {
         // Determine the total number of hits.
         int totalHits = 0;
         for (int i = 0; i < hitsPerLayer.Length; i++)
         {
             totalHits += hitsPerLayer[i];
+        }
+
+        // Variables to be written out.
+        List<float> durations = new List<float>();
+        List<float> distances = new List<float>();
+        List<float> averageSpeeds = new List<float>();
+        List<float> shortestPathDistances = new List<float>();
+        List<float> surplusShortestPaths = new List<float>();
+        List<float> ratioShortestPaths = new List<float>();
+        List<int> successfuls = new List<int>();
+        List<List<float>> viewPercentages = new List<List<float>>();
+
+        for (int i = 0; i < numFiles; i++)
+        {
+            // Duration of a walkthrough is the temporal difference between the last update step and the first.
+            durations.Add(trajectoryTimes[i][trajectoryTimes[i].Length - 1] - trajectoryTimes[i][0]);
+        }
+
+        for (int i = 0; i < numFiles; i++)
+        {
+            // Add up distances between measures time-points. Note that the resolution at which the time-points are 
+            // recorded will make a difference.
+            float currDistance = 0.0f;
+            for (int j = 0; j < trajectoryPositions[i].Length - 1; j++)
+            {
+                currDistance += Vector3.Distance(trajectoryPositions[i][j], trajectoryPositions[i][j]);
+            }
+            distances.Add(currDistance);
+        }
+
+        for (int i = 0; i < numFiles; i++)
+        {
+            averageSpeeds.Add(distances[i] / durations[i]);
+        }
+
+        for (int i = 0; i < numFiles; i++)
+        {
+            Vector3[] currPositions = trajectoryPositions[i];
+            Vector3 startPos = inferStartLocation ? currPositions[0] : startLocation.position;
+            Vector3 endPos = endLocation.position;
+
+            // startPos and endPos do not necessarily lie on the NavMesh. Finding path between them might fail.
+            NavMeshHit startHit;
+            NavMesh.SamplePosition(startPos, out startHit, 100.0f, NavMesh.AllAreas);  // Hardcoded to 100 units of maximal distance.
+            startPos = startHit.position;
+            NavMeshHit endHit;
+            NavMesh.SamplePosition(endPos, out endHit, 100.0f, NavMesh.AllAreas);
+            endPos = endHit.position;
+
+            // Create shortest path.
+            NavMeshPath navMeshPath = new NavMeshPath();
+            NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
+
+            float currDistance = 0.0f;
         }
         using (StreamWriter statisticDataFile = new StreamWriter(outSummarizedDataFileName))
         {

@@ -22,8 +22,7 @@ public class CaptureWalkthrough : MonoBehaviour
     private List<float> yAngle;                     // Azimuth.
     private List<float> xAngle;                     // Elevation.
     private List<float> time;                       // Time.
-    private float lastSample;                       // The time the last sample was taken. 
-    private float firstTimePlayable = -1.0f;        // Subtract from time.realTimeSinceStartup to get time since game is responsive.      
+    private float lastSample;                       // The time the last sample was taken.    
 
     // Start is called before the first frame update
     void Start()
