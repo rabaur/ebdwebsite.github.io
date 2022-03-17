@@ -42,7 +42,7 @@ public class ProcessWalkthrough : MonoBehaviour
     public string inSummarizedDataFileName;
     private List<Vector3> hits = new List<Vector3>();
     private float[] colors;
-    private int[] hitsPerLayer;
+    private List<int[]> hitsPerLayer;
     public bool visualizeHeatmap = false;
     public bool visualizeTrajectory = false;
     private Vector3[] particlePositions;
@@ -67,6 +67,8 @@ public class ProcessWalkthrough : MonoBehaviour
     public Material lineRendererMaterial;
     public Material heatmapMaterial;
     private List<string> rawDataFileNames;
+    private char csvSep = ';';
+    public bool generateSummarizedDataFile;
 
     void Start()
     {
@@ -82,6 +84,8 @@ public class ProcessWalkthrough : MonoBehaviour
         gameObject.GetComponent<ParticleSystemRenderer>().material = heatmapMaterial;
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
+        hitsPerLayer = new List<int[]>();
+        trajectoryTimes = new List<float[]>();
         trajectoryPositions = new List<Vector3[]>();
         trajectoryForwardDirections = new List<Vector3[]>();
         trajectoryUpDirections = new List<Vector3[]>();
@@ -111,11 +115,12 @@ public class ProcessWalkthrough : MonoBehaviour
         // Parse each file and populate the positions and direction arrays.
         foreach (string fileName in rawDataFileNames)
         {
-            (Vector3[], Vector3[], Vector3[], Vector3[]) parsedData = ReadRawDataFile(fileName);
-            trajectoryPositions.Add(parsedData.Item1);
-            trajectoryForwardDirections.Add(parsedData.Item2);
-            trajectoryUpDirections.Add(parsedData.Item3);
-            trajectoryRightDirections.Add(parsedData.Item4);
+            (float[], Vector3[], Vector3[], Vector3[], Vector3[]) parsedData = ReadRawDataFile(fileName);
+            trajectoryTimes.Add(parsedData.Item1);
+            trajectoryPositions.Add(parsedData.Item2);
+            trajectoryForwardDirections.Add(parsedData.Item3);
+            trajectoryUpDirections.Add(parsedData.Item4);
+            trajectoryRightDirections.Add(parsedData.Item5);
         }        
 
         if (visualizeHeatmap)
@@ -165,8 +170,10 @@ public class ProcessWalkthrough : MonoBehaviour
             }
         }
 
-        // Always write summary. However fill invalid values with Nan if don't make sense.
-        WriteSummarizedDataFile();
+        if (generateSummarizedDataFile)
+        {
+            WriteSummarizedDataFile();
+        }
     }
 
     /* Converts string-representation of vector (in format of Vector3.ToString()) to Vector3.
@@ -176,7 +183,7 @@ public class ProcessWalkthrough : MonoBehaviour
     Vector3 str2Vec(string str)
     {
         str = str.Substring(1, str.Length - 2);
-        string[] substrs = str.Split(',');
+        string[] substrs = str.Split(csvSep);
         return new Vector3( float.Parse(substrs[0]), 
                             float.Parse(substrs[1]), 
                             float.Parse(substrs[2]));
@@ -199,7 +206,7 @@ public class ProcessWalkthrough : MonoBehaviour
                         + forward
                         + vertical * Random.value * outerConeRadiusVertical * Mathf.Sin(2.0f * Mathf.PI * Random.value)
                         + horizontal * Random.value * outerConeRadiusHorizontal * Mathf.Sin(2.0f * Mathf.PI * Random.value);
-            if (collision(viewPoint, p - viewPoint, ref hitPos, ref hitsPerLayer))
+            if (Collision(viewPoint, p - viewPoint, ref hitPos, ref hitsPerLayer))
             {
                 results.Add(hitPos);
             }
@@ -208,13 +215,7 @@ public class ProcessWalkthrough : MonoBehaviour
         return results;
     }
 
-    /* Casts a ray and returns the position of collision if ray hits object in specified layers.
-     * @param start             Vector corresponding to the start-position of the ray.
-     * @param dir               Vector corresponding to the direction of the ray.
-     * @param hitPos            Will be overwritten with position of hit if it occurs.
-     * @return                  If hits object in specified layer: true. Else: false.
-     */
-    bool collision(Vector3 start, Vector3 dir, ref Vector3 hitPos, ref int[] hitsPerLayer)
+    bool Collision(Vector3 start, Vector3 dir, ref Vector3 hitPos, ref int[] hitsPerLayer)
     {
         // If a hit occurs, this will hold all the information about it.
         RaycastHit hit;
@@ -310,10 +311,10 @@ public class ProcessWalkthrough : MonoBehaviour
             string[] splitRawDataDirectory = rawDataDirectory.Split('/');
             return "all_files_in_" + splitRawDataDirectory[splitRawDataDirectory.Length - 1] + "_" + type + ".csv";
         }
-        return Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
+        return rawDataDirectory + "_" + Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
     }
 
-    private (Vector3[], Vector3[], Vector3[], Vector3[]) ReadRawDataFile(string rawDataFileName)
+    private (float[], Vector3[], Vector3[], Vector3[], Vector3[]) ReadRawDataFile(string rawDataFileName)
     {
         // Reading in the data from a walkthough.
         string[] data = File.ReadAllLines(rawDataFileName);
@@ -326,7 +327,7 @@ public class ProcessWalkthrough : MonoBehaviour
         for (int i = 0; i < data.Length; i++)
         {
             // Split string at comma.
-            string[] splitLine = data[i].Split(',');
+            string[] splitLine = data[i].Split(csvSep);
             times[i] = float.Parse(splitLine[0]);
             positions[i] = new Vector3(float.Parse(splitLine[1]), float.Parse(splitLine[2]), float.Parse(splitLine[3]));
             forwardDirections[i] = new Vector3(float.Parse(splitLine[4]), float.Parse(splitLine[5]), float.Parse(splitLine[6]));
@@ -334,7 +335,7 @@ public class ProcessWalkthrough : MonoBehaviour
             rightDirections[i] = new Vector3(float.Parse(splitLine[10]), float.Parse(splitLine[11]), float.Parse(splitLine[12]));
         }
         Debug.Log(positions.Length);
-        return (positions, forwardDirections, upDirections, rightDirections);
+        return (times, positions, forwardDirections, upDirections, rightDirections);
     }
 
     private void CreateHeatMap()
@@ -344,7 +345,7 @@ public class ProcessWalkthrough : MonoBehaviour
         hits = new List<Vector3>();
 
         // Unity generates 32 layers per default.
-        hitsPerLayer = new int[32];
+        hitsPerLayer = new List<int[]>();
 
         for (int i = 0; i < numFiles; i++)
         {
@@ -352,6 +353,7 @@ public class ProcessWalkthrough : MonoBehaviour
             Vector3[] currForwardDirections = trajectoryForwardDirections[i];
             Vector3[] currUpDirections = trajectoryUpDirections[i];
             Vector3[] currRightDirections = trajectoryRightDirections[i];
+            int[] currHitsPerLayer = new int[32];  // Unity has 32 layers by default.
             Debug.Log(currPositions.Length);
             for (int j = 0; j < currPositions.Length; j++)
             {
@@ -361,14 +363,15 @@ public class ProcessWalkthrough : MonoBehaviour
                         currForwardDirections[j],
                         currUpDirections[j],
                         currRightDirections[j],
-                        ref hitsPerLayer
+                        ref currHitsPerLayer
                     )
                 );
             }
+            hitsPerLayer.Add(currHitsPerLayer);
         }
 
         int n = hits.Count;
-        Debug.Log($"number of hits: {n}");
+        Debug.Log($"Number of hits: {n}");
         
         // Calculate the distances between each hit.
         List<float> distances = new List<float>();
@@ -425,12 +428,9 @@ public class ProcessWalkthrough : MonoBehaviour
         colors = new float[allLines.Length];
         for (int i = 0; i < allLines.Length; i++)
         {
-            string[] line = allLines[i].Split(',');
-            if (line.Length == 4)
-            {
-                particlePositions[i] = str2Vec(line[0] + "," + line[1] + "," + line[2]);
-                colors[i] = float.Parse(line[3]);
-            }
+            string[] line = allLines[i].Split(csvSep);
+            particlePositions[i] = new Vector3(float.Parse(line[0]), float.Parse(line[1]), float.Parse(line[2]));
+            colors[i] = float.Parse(line[3]);
         }
     }
 
@@ -440,19 +440,13 @@ public class ProcessWalkthrough : MonoBehaviour
         {
             for (int i = 0; i < hits.Count; i++)
             {
-                processedDataFile.WriteLine(hits[i]+","+colors[i]);
+                processedDataFile.WriteLine(hits[i].x + csvSep + hits[i].y +csvSep+ hits[i].z + colors[i]);
             }
         }
     }
 
-    private async void WriteSummarizedDataFile()
+    private void WriteSummarizedDataFile()
     {
-        // Determine the total number of hits.
-        int totalHits = 0;
-        for (int i = 0; i < hitsPerLayer.Length; i++)
-        {
-            totalHits += hitsPerLayer[i];
-        }
 
         // Variables to be written out.
         List<float> durations = new List<float>();
@@ -470,6 +464,7 @@ public class ProcessWalkthrough : MonoBehaviour
             durations.Add(trajectoryTimes[i][trajectoryTimes[i].Length - 1] - trajectoryTimes[i][0]);
         }
 
+        // Distances of user trajectory.
         for (int i = 0; i < numFiles; i++)
         {
             // Add up distances between measures time-points. Note that the resolution at which the time-points are 
@@ -482,11 +477,13 @@ public class ProcessWalkthrough : MonoBehaviour
             distances.Add(currDistance);
         }
 
+        // Average speeds.
         for (int i = 0; i < numFiles; i++)
         {
             averageSpeeds.Add(distances[i] / durations[i]);
         }
 
+        // Shortest path distances.
         for (int i = 0; i < numFiles; i++)
         {
             Vector3[] currPositions = trajectoryPositions[i];
@@ -506,15 +503,97 @@ public class ProcessWalkthrough : MonoBehaviour
             NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
 
             float currDistance = 0.0f;
-        }
-        using (StreamWriter statisticDataFile = new StreamWriter(outSummarizedDataFileName))
-        {
-            for (int i = 0; i < hitsPerLayer.Length; i++)
+            for (int j = 0; j < navMeshPath.corners.Length - 1; j++) 
             {
-                if (hitsPerLayer[i] != 0)
+                currDistance += Vector3.Distance(navMeshPath.corners[j], navMeshPath.corners[j + 1]);
+            }
+
+            shortestPathDistances.Add(currDistance);
+        }
+
+        // Surplus distance to shortest path.
+        for (int i = 0; i < numFiles; i++)
+        {
+            surplusShortestPaths.Add(distances[i] - shortestPathDistances[i]);
+        }
+
+        // Ratio between user trajectory length and shortest path.
+        for (int i = 0; i < numFiles; i++)
+        {
+            ratioShortestPaths.Add(distances[i] / shortestPathDistances[i]);
+        }
+
+        // Whether the run was successful.
+        for (int i = 0; i < numFiles; i++)
+        {
+            if (Vector3.Distance(trajectoryPositions[i][trajectoryPositions[i].Length - 1], endLocation.position) < 2.0f)
+            {
+                successfuls.Add(1);
+            }
+            else
+            {
+                successfuls.Add(0);
+            }
+        }
+
+        // Percentages of visibility.
+        for (int i = 0; i < numFiles; i++)
+        {
+            int[] currHitsPerLayer = hitsPerLayer[i];
+
+            // Determine the total number of hits.
+            int totalHits = 0;
+            for (int j = 0; i < currHitsPerLayer.Length; j++)
+            {
+                totalHits += currHitsPerLayer[i];
+            }
+
+            List<float> currHitPercentages = new List<float>();
+            for (int j = 0; j < currHitsPerLayer.Length; j++)
+            {
+                currHitPercentages.Add(currHitsPerLayer[j] / totalHits);
+            }
+        }
+
+        bool isHead = true;  // Indicates whether the current line is a header.
+        using (StreamWriter summaryDataFile = new StreamWriter(outSummarizedDataFileName))
+        {
+            if (isHead)
+            {
+                // Generate header.
+                string header = "RawDataFileName,Duration,Distance,AverageSpeed,ShortestPathDistance,SurplusShortestPath,RatioShortestPath,Successful,";
+
+                // For each layer, generate a header.
+                for (int i = 0; i < hitsPerLayer[0].Length - 1; i++)
                 {
-                    statisticDataFile.WriteLine(LayerMask.LayerToName(i)+ "," +(((float) hitsPerLayer[i]) / ((float) totalHits)));
+                    header += LayerMask.LayerToName(i) + csvSep;
                 }
+
+                // Last element should be followed by comma, thus breaking off.
+                header += LayerMask.LayerToName(hitsPerLayer[0].Length - 1);
+                isHead = false;  // Set head to false, such that head will not be generated in the following iterations.
+                summaryDataFile.WriteLine(header);
+            }
+            
+            // Write data for each file.
+            for (int i = 0; i < numFiles; i++)
+            {
+                // Generate normal line.
+                string line = "";
+                line += rawDataFileNames[i] + csvSep;
+                line += durations[i] + csvSep;
+                line += distances[i] + csvSep;
+                line += averageSpeeds[i] + csvSep;
+                line += shortestPathDistances[i] + csvSep;
+                line += surplusShortestPaths[i] + csvSep;
+                line += ratioShortestPaths[i] + csvSep;
+                line += successfuls[i] + csvSep;
+                for (int j = 0; j < viewPercentages[i].Count - 1; j++)
+                {
+                    line += viewPercentages[i][j] + csvSep;
+                }
+                line += viewPercentages[i][viewPercentages[i].Count - 1];
+                summaryDataFile.WriteLine(line);
             }
         }
     }

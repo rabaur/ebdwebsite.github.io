@@ -22,7 +22,8 @@ public class CaptureWalkthrough : MonoBehaviour
     private List<float> yAngle;                     // Azimuth.
     private List<float> xAngle;                     // Elevation.
     private List<float> time;                       // Time.
-    private float lastSample;                       // The time the last sample was taken.    
+    private float lastSample;                       // The time the last sample was taken.  
+    private const char csvSep = ';';  
 
     // Start is called before the first frame update
     void Start()
@@ -116,34 +117,43 @@ public class CaptureWalkthrough : MonoBehaviour
             for (int i = 0; i < positions.Count; i++) {
 
                 // Write out time.
-                string line = times[i].ToString("F3") + ",";
+                string line = times[i].ToString("F3") + csvSep;
 
                 // Write out coordinates of position.
                 Vector3 currPos = positions[i];
-                line += currPos.x.ToString("F3") + ",";
-                line += currPos.y.ToString("F3") + ",";
-                line += currPos.z.ToString("F3") + ",";
+                line += currPos.x.ToString("F3") + csvSep;
+                line += currPos.y.ToString("F3") + csvSep;
+                line += currPos.z.ToString("F3") + csvSep;
 
                 // Write out coordinates of forward direction.
                 Vector3 currDir = directions[i];
-                line += currDir.x.ToString("F3") + ",";
-                line += currDir.y.ToString("F3") + ",";
-                line += currDir.z.ToString("F3") + ",";
+                line += currDir.x.ToString("F3") + csvSep;
+                line += currDir.y.ToString("F3") + csvSep;
+                line += currDir.z.ToString("F3") + csvSep;
 
                 // Write out coordinates of up direction.
                 Vector3 currUp = directions[i];
-                line += currUp.x.ToString("F3") + ",";
-                line += currUp.y.ToString("F3") + ",";
-                line += currUp.z.ToString("F3") + ",";
+                line += currUp.x.ToString("F3") + csvSep;
+                line += currUp.y.ToString("F3") + csvSep;
+                line += currUp.z.ToString("F3") + csvSep;
 
                 // Write out coordinates of right direction.
                 Vector3 currRight = directions[i];
-                line += currRight.x.ToString("F3") + ",";
-                line += currRight.y.ToString("F3") + ",";
+                line += currRight.x.ToString("F3") + csvSep;
+                line += currRight.y.ToString("F3") + csvSep;
                 line += currRight.z.ToString("F3");
 
                 openFile.WriteLine(line);
             }
+        }
+    }
+
+    // Need to define this as well in case the trial is ended before the player can reach the end.
+    void OnDestroy()
+    {
+        if (this.enabled)
+        {
+            WriteRawDataFile();
         }
     }
 }

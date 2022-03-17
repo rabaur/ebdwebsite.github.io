@@ -251,6 +251,25 @@ public class ProcessWalkthroughCustomEditor : Editor
         }
         EditorGUILayout.EndFadeGroup();
         EditorGUI.EndDisabledGroup();
+
+        EditorGUILayout.Space();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                                                                                            //
+        // Summary                                                                                                    //
+        //                                                                                                            //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        HorizontalSeperator();
+
+        EditorGUILayout.Space();
+        
+        EditorGUI.BeginDisabledGroup(!processor.visualizeHeatmap);
+        processor.generateSummarizedDataFile = EditorGUILayout.Toggle(
+            new GUIContent("Generate Summary", "Enable \"Visualize Heatmap\" to generate summary"), 
+            processor.generateSummarizedDataFile
+        );
+        EditorGUI.EndDisabledGroup();
     }
 
     private void HorizontalSeperator()
