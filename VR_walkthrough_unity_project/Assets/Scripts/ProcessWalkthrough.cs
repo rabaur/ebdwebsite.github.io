@@ -64,9 +64,20 @@ public class ProcessWalkthrough : MonoBehaviour
     private LineRenderer shortestPathLinerenderer;
     private int numFiles;
     public Material lineRendererMaterial;
+    public Material heatmapMaterial;
 
     void Start()
     {
+        if (lineRendererMaterial == null)
+        {
+            lineRendererMaterial = new Material(Shader.Find("Sprites/Default"));  // Default material for linerenderer.
+        }
+        if (heatmapMaterial == null)
+        {
+            heatmapMaterial = new Material(Shader.Find("Particles/Priority Additive (Soft)")); // Default material for heatmap.
+        }
+        // Set material of particle system.
+        gameObject.GetComponent<ParticleSystemRenderer>().material = heatmapMaterial;
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
         trajectoryPositions = new List<Vector3[]>();

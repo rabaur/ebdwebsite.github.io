@@ -78,5 +78,26 @@ public class CaptureWalkthroughCustomEditor : Editor
         EditorGUILayout.Space();
 
         capture.sampleInterval = EditorGUILayout.Slider("Sample Interval", capture.sampleInterval, 0.05f, 1.0f);
+
+        capture.target = EditorGUILayout.ObjectField(
+            new GUIContent("Target", "The Game Object that the player needs to find"),
+            capture.target,
+            typeof(Transform),
+            true
+        ) as Transform;
+
+        capture.targetProximity = EditorGUILayout.Slider(
+            new GUIContent("Target proximity", "How close has the player have to get such that the task is solved"), 
+            capture.targetProximity, 
+            0.5f, 
+            2.0f
+        );
+
+        // Stop gamemode if user is close enough to target.
+        if (Vector3.Distance(capture.gameObject.transform.position, capture.target.position) < capture.targetProximity)
+        {
+            capture.WriteRawDataFile();
+            EditorApplication.isPlaying = false;
+        }
     }
 }

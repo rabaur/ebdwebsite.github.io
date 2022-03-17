@@ -41,15 +41,29 @@ public class ProcessWalkthroughCustomEditor : Editor
 
         GUILayout.BeginHorizontal();
 
+        // If a new directory is chosen, we need to force the user to choose a new file name as well.
         if (GUILayout.Button("Choose raw data directory", GUILayout.Width(buttonWidth)))
         {
             string newRawDirectoryName = EditorUtility.OpenFolderPanel("Choose directory containing raw data", "RawData", "Default");
             
-            if (newRawDirectoryName != "")
+            // Only apply changes if the user has actually chosen a new directory (the returned name is not the empty
+            // string) and if the new directory is not the same as the old one.
+            if (newRawDirectoryName != "" && newRawDirectoryName != processor.rawDataDirectory)
             {
+                processor.rawDataDirectory = newRawDirectoryName;
+
+                // If the not all files in the directory are used, we need to choose a new file name.
                 if (!processor.useAllFilesInDirectory)
                 {
-                    processor.rawDataFileName = newRawDirectoryName;
+                    // The toggle was previously on, but is now switched off. In this case we need to choose a specific file.
+                    string newRawDataFileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+                    if (newRawDataFileName == "")
+                    {
+                        // The user has aborted the file selection process, but we need to make sure that a valid file is chosen.
+                        // We will choose the first file in the directory by default for now.
+                        newRawDataFileName = Directory.GetFiles(processor.rawDataDirectory)[0];
+                    }
+                    processor.rawDataFileName = newRawDataFileName;
                 }
                 processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
                 processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
@@ -59,6 +73,8 @@ public class ProcessWalkthroughCustomEditor : Editor
         string[] splitRawDataPath = processor.rawDataDirectory.Split('/');
         GUILayout.Label(splitRawDataPath[splitRawDataPath.Length - 2] + '/' + splitRawDataPath[splitRawDataPath.Length - 1]);
 
+        // If user goes from using all files in the directory back to just using a single file, a prompt appears to 
+        // choose a new file.
         EditorGUI.BeginChangeCheck();
         processor.useAllFilesInDirectory = GUILayout.Toggle(processor.useAllFilesInDirectory, " Use all");
         if (EditorGUI.EndChangeCheck())
@@ -152,16 +168,17 @@ public class ProcessWalkthroughCustomEditor : Editor
                 processor.h = EditorGUILayout.Slider("Blur", processor.h, 0.1f, 10.0f);
 
                 EditorGUI.BeginChangeCheck();
-                SerializedObject serializedGradient1 = new SerializedObject(target);
-                SerializedProperty colorGradient1 = serializedGradient1.FindProperty("heatmapGradient");
-                EditorGUILayout.PropertyField(colorGradient1, true);
+                SerializedObject serializedHeatmapGradient = new SerializedObject(target);
+                SerializedProperty heatmapGradient = serializedHeatmapGradient.FindProperty("heatmapGradient");
+                EditorGUILayout.PropertyField(heatmapGradient, true);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    serializedGradient1.ApplyModifiedProperties();
+                    serializedHeatmapGradient.ApplyModifiedProperties();
                 }
                 LayerMask newMask = EditorGUILayout.MaskField("Heatmap Layers", InternalEditorUtility.LayerMaskToConcatenatedLayersMask(processor.layerMask), InternalEditorUtility.layers);
                 processor.layerMask = InternalEditorUtility.ConcatenatedLayersMaskToLayerMask(newMask);
             EditorGUI.EndDisabledGroup();
+            processor.heatmapMaterial = EditorGUILayout.ObjectField("Heatmap Material", processor.heatmapMaterial, typeof(Material), true) as Material;
             EditorGUI.indentLevel -= 2;
         }
         EditorGUILayout.EndFadeGroup();
@@ -187,6 +204,9 @@ public class ProcessWalkthroughCustomEditor : Editor
 
             // Width of the trajectory.
             processor.pathWidth = EditorGUILayout.Slider("Trajectory Width", processor.pathWidth, 0.01f, 1.0f);
+
+            // Material of the line renderer.
+            processor.lineRendererMaterial = EditorGUILayout.ObjectField("Trajectory Material", processor.lineRendererMaterial, typeof(Material), true) as Material;
 
             // Should shortest path be visualized?
             processor.visualizeShortestPath = EditorGUILayout.ToggleLeft("Visualize Shortest Path", processor.visualizeShortestPath);

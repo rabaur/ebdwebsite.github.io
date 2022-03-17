@@ -11,7 +11,10 @@ public class CaptureWalkthrough : MonoBehaviour
     public string fileName;                         // Name of file the samples get written to.
     public bool useCustomSubDirectory = false;
     public string directory = "RawData/Default";
+    public float targetProximity = 1.0f;
+    public Transform target;                        // The target to be found.
     public GameObject view;                         // The actual view.
+    private List<float> times;                      // Time point at which values were recorded.
     private List<Vector3> positions;                // List of all positions.
     private List<Vector3> directions;               // List of all directions.
     private List<Vector3> ups;                      // Up axis at each sample.
@@ -19,7 +22,8 @@ public class CaptureWalkthrough : MonoBehaviour
     private List<float> yAngle;                     // Azimuth.
     private List<float> xAngle;                     // Elevation.
     private List<float> time;                       // Time.
-    private float lastSample;                       // The time the last sample was taken.       
+    private float lastSample;                       // The time the last sample was taken. 
+    private float firstTimePlayable = -1.0f;        // Subtract from time.realTimeSinceStartup to get time since game is responsive.      
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +48,7 @@ public class CaptureWalkthrough : MonoBehaviour
         }
 
         // Initialize the containers of our data.
+        times = new List<float>();
         positions = new List<Vector3>();
         directions = new List<Vector3>();
         ups = new List<Vector3>();
@@ -71,6 +76,7 @@ public class CaptureWalkthrough : MonoBehaviour
             lastSample = currTime;
 
             // Sample the current position and direction.
+            times.Add(Time.realtimeSinceStartup);
             positions.Add(view.transform.position);
             directions.Add(view.transform.forward);
             ups.Add(view.transform.up);
@@ -79,24 +85,6 @@ public class CaptureWalkthrough : MonoBehaviour
             xAngle.Add(view.transform.rotation.eulerAngles.x);
             time.Add(currTime);
         }
-    }
-
-    // Here the actual IO happens.
-    void OnDestroy()
-    {
-        // Need to make this check, otherwise a file gets overwritten and ObjectReferenceNotSet error on console.
-        if (this.enabled)
-        {
-            using (StreamWriter openFile = new StreamWriter(fileName)) 
-            {
-                for (int i = 0; i < positions.Count; i++) {
-                    openFile.WriteLine(positions[i].ToString());
-                    openFile.WriteLine(directions[i].ToString());
-                    openFile.WriteLine(ups[i].ToString());
-                    openFile.WriteLine(rights[i].ToString());
-                }
-            }
-        }      
     }
 
     private string MakeFileNameUnique(string path)
@@ -120,5 +108,43 @@ public class CaptureWalkthrough : MonoBehaviour
             wildCard++;
         }
         return pathWithoutFileName + fileNameWithoutExtension + "_" + wildCard.ToString() + extension;
+    }
+
+    public void WriteRawDataFile()
+    {
+        using (StreamWriter openFile = new StreamWriter(fileName)) 
+        {
+            for (int i = 0; i < positions.Count; i++) {
+
+                // Write out time.
+                string line = times[i].ToString("F3") + ",";
+
+                // Write out coordinates of position.
+                Vector3 currPos = positions[i];
+                line += currPos.x.ToString("F3") + ",";
+                line += currPos.y.ToString("F3") + ",";
+                line += currPos.z.ToString("F3") + ",";
+
+                // Write out coordinates of forward direction.
+                Vector3 currDir = directions[i];
+                line += currDir.x.ToString("F3") + ",";
+                line += currDir.y.ToString("F3") + ",";
+                line += currDir.z.ToString("F3") + ",";
+
+                // Write out coordinates of up direction.
+                Vector3 currUp = directions[i];
+                line += currUp.x.ToString("F3") + ",";
+                line += currUp.y.ToString("F3") + ",";
+                line += currUp.z.ToString("F3") + ",";
+
+                // Write out coordinates of right direction.
+                Vector3 currRight = directions[i];
+                line += currRight.x.ToString("F3") + ",";
+                line += currRight.y.ToString("F3") + ",";
+                line += currRight.z.ToString("F3");
+
+                openFile.WriteLine(line);
+            }
+        }
     }
 }
