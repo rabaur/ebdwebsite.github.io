@@ -64,10 +64,8 @@ public class ProcessWalkthrough : MonoBehaviour
     private LineRenderer shortestPathLinerenderer;
     private int numFiles;
     public Material lineRendererMaterial;
-    public string[] trajectoryVisualizationMethods = {"Temporal Progression", "Walking Speed"};
-    public int chosenTrajectoryVisualizationMethod = 0;
 
-    async void Start()
+    void Start()
     {
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
@@ -117,7 +115,7 @@ public class ProcessWalkthrough : MonoBehaviour
             {
                 CreateHeatMap();
                 SaveProcessedDataFile();
-                SaveStatisticDataFile();
+                WriteSummarizedDataFile();
             }
             CreateParticles();
         }
@@ -128,7 +126,7 @@ public class ProcessWalkthrough : MonoBehaviour
                 lineRendererParent = new GameObject();
                 lineRendererParent.hideFlags = HideFlags.HideInHierarchy;
                 lineRenderer = lineRendererParent.AddComponent<LineRenderer>();
-                VisualizeTrajectoryTemporal(lineRenderer, new List<Vector3>(currPositions), trajectoryGradient, pathWidth);
+                VisualizeTrajectory(lineRenderer, new List<Vector3>(currPositions), trajectoryGradient, pathWidth);
                 if (visualizeShortestPath)
                 {
                     Vector3 startPos = inferStartLocation ? currPositions[0] : startLocation.position;
@@ -150,13 +148,9 @@ public class ProcessWalkthrough : MonoBehaviour
                     // Create shortest path.
                     NavMeshPath navMeshPath = new NavMeshPath();
                     NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
-                    VisualizeTrajectoryTemporal(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
+                    VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
                 }
             }
-        }
-        for (int i = 0; i < numFiles; i++)
-        {
-            CreateTrajectoryMesh(trajectoryPositions[i], trajectoryUpDirections[i], trajectoryRightDirections[i], 32, 0.1f);
         }
     }
 
@@ -331,6 +325,7 @@ public class ProcessWalkthrough : MonoBehaviour
 
         // Unity generates 32 layers per default.
         hitsPerLayer = new int[32];
+
         for (int i = 0; i < numFiles; i++)
         {
             Vector3[] currPositions = trajectoryPositions[i];
@@ -430,7 +425,7 @@ public class ProcessWalkthrough : MonoBehaviour
         }
     }
 
-    private void SaveStatisticDataFile()
+    private void WriteSummarizedDataFile()
     {
         // Determine the total number of hits.
         int totalHits = 0;
@@ -450,7 +445,7 @@ public class ProcessWalkthrough : MonoBehaviour
         }
     }
 
-    private void VisualizeTrajectoryTemporal(LineRenderer lineRenderer, List<Vector3> positions, Gradient gradient, float trajectoryWidth)
+    private void VisualizeTrajectory(LineRenderer lineRenderer, List<Vector3> positions, Gradient gradient, float trajectoryWidth)
     {
         lineRenderer.colorGradient = gradient;
         lineRenderer.material = lineRendererMaterial;

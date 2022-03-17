@@ -83,22 +83,24 @@ public class ProcessWalkthroughCustomEditor : Editor
 
 
         GUILayout.BeginHorizontal();
-        // If not all files are chosen, a specific file need to be indicated.
-        if (GUILayout.Button("Choose raw data file", GUILayout.Width(buttonWidth))) 
-        {
-            string newRawDatafileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
-            if (newRawDatafileName == "")
-            {
-                // The user has aborted the file-selection process. Revert to old file name.
-                newRawDatafileName = processor.rawDataFileName;
-            }
-            processor.rawDataFileName = newRawDatafileName;
-            processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
-            processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
-        }
 
-        GUILayout.Label(Path.GetFileName(processor.rawDataFileName));
-        GUILayout.EndHorizontal();
+        // If not all files are chosen, a specific file need to be indicated.
+        EditorGUI.BeginDisabledGroup(processor.useAllFilesInDirectory);
+            if (GUILayout.Button("Choose raw data file", GUILayout.Width(buttonWidth))) 
+            {
+                string newRawDatafileName = EditorUtility.OpenFilePanel("Choose raw data file", processor.rawDataDirectory, "csv");
+                if (newRawDatafileName == "")
+                {
+                    // The user has aborted the file-selection process. Revert to old file name.
+                    newRawDatafileName = processor.rawDataFileName;
+                }
+                processor.rawDataFileName = newRawDatafileName;
+                processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
+                processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
+            }
+            GUILayout.Label(Path.GetFileName(processor.rawDataFileName));
+            GUILayout.EndHorizontal();
+        EditorGUI.EndDisabledGroup();
 
         GUILayout.BeginHorizontal();
 
@@ -182,12 +184,6 @@ public class ProcessWalkthroughCustomEditor : Editor
             {
                 serializedGradient.ApplyModifiedProperties();
             }
-
-            processor.chosenTrajectoryVisualizationMethod = EditorGUILayout.Popup(
-                "Visualization Method",
-                processor.chosenTrajectoryVisualizationMethod, 
-                processor.trajectoryVisualizationMethods
-            );
 
             // Width of the trajectory.
             processor.pathWidth = EditorGUILayout.Slider("Trajectory Width", processor.pathWidth, 0.01f, 1.0f);
