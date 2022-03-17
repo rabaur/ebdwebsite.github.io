@@ -77,6 +77,6 @@ public class CaptureWalkthroughCustomEditor : Editor
 
         EditorGUILayout.Space();
 
-        capture.sampleInterval = EditorGUILayout.Slider("Sample Interval", capture.sampleInterval, 0.1f, 1.0f);
+        capture.sampleInterval = EditorGUILayout.Slider("Sample Interval", capture.sampleInterval, 0.05f, 1.0f);
     }
 }

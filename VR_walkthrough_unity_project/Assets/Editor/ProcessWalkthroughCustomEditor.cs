@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
+using UnityEditorInternal;
 
 [CustomEditor(typeof(ProcessWalkthrough))]
 public class ProcessWalkthroughCustomEditor : Editor
@@ -20,7 +21,7 @@ public class ProcessWalkthroughCustomEditor : Editor
     }
     public override void OnInspectorGUI()
     {
-        // base.OnInspectorGUI();
+        base.OnInspectorGUI();
 
         EditorGUILayout.Space();
 
@@ -156,6 +157,8 @@ public class ProcessWalkthroughCustomEditor : Editor
                 {
                     serializedGradient1.ApplyModifiedProperties();
                 }
+                LayerMask newMask = EditorGUILayout.MaskField("Heatmap Layers", InternalEditorUtility.LayerMaskToConcatenatedLayersMask(processor.layerMask), InternalEditorUtility.layers);
+                processor.layerMask = InternalEditorUtility.ConcatenatedLayersMaskToLayerMask(newMask);
             EditorGUI.EndDisabledGroup();
             EditorGUI.indentLevel -= 2;
         }
@@ -164,11 +167,13 @@ public class ProcessWalkthroughCustomEditor : Editor
         EditorGUILayout.Space();
 
         EditorGUI.BeginDisabledGroup(!processor.generateData);
-        processor.visualizeTrajectory = GUILayout.Toggle(processor.visualizeTrajectory, new GUIContent("Trajectory", "Enable \"Generate data from raw data file\" to use this option"));
+        processor.visualizeTrajectory = GUILayout.Toggle(processor.visualizeTrajectory, new GUIContent("Trajectory"));
         visualizeTrajectoryAnimBool.target = processor.visualizeTrajectory;
         if (EditorGUILayout.BeginFadeGroup(visualizeTrajectoryAnimBool.faded))
         {
             EditorGUI.indentLevel += 2;
+
+            // Gradient of the trajectory.
             EditorGUI.BeginChangeCheck();
             SerializedObject serializedGradient = new SerializedObject(target);
             SerializedProperty colorGradient = serializedGradient.FindProperty("trajectoryGradient");
@@ -177,19 +182,42 @@ public class ProcessWalkthroughCustomEditor : Editor
             {
                 serializedGradient.ApplyModifiedProperties();
             }
+
+            processor.chosenTrajectoryVisualizationMethod = EditorGUILayout.Popup(
+                "Visualization Method",
+                processor.chosenTrajectoryVisualizationMethod, 
+                processor.trajectoryVisualizationMethods
+            );
+
+            // Width of the trajectory.
             processor.pathWidth = EditorGUILayout.Slider("Trajectory Width", processor.pathWidth, 0.01f, 1.0f);
+
+            // Should shortest path be visualized?
             processor.visualizeShortestPath = EditorGUILayout.ToggleLeft("Visualize Shortest Path", processor.visualizeShortestPath);
             visualizeShortestPathBool.target = processor.visualizeShortestPath;
             if (EditorGUILayout.BeginFadeGroup(visualizeShortestPathBool.faded))
             {
                 EditorGUI.indentLevel += 2;
-                processor.inferStartLocation = EditorGUILayout.ToggleLeft(new GUIContent("Infer start location", "Check this if you want the script to automatically infer where the agent has started."), processor.inferStartLocation);
+
+                // Should the start location of the shortest path inferred automatically ot chosen manually.
+                processor.inferStartLocation = EditorGUILayout.ToggleLeft(
+                    new GUIContent("Infer start location", "Check this if you want the script to automatically infer where the agent has started."), 
+                    processor.inferStartLocation
+                );
                 EditorGUI.BeginDisabledGroup(processor.inferStartLocation);
                 {
-                    processor.startLocation = EditorGUILayout.ObjectField(new GUIContent("Start Location", "The gameobject that corresponds to the start location"), processor.startLocation, typeof(Transform), true) as Transform;
+                    processor.startLocation = EditorGUILayout.ObjectField(
+                        new GUIContent("Start Location", "The gameobject that corresponds to the start location"), 
+                        processor.startLocation, typeof(Transform), true
+                    ) as Transform;
                 }
                 EditorGUI.EndDisabledGroup();
-                processor.endLocation = EditorGUILayout.ObjectField(new GUIContent("End Location", "The gameobject that corresponds to the end location"), processor.endLocation, typeof(Transform), true) as Transform;
+
+                // Setting the endlocation.
+                processor.endLocation = EditorGUILayout.ObjectField(
+                    new GUIContent("End Location", "The gameobject that corresponds to the end location"), 
+                    processor.endLocation, typeof(Transform), true
+                ) as Transform;
 
                 EditorGUI.BeginChangeCheck();
                 SerializedObject serializedGradient1 = new SerializedObject(target);

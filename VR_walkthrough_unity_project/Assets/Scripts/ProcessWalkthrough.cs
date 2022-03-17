@@ -63,8 +63,11 @@ public class ProcessWalkthrough : MonoBehaviour
     private GameObject shortestPathLinerendererParent;
     private LineRenderer shortestPathLinerenderer;
     private int numFiles;
+    public Material lineRendererMaterial;
+    public string[] trajectoryVisualizationMethods = {"Temporal Progression", "Walking Speed"};
+    public int chosenTrajectoryVisualizationMethod = 0;
 
-    void Start()
+    async void Start()
     {
         outerConeRadiusHorizontal = Mathf.Tan((horizontalViewAngle / 2.0f) * Mathf.Deg2Rad);
         outerConeRadiusVertical = Mathf.Tan((verticalViewAngle / 2.0f) * Mathf.Deg2Rad);
@@ -88,6 +91,7 @@ public class ProcessWalkthrough : MonoBehaviour
         }
 
         numFiles = rawDataFileNames.Count;
+        Debug.Log(numFiles);
 
         // TODO: Remove after debug.
         foreach (string fileName in rawDataFileNames)
@@ -124,7 +128,7 @@ public class ProcessWalkthrough : MonoBehaviour
                 lineRendererParent = new GameObject();
                 lineRendererParent.hideFlags = HideFlags.HideInHierarchy;
                 lineRenderer = lineRendererParent.AddComponent<LineRenderer>();
-                VisualizeTrajectory(lineRenderer, new List<Vector3>(currPositions), trajectoryGradient, pathWidth);
+                VisualizeTrajectoryTemporal(lineRenderer, new List<Vector3>(currPositions), trajectoryGradient, pathWidth);
                 if (visualizeShortestPath)
                 {
                     Vector3 startPos = inferStartLocation ? currPositions[0] : startLocation.position;
@@ -146,9 +150,13 @@ public class ProcessWalkthrough : MonoBehaviour
                     // Create shortest path.
                     NavMeshPath navMeshPath = new NavMeshPath();
                     NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navMeshPath);
-                    VisualizeTrajectory(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
+                    VisualizeTrajectoryTemporal(shortestPathLinerenderer, new List<Vector3>(navMeshPath.corners), shortestPathGradient, pathWidth);
                 }
             }
+        }
+        for (int i = 0; i < numFiles; i++)
+        {
+            CreateTrajectoryMesh(trajectoryPositions[i], trajectoryUpDirections[i], trajectoryRightDirections[i], 32, 0.1f);
         }
     }
 
@@ -442,13 +450,104 @@ public class ProcessWalkthrough : MonoBehaviour
         }
     }
 
-    private void VisualizeTrajectory(LineRenderer lineRenderer, List<Vector3> positions, Gradient gradient, float trajectoryWidth)
+    private void VisualizeTrajectoryTemporal(LineRenderer lineRenderer, List<Vector3> positions, Gradient gradient, float trajectoryWidth)
     {
-        // Setting up the visualization things.
         lineRenderer.colorGradient = gradient;
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.material = lineRendererMaterial;
         lineRenderer.widthMultiplier = trajectoryWidth;
         lineRenderer.positionCount = positions.Count;
         lineRenderer.SetPositions(positions.ToArray());
+    }
+
+    private Mesh CreateTrajectoryMesh(Vector3[] positions, Vector3[] upDirections, Vector3[] rightDirections, int resolution, float thickness)
+    {
+        int numPos = positions.Length;
+        float radIncrement = 2 * Mathf.PI / resolution;
+
+        // For each position in the trajectory, we create a surrounding ring of <resolution> vertices.
+        Vector3[] vertices = new Vector3[numPos * resolution];
+        Vector3[] normals = new Vector3[numPos * resolution];
+        Color[] colors = new Color[numPos * resolution];
+
+        // Calculate maximal distance between timesteps.
+        float maxDist = 0.0f;
+        for (int i = 0; i < numPos - 1; i++)
+        {
+            float currDist = Vector3.Distance(positions[i + 1], positions[i]);
+            maxDist = currDist > maxDist ? currDist : maxDist;
+        }
+
+        Color currColor = Color.black; // Initialize as black.
+
+        for (int i = 0; i < numPos; i++)
+        {
+            Vector3 currPos = positions[i];
+            Vector3 currRight = rightDirections[i];
+            Vector3 currUp = upDirections[i];
+
+            if (i >= 1 && i < numPos - 1)
+            {
+                // Averaged direction of segments adjacent to current position.
+                Vector3 lastDir = positions[i] - positions[i - 1];
+                Vector3 nextDir = positions[i + 1] - positions[i];
+                Vector3 ringPlaneNormal = (lastDir + nextDir) / 2;
+
+                // Project right vector and up vector onto this new plane.
+                currRight = Vector3.Normalize(Vector3.ProjectOnPlane(currRight, ringPlaneNormal));
+                currUp = Vector3.Normalize(Vector3.ProjectOnPlane(currUp, ringPlaneNormal));
+            }
+
+            if (i < numPos - 1)
+            {
+                currColor = trajectoryGradient.Evaluate(Vector3.Distance(positions[i + 1], positions[i]) / maxDist);
+            }
+
+            // The surrounding ring lies on the plane spanned by the up and right vectors.
+            for (int j = 0; j < resolution; j++)
+            {
+                Vector3 vertex = positions[i] + thickness * Mathf.Cos(radIncrement * j) * currRight + thickness * Mathf.Sin(radIncrement * j) * currUp;
+                normals[i * resolution + j] = Mathf.Cos(radIncrement * j) * currRight + Mathf.Sin(radIncrement * j) * currUp;
+                Debug.DrawRay(vertex, 0.1f * normals[i * resolution + j], Color.blue, 120.0f);
+                vertices[i * resolution + j] = vertex;
+                colors[i * resolution + j] = currColor;
+            }
+        }
+
+        // The forward triangles:
+        int[] triangles = new int[(numPos - 1) * (resolution - 1) * 2 * 3];
+        int triIdx = 0;
+        for (int i = 0; i < numPos - 1; i++)
+        {
+            for (int j = 0; j < resolution - 1; j++)
+            {
+                triangles[triIdx * 3] = i * resolution + j;
+                triangles[triIdx * 3 + 1] = i * resolution + j + 1;
+                triangles[triIdx * 3 + 2] = (i + 1) * resolution + j;
+                triIdx++;
+            }
+        }
+
+        // The backward triangles:
+        for (int i = 1; i < numPos; i++)
+        {
+            for (int j = 1; j < resolution; j++)
+            {
+                triangles[triIdx * 3] = i * resolution + j;
+                triangles[triIdx * 3 + 1] = i * resolution + j - 1;
+                triangles[triIdx * 3 + 2] = (i - 1) * resolution + j;
+                triIdx++;
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        GameObject go = new GameObject();
+        go.AddComponent<MeshFilter>();
+        go.GetComponent<MeshFilter>().mesh = mesh;
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.normals = normals;
+        mesh.colors = colors;
+        go.AddComponent<MeshRenderer>();
+        return mesh;
     }
 }
