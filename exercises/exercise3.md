@@ -19,6 +19,7 @@ permalink: /exercise3/
 **Submission files:** 
 * A zip folder that includes your Unity project (which should include the scenes you used, the fbx models and the data files from the simulation).
 * A report (in Miro) covering the different steps of the exercise (i.e., Activities table, Hypothesis, Results and visualizations, Interpretation) 
+
 ![image](/assets/images/exercise3/exc3.png)
 
 **Submission Link (for zip folder):**  Drag and drop [here](https://polybox.ethz.ch/index.php/s/Iy3sePgdmvDPqpJ)
