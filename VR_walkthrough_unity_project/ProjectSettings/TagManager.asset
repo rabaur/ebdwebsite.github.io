@@ -14,20 +14,20 @@ TagManager:
   - UI
   - 
   - 
-  - Furniture
-  - Floor
-  - OuterWalls
-  - Building
-  - InnerWalls
-  - Apples
-  - Patient
+  - Walls
+  - Curtain Walls
+  - Openings
+  - Doors
   - Windows
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Glass
+  - Columns
+  - Beams
+  - Slabs
+  - Roofs
+  - Stairs
+  - Railings
+  - Furniture
+  - Patients
   - 
   - 
   - 

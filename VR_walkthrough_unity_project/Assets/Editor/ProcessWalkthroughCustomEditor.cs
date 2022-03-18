@@ -21,7 +21,6 @@ public class ProcessWalkthroughCustomEditor : Editor
     }
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
 
         EditorGUILayout.Space();
 
@@ -110,7 +109,6 @@ public class ProcessWalkthroughCustomEditor : Editor
                     // The user has aborted the file-selection process. Revert to old file name.
                     newRawDatafileName = processor.rawDataFileName;
                 }
-                Debug.Log($"new file name without ext: " + Path.GetFileNameWithoutExtension(newRawDatafileName));
                 processor.rawDataFileName = newRawDatafileName;
                 processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
                 processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");
@@ -224,7 +222,7 @@ public class ProcessWalkthroughCustomEditor : Editor
                 EditorGUI.BeginDisabledGroup(processor.inferStartLocation);
                 {
                     processor.startLocation = EditorGUILayout.ObjectField(
-                        new GUIContent("Start Location", "The gameobject that corresponds to the start location"), 
+                        new GUIContent("Start", "The gameobject that corresponds to the start"), 
                         processor.startLocation, typeof(Transform), true
                     ) as Transform;
                 }
@@ -232,7 +230,7 @@ public class ProcessWalkthroughCustomEditor : Editor
 
                 // Setting the endlocation.
                 processor.endLocation = EditorGUILayout.ObjectField(
-                    new GUIContent("End Location", "The gameobject that corresponds to the end location"), 
+                    new GUIContent("Target", "The gameobject that corresponds to the target"), 
                     processor.endLocation, typeof(Transform), true
                 ) as Transform;
 

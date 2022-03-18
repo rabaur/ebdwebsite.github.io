@@ -5,6 +5,7 @@ using System.IO;
 [CustomEditor(typeof(CaptureWalkthrough))]
 public class CaptureWalkthroughCustomEditor : Editor
 {
+    CaptureWalkthrough capture;
     public override void OnInspectorGUI()
     {
         CaptureWalkthrough capture = (CaptureWalkthrough) target;
