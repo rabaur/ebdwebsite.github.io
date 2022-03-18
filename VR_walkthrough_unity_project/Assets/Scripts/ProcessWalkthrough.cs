@@ -69,6 +69,7 @@ public class ProcessWalkthrough : MonoBehaviour
     private List<string> rawDataFileNames;
     private char csvSep = ';';
     public bool generateSummarizedDataFile;
+    private string prec = "F3";
 
     void Start()
     {
@@ -196,11 +197,11 @@ public class ProcessWalkthrough : MonoBehaviour
      * @param horizontal        Vector corresponding to the horizontal axis of the cone.
      * @return                  List of vectors corresponding to the collisions of the cone-raycast with the environment.
      */
-    List<Vector3> CastAndCollide(Vector3 viewPoint, Vector3 forward, Vector3 vertical, Vector3 horizontal, ref int[] hitsPerLayer)
+    private List<Vector3> CastAndCollide(Vector3 viewPoint, Vector3 forward, Vector3 vertical, Vector3 horizontal, ref int[] hitsPerLayer)
     {
         Vector3 hitPos = Vector3.zero;
         List<Vector3> results = new List<Vector3>();
-        for(int i = 0; i < raysPerRaycast; i++)
+        for (int i = 0; i < raysPerRaycast; i++)
         {
             Vector3 p = viewPoint
                         + forward
@@ -311,7 +312,8 @@ public class ProcessWalkthrough : MonoBehaviour
             string[] splitRawDataDirectory = rawDataDirectory.Split('/');
             return "all_files_in_" + splitRawDataDirectory[splitRawDataDirectory.Length - 1] + "_" + type + ".csv";
         }
-        return rawDataDirectory + "_" + Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
+        string[] splitRawDir = rawDataDirectory.Split('/'); 
+        return splitRawDir[splitRawDir.Length - 1] + "_" + Path.GetFileNameWithoutExtension(rawDataFileName) + "_" + type + Path.GetExtension(rawDataFileName);
     }
 
     private (float[], Vector3[], Vector3[], Vector3[], Vector3[]) ReadRawDataFile(string rawDataFileName)
@@ -334,7 +336,7 @@ public class ProcessWalkthrough : MonoBehaviour
             upDirections[i] = new Vector3(float.Parse(splitLine[7]), float.Parse(splitLine[8]), float.Parse(splitLine[9]));
             rightDirections[i] = new Vector3(float.Parse(splitLine[10]), float.Parse(splitLine[11]), float.Parse(splitLine[12]));
         }
-        Debug.Log(positions.Length);
+        Debug.Log($"skiii: {positions.Length}");
         return (times, positions, forwardDirections, upDirections, rightDirections);
     }
 
@@ -347,16 +349,23 @@ public class ProcessWalkthrough : MonoBehaviour
         // Unity generates 32 layers per default.
         hitsPerLayer = new List<int[]>();
 
+        int count = 0;
         for (int i = 0; i < numFiles; i++)
         {
+            Debug.Log($"processing file {i}");
             Vector3[] currPositions = trajectoryPositions[i];
+            Debug.Log($"skür: {trajectoryPositions[i].Length}");
             Vector3[] currForwardDirections = trajectoryForwardDirections[i];
             Vector3[] currUpDirections = trajectoryUpDirections[i];
             Vector3[] currRightDirections = trajectoryRightDirections[i];
             int[] currHitsPerLayer = new int[32];  // Unity has 32 layers by default.
-            Debug.Log(currPositions.Length);
             for (int j = 0; j < currPositions.Length; j++)
             {
+                count++;
+                if (count % 100 == 0)
+                {
+                    Debug.Log($"count: {count}");
+                }
                 hits.AddRange(
                     CastAndCollide(
                         currPositions[j],
@@ -462,6 +471,7 @@ public class ProcessWalkthrough : MonoBehaviour
         {
             // Duration of a walkthrough is the temporal difference between the last update step and the first.
             durations.Add(trajectoryTimes[i][trajectoryTimes[i].Length - 1] - trajectoryTimes[i][0]);
+            Debug.Log($"Adding time: {trajectoryTimes[i][trajectoryTimes[i].Length - 1] - trajectoryTimes[i][0]}");
         }
 
         // Distances of user trajectory.
@@ -472,16 +482,20 @@ public class ProcessWalkthrough : MonoBehaviour
             float currDistance = 0.0f;
             for (int j = 0; j < trajectoryPositions[i].Length - 1; j++)
             {
-                currDistance += Vector3.Distance(trajectoryPositions[i][j], trajectoryPositions[i][j]);
+                currDistance += Vector3.Distance(trajectoryPositions[i][j], trajectoryPositions[i][j + 1]);
             }
             distances.Add(currDistance);
+            Debug.Log($"Adding distance: {currDistance}");
         }
 
         // Average speeds.
         for (int i = 0; i < numFiles; i++)
         {
             averageSpeeds.Add(distances[i] / durations[i]);
+            Debug.Log($"Average speed: {distances[i] / durations[i]}");
         }
+
+
 
         // Shortest path distances.
         for (int i = 0; i < numFiles; i++)
@@ -509,19 +523,26 @@ public class ProcessWalkthrough : MonoBehaviour
             }
 
             shortestPathDistances.Add(currDistance);
+            Debug.Log($"Adding shortest distance: {currDistance}");
         }
+
 
         // Surplus distance to shortest path.
         for (int i = 0; i < numFiles; i++)
         {
             surplusShortestPaths.Add(distances[i] - shortestPathDistances[i]);
+            Debug.Log($"Adding surplus distance: {distances[i] - shortestPathDistances[i]}");
         }
+
 
         // Ratio between user trajectory length and shortest path.
         for (int i = 0; i < numFiles; i++)
         {
             ratioShortestPaths.Add(distances[i] / shortestPathDistances[i]);
+            Debug.Log($"Adding ratio: {distances[i] / shortestPathDistances[i]}");
         }
+
+        
 
         // Whether the run was successful.
         for (int i = 0; i < numFiles; i++)
@@ -529,10 +550,12 @@ public class ProcessWalkthrough : MonoBehaviour
             if (Vector3.Distance(trajectoryPositions[i][trajectoryPositions[i].Length - 1], endLocation.position) < 2.0f)
             {
                 successfuls.Add(1);
+                Debug.Log($"Adding successful: {1}");
             }
             else
             {
                 successfuls.Add(0);
+                Debug.Log($"Adding successful: {0}");
             }
         }
 
@@ -543,25 +566,40 @@ public class ProcessWalkthrough : MonoBehaviour
 
             // Determine the total number of hits.
             int totalHits = 0;
-            for (int j = 0; i < currHitsPerLayer.Length; j++)
+            for (int j = 0; j < currHitsPerLayer.Length; j++)
             {
-                totalHits += currHitsPerLayer[i];
+                Debug.Log(currHitsPerLayer[j]);
+                totalHits += currHitsPerLayer[j];
             }
+
+            Debug.Log($"totalHits: {totalHits}");
 
             List<float> currHitPercentages = new List<float>();
             for (int j = 0; j < currHitsPerLayer.Length; j++)
             {
-                currHitPercentages.Add(currHitsPerLayer[j] / totalHits);
+                currHitPercentages.Add((float) currHitsPerLayer[j] / totalHits);
+                Debug.Log($"currHitPercentages: {(float) currHitsPerLayer[j] / totalHits}");
             }
+            viewPercentages.Add(currHitPercentages);
         }
 
+
         bool isHead = true;  // Indicates whether the current line is a header.
+        Debug.Log("here2");
         using (StreamWriter summaryDataFile = new StreamWriter(outSummarizedDataFileName))
         {
+            Debug.Log("here");
             if (isHead)
             {
                 // Generate header.
-                string header = "RawDataFileName,Duration,Distance,AverageSpeed,ShortestPathDistance,SurplusShortestPath,RatioShortestPath,Successful,";
+                string header = "RawDataFileName" + csvSep;
+                header += "Duration" + csvSep;
+                header += "Distance" + csvSep;
+                header += "AverageSpeed" + csvSep;
+                header += "ShortestPathDistance" + csvSep;
+                header += "SurplusShortestPath" + csvSep;
+                header += "RatioShortestPath" + csvSep;
+                header += "Successful" + csvSep;
 
                 // For each layer, generate a header.
                 for (int i = 0; i < hitsPerLayer[0].Length - 1; i++)
@@ -580,20 +618,21 @@ public class ProcessWalkthrough : MonoBehaviour
             {
                 // Generate normal line.
                 string line = "";
-                line += rawDataFileNames[i] + csvSep;
-                line += durations[i] + csvSep;
-                line += distances[i] + csvSep;
-                line += averageSpeeds[i] + csvSep;
-                line += shortestPathDistances[i] + csvSep;
-                line += surplusShortestPaths[i] + csvSep;
-                line += ratioShortestPaths[i] + csvSep;
-                line += successfuls[i] + csvSep;
+                line += Path.GetFileNameWithoutExtension(rawDataFileNames[i]) + csvSep;
+                line += durations[i].ToString(prec) + csvSep;
+                line += distances[i].ToString(prec) + csvSep;
+                line += averageSpeeds[i].ToString(prec) + csvSep;
+                line += shortestPathDistances[i].ToString(prec) + csvSep;
+                line += surplusShortestPaths[i].ToString(prec) + csvSep;
+                line += ratioShortestPaths[i].ToString(prec) + csvSep;
+                line += successfuls[i].ToString(prec) + csvSep;
                 for (int j = 0; j < viewPercentages[i].Count - 1; j++)
                 {
-                    line += viewPercentages[i][j] + csvSep;
+                    line += viewPercentages[i][j].ToString(prec) + csvSep;
                 }
-                line += viewPercentages[i][viewPercentages[i].Count - 1];
+                line += viewPercentages[i][viewPercentages[i].Count - 1].ToString(prec);
                 summaryDataFile.WriteLine(line);
+                Debug.Log(line);
             }
         }
     }

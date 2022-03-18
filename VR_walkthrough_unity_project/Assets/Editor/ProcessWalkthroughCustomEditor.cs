@@ -110,6 +110,7 @@ public class ProcessWalkthroughCustomEditor : Editor
                     // The user has aborted the file-selection process. Revert to old file name.
                     newRawDatafileName = processor.rawDataFileName;
                 }
+                Debug.Log($"new file name without ext: " + Path.GetFileNameWithoutExtension(newRawDatafileName));
                 processor.rawDataFileName = newRawDatafileName;
                 processor.outProcessedDataFileName = "ProcessedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "processed");
                 processor.outSummarizedDataFileName = "SummarizedData/" + processor.CreateDerivedDataFileName(processor.rawDataDirectory, processor.rawDataFileName, "summarized");

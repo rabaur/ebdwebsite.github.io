@@ -132,13 +132,13 @@ public class CaptureWalkthrough : MonoBehaviour
                 line += currDir.z.ToString("F3") + csvSep;
 
                 // Write out coordinates of up direction.
-                Vector3 currUp = directions[i];
+                Vector3 currUp = ups[i];
                 line += currUp.x.ToString("F3") + csvSep;
                 line += currUp.y.ToString("F3") + csvSep;
                 line += currUp.z.ToString("F3") + csvSep;
 
                 // Write out coordinates of right direction.
-                Vector3 currRight = directions[i];
+                Vector3 currRight = rights[i];
                 line += currRight.x.ToString("F3") + csvSep;
                 line += currRight.y.ToString("F3") + csvSep;
                 line += currRight.z.ToString("F3");
