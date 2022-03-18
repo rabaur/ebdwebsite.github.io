@@ -45,9 +45,9 @@ However, note that you will need to use Rhino in future exercises, so some early
 - Upload screenshot of Unity3D scene to Miro board (link will be sent via email).
 
 # Part 2 & 3: VR Experiment
-**_Due date: 24.03.2022, 23:59_**
+**_Due date (extended) 01.04.2022, 23:59_**
 To ensure that the exercise is as fun and educational as possible, we are still updating the tutorial materials.
-The exercise will be fully published on Monday, 15.08.2022.
+The exercise will be fully published by Friday, 18.03.22
 
 
 
