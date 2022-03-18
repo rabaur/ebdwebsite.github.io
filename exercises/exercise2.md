@@ -46,8 +46,34 @@ However, note that you will need to use Rhino in future exercises, so some early
 
 # Part 2 & 3: VR Experiment
 **_Due date (extended) 01.04.2022, 23:59_**
-To ensure that the exercise is as fun and educational as possible, we are still updating the tutorial materials.
-The exercise will be fully published by Friday, 18.03.22
+
+Please find the Unity Project [here](https://drive.google.com/file/d/1xdkZAqEDyKXFjrkE_1Gnuf3OTm1wHX4n/view?usp=sharing)
+
+Then, follow these steps:
+- Download the Unity Project
+- Unzip it (3.6 GB)
+- Open Unity Hub
+- In the tab "Project", select "Add"
+- Search the project you have just downloaded and indicate its location
+- Open the project. It will run the setup. If you are on a Mac, agree to "Switch Target"
+
+## Setting Up the Unity Scene
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/B8-yWv6ArTA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Computing the Navigation Mesh
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Qsdqdx7_R3w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Recording and Visualizing VR-Experiment Data
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/fgsnSCxzygE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Summarizing the VR-Experiment Data
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ezfUbiOHhp8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 
 
 
