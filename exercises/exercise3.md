@@ -44,6 +44,6 @@ The UnityProject (to get accustomed with the setting) and tutorial videos:
 * [Video 3](https://polybox.ethz.ch/index.php/s/aZj6XDtanusYVxn): Analysis: Density-maps and comparison-maps
 * [Video 4](https://polybox.ethz.ch/index.php/s/RC0akU9gzi1fcgg): Investigating the data
 * [Video 5](https://polybox.ethz.ch/index.php/s/kHqzedOnTPVJEz7): Recording Footage
-* [Lecture 4 recording](https://polybox.ethz.ch/index.php/s/jTgQ2jyLltwPUrF): The live demo from lecture#4
+* [Lecture 4 recording](https://polybox.ethz.ch/index.php/s/5QFp1mn8hPam5mF): The live demo from lecture#4
 
 
