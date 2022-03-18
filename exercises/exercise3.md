@@ -4,12 +4,7 @@ title: Exercise3
 permalink: /exercise3/
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})\
-[Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %})\
-[Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})\
-[Final Project]({{ site.baseurl }}{% link final_project.md %})\
-[Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %})\
-[Software]({{ site.baseurl }}{% link software.md %})
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %}) | [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) | [Software]({{ site.baseurl }}{% link software.md %})
 
 # Agent-based simulations to analyse design tradeoffs
 
@@ -40,14 +35,14 @@ The exercise stages are:
 ## Running the simulation in Unity3D
 
 The UnityProject (to get accustomed with the setting) and tutorial videos:
-* [UnityProject](ADDLINK) of the tutorial (you can either build upon this project or make one from scratch). 
+* [UnityProject](https://polybox.ethz.ch/index.php/s/5d7Q5SuVqfbfTu1) of the tutorial (you can either build upon this project or make one from scratch). 
 
-* [Video 0](ADDLINK): Generating translucent (glass-like) materials.
-* [Video 1](ADDLINK): Setting up a navigation mesh
-* [Video 2](ADDLINK): Setting up points of interest
-* [Video 3](ADDLINK): Analysis: Density-maps and comparison-maps
-* [Video 4](ADDLINK): Investigating the data
-* [Video 5](ADDLINK): Recording Footage
-* [Lecture 4 recording](ADDLINK): The live demo from lecture#4
+* [Video 0](https://polybox.ethz.ch/index.php/s/Agd17f5cJOecgkx): Generating translucent (glass-like) materials.
+* [Video 1](https://polybox.ethz.ch/index.php/s/UROL3ktgfGo6QUL): Setting up a navigation mesh
+* [Video 2](https://polybox.ethz.ch/index.php/s/6PTSvR9cjxw8YyN): Setting up points of interest
+* [Video 3](https://polybox.ethz.ch/index.php/s/aZj6XDtanusYVxn): Analysis: Density-maps and comparison-maps
+* [Video 4](https://polybox.ethz.ch/index.php/s/RC0akU9gzi1fcgg): Investigating the data
+* [Video 5](https://polybox.ethz.ch/index.php/s/kHqzedOnTPVJEz7): Recording Footage
+* [Lecture 4 recording](https://polybox.ethz.ch/index.php/s/jTgQ2jyLltwPUrF): The live demo from lecture#4
 
 
