@@ -8,6 +8,9 @@ permalink: /exercise3/
 
 # Agent-based simulations to analyse design tradeoffs
 
+- **UPDATED SCRIPTS 02.03.2022**: [Link](https://polybox.ethz.ch/index.php/s/e2gBjAAQ4NvMhkq)
+  To use the updated scripts, simply replace the old ones with the current ones you can find at the link above. To use data generated with the old scripts, change ","   to ";" in each generated .csv file that you are planning to use.
+
 **Objectives:** 
 * The aim of this exercise is to apply agent-based simulation to understand how different layouts accommodate the same sequence of activities. For instance, in a hospital, there are many activities by different users at the same time. This exercise will help you measure how the SAME ACTIVITIES unfold across DIFFERENT BUILDING typologies and realise design tradeoffs.You can compare differences across the following measures: 
 * Average walking distances (could reflect effort, and fatigue) 
