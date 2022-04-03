@@ -243,6 +243,11 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       }
 
       Brep[] currBreps = Brep.CreatePlanarBreps(edges, RhinoMath.SqrtEpsilon);
+      if (currBreps == null)
+      {
+        Print("was null");
+        continue;
+      }
       if (currBreps.Length != 1)
       {
         throw new Exception("Too little or too many surfaces generated");
