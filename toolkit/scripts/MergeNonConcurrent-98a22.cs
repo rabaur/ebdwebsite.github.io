@@ -52,7 +52,7 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut, ref object Weird)
+  private void RunScript(List<Brep> InBreps, List<int> InTypes, List<Point3d> InLocations, DataTree<Point3d> InDelimitingPoints, object InAdjacencyMatrix, List<Point3d> BranchPointList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object OddOneOut, ref object Weird, ref object ToJoinNeighCount)
   {
     // Reassemble input into graph.
     Dictionary<Node, List<Node>> graph = ReassembleGraph(InBreps, InTypes, InLocations, InDelimitingPoints, (Matrix)InAdjacencyMatrix);
@@ -63,6 +63,8 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     {
       globalVisited[keyVal.Key] = false;
     }
+    List<Brep> toJoin = new List<Brep>();
+    List<int> toJoinNeighCount = new List<int>();
     foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
     {
       Node initNode = keyVal.Key;
@@ -77,14 +79,10 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       List<Node> joinable = new List<Node>();
       Queue<Node> queue = new Queue<Node>();
       queue.Enqueue(initNode);
-      int cnt = 0;
+      bool wasNotConvex = false;
+      bool wasTooLarge = false;
       while (queue.Count != 0)
       {
-        cnt++;
-        if (cnt > 10000)
-        {
-          throw new Exception("Probably stuck in a while loop.");
-        }
         Node currNode = queue.Dequeue();
         if (globalVisited[currNode])
         {
@@ -101,30 +99,33 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
           }
           potentialBreps.Add(neighbor.brep);
           //---------------- BUGGY --------------------//
-          bool isConvex = false;
+          bool isConvex = IsConvex(GetUniqueCorners(potentialBreps));
           bool isSmall = false;
-          try
-          {
-            isConvex = IsConvex(GetUniqueCorners(potentialBreps));
-          }
-          catch (Exception e)
-          {
-            Print("convexconvexconvexconvex");
-          }
           try
           {
             isSmall = graph[neighbor].Count <= 2;
           }
-          catch (Exception e)
+          catch
           {
-            Print("strunzstrunzstrunzstrunz");
-            continue;
+            toJoin.Add(currNode.brep);
+            Print("hili");
           }
-          if (isConvex)
+          if (isConvex && isSmall)
           {
             queue.Enqueue(neighbor);
           }
+          wasNotConvex = !isConvex;
+          wasTooLarge = !isSmall;
+
           //---------------- BUGGY --------------------//
+        }
+      }
+      if (true)
+      {
+        foreach (Node join in joinable)
+        {
+          toJoin.Add(join.brep);
+          toJoinNeighCount.Add(graph[join].Count);
         }
       }
       if (joinable.Count <= 1)
@@ -133,6 +134,8 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       }
       ContractNodes(graphCopy, joinable, 2);
     }
+    Weird = toJoin;
+    ToJoinNeighCount = toJoinNeighCount;
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
     List<int> outTypes = new List<int>();
@@ -605,7 +608,6 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
           closestCurve = edge;
         }
       }
-      Print(minDist.ToString());
       if (minDist > 1.0)
       {
         return false;

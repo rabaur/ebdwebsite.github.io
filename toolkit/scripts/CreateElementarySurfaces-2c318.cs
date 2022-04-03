@@ -241,8 +241,13 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       {
         edges.Add(new LineCurve(hull[i], hull[(i + 1) % hull.Count]));
       }
+      if (edges.Count == 2)
+      {
+        Print("here");
+        continue;
+      }
 
-      Brep[] currBreps = Brep.CreatePlanarBreps(edges, RhinoMath.SqrtEpsilon);
+      Brep[] currBreps = Brep.CreatePlanarBreps(edges, 0.1);
       if (currBreps == null)
       {
         Print("was null");

@@ -88,7 +88,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           if (intersect.IsPoint)
           {
             intersectionPairs.Add(new List<Curve> { seg0, seg1 });
-            if (!IsCurveEndPoint(seg0, intersect.ParameterA, RhinoMath.SqrtEpsilon))
+            if (!IsCurveEndPoint(seg0, intersect.ParameterA, INTERSECTION_TOL))
             {
               Curve[] split0 = seg0.Split(intersect.ParameterA);
               if (split0 == null)
