@@ -537,6 +537,10 @@ public abstract class Script_Instance_f4c4d : GH_ScriptInstance
       {
         startIdx = i;
       }
+      else if (points[i].X == points[startIdx].X && points[i].Y < points[startIdx].Y)
+      {
+        startIdx = i;
+      }
     }
 
     // Wrapping.

@@ -546,6 +546,10 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       {
         startIdx = i;
       }
+      else if (points[i].X == points[startIdx].X && points[i].Y < points[startIdx].Y)
+      {
+        startIdx = i;
+      }
     }
 
     // Wrapping.
