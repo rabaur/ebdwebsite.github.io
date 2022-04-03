@@ -54,7 +54,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object AfterJoinEdges)
+  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix)
   {
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
@@ -328,6 +328,61 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     }
     NodeLocations = nodeLocs;
     Edges = graphEdges;
+
+    // Check how many duplicate breps we have.
+    List<bool> duplicate = new List<bool>();
+    List<Brep> duplicateBreps = new List<Brep>();
+    foreach (Brep elemBrep in elementaryBreps)
+    {
+      duplicate.Add(false);
+    }
+    int n_dups = 0;
+    for (int i = 0; i < elementaryBreps.Count; i++)
+    {
+      if (duplicate[i])
+      {
+        continue;
+      }
+      for (int j = i + 1; j < elementaryBreps.Count; j++)
+      {
+        if (duplicate[j])
+        {
+          continue;
+        }
+        Point3d c0 = ComputePolyCenter(elementaryBreps[i]);
+        Point3d c1 = ComputePolyCenter(elementaryBreps[j]);
+        if (c0.DistanceTo(c1) < 0.1)
+        {
+          duplicate[j] = true;
+          duplicateBreps.Add(elementaryBreps[j]);
+          n_dups++;
+        }
+      }
+    }
+
+    // Remove duplicates. Since we have only identified duplicate breps, we also need to search which nodes these duplicate breps correspond to.
+    List<Node> toRemove = new List<Node>();  // We can not remove while iterating over the graph, that is why I save the nodes here and delete them later.
+    for (int i = 0; i < duplicate.Count; i++)
+    {
+      if (!duplicate[i])
+      {
+        continue;
+      }
+      foreach (KeyValuePair<Node, List<Node>> keyVal in graph)
+      {
+        if (ComputePolyCenter(keyVal.Key.brep).DistanceTo(ComputePolyCenter(elementaryBreps[i])) < 0.1)
+        {
+          toRemove.Add(keyVal.Key);
+          break;
+        }
+      }
+    }
+
+    Print(toRemove.Count.ToString());
+    foreach (Node remove in toRemove)
+    {
+      DeleteNode(graph, remove);
+    }
 
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
@@ -662,6 +717,25 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       return 0; // collinear
     }
     return (val > 0) ? 1 : 2; // clock or counterclock wise
+  }
+
+  // Returns old neighborhood if successful.
+  private void DeleteNode(Dictionary<Node, List<Node>> graph, Node toDelete)
+  {
+    List<Node> neighbors;
+    if (!graph.TryGetValue(toDelete, out neighbors))
+    {
+      throw new Exception("The node to be deleted was not present in the graph.");
+    }
+
+    // Delete the node.
+    graph.Remove(toDelete);
+
+    // Remove node from neighbor's adjacency list.
+    foreach (Node neighbor in neighbors)
+    {
+      graph[neighbor].Remove(toDelete);
+    }
   }
   #endregion
 }

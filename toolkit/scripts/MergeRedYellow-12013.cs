@@ -88,7 +88,7 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
         }
         toContract.Add(neighbor);
       }
-      if (toContract.Count == 1)
+      if (toContract.Count <= 1)
       {
         continue;
       }
@@ -102,6 +102,7 @@ public abstract class Script_Instance_12013 : GH_ScriptInstance
     List<int> outTypes = new List<int>();
     List<Point3d> outLocations = new List<Point3d>();
     DataTree<Point3d> outDelimitingPoints = new DataTree<Point3d>();
+    Print(graphCopy.Count.ToString());
     Matrix adjacencyMatrix = new Matrix(graphCopy.Count, graphCopy.Count);
     DeconstructGraph(graphCopy, ref outBreps, ref outTypes, ref outLocations, ref outDelimitingPoints, ref adjacencyMatrix);
     OutBreps = outBreps;

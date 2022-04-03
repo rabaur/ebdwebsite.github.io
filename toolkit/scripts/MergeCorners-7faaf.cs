@@ -74,7 +74,19 @@ public abstract class Script_Instance_7faaf : GH_ScriptInstance
       List<Node> toContract = new List<Node>() { currNode };
       foreach (Node neighbor in neighbors)
       {
-
+        if (neighbor.type == 0)
+        {
+          for (int i = 0; i < graph[neighbor].Count; i++)
+          {
+            for (int j = i + 1; j < graph[neighbor].Count; j++)
+            {
+              if (ComputePolyCenter(new List<Brep>() { graph[neighbor][i].brep }).DistanceTo(ComputePolyCenter(new List<Brep>() { graph[neighbor][j].brep })) < 0.1)
+              {
+                throw new Exception("Great, we have node aliasing");
+              }
+            }
+          }
+        }
         if (neighbor.type == 0 && graph[neighbor].Count == 1)
         {
           toContract.Add(neighbor);
