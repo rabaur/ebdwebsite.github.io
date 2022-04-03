@@ -53,11 +53,11 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, int idx1, int idx2, int pairIdx, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs, ref object pair, ref object OminousNeigbors, ref object JoinedCurves)
+  private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, int idx1, int idx2, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs, ref object pair, ref object OminousNeigbors, ref object JoinedCurves)
   {
 
-    const double INTERSECTION_TOL = 0.01;
-    const double JOIN_TOL = 0.01;
+    const double INTERSECTION_TOL = 0.1;
+    const double JOIN_TOL = 0.1;
 
     // It often happens that the curves are self-overlapping, especially when they are branching out towards a corner.
     // To get rid of these overlaps, the curves are first broken in extremal points close to corner locations.
@@ -119,13 +119,13 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
             {
 
               // Otherwise just remove the part from the first segment that is overlapping.
-              bool minInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Min, RhinoMath.SqrtEpsilon);
-              bool maxInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Max, RhinoMath.SqrtEpsilon);
+              bool minInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Min, INTERSECTION_TOL);
+              bool maxInDomain = IsInCurveDomain(seg0, intersect.OverlapA.Max, INTERSECTION_TOL);
 
               // Ensure that always exactly one side of the interval is in the domain, otherwise this would not be a valid overlap.
               if (!minInDomain ^ maxInDomain)
               {
-                if (intersect.OverlapA.Max - intersect.OverlapA.Min < RhinoMath.SqrtEpsilon || intersect.OverlapB.Max - intersect.OverlapB.Min < RhinoMath.SqrtEpsilon)
+                if (intersect.OverlapA.Max - intersect.OverlapA.Min < INTERSECTION_TOL || intersect.OverlapB.Max - intersect.OverlapB.Min < INTERSECTION_TOL)
                 {
                   // This should actually be a point-intersection, but for some reason, Rhino fucked up.
                   if (!IsCurveEndPoint(seg0, intersect.ParameterA, RhinoMath.SqrtEpsilon))
@@ -161,7 +161,6 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
         }
       }
     }
-    pair = intersectionPairs[pairIdx]; 
     SplitSegments = splitSegments;
 
     // Building segment graph where segments are nodes and there is and edge between segments iff they intersect at a point which is not a branchpoint.
@@ -210,7 +209,6 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
     Dictionary<Curve, bool> visited = new Dictionary<Curve, bool>(); // Tracks whether a curve was already assigned to a connected component.
     foreach (KeyValuePair<Curve, List<Curve>> keyVal in segmentGraph)
     {
-
       visited[keyVal.Key] = false;
     }
     foreach (KeyValuePair<Curve, List<Curve>> keyValue in segmentGraph)
@@ -221,10 +219,10 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
       {
         continue;
       }
-
       if (neighbors.Count == 1)
       {
         joinedSegments.Add(initSeg); // If there is only one neighbor, then it is the curve itself and we can join it without any additional joining.
+        visited[initSeg] = true;
         continue;
       }
 
@@ -246,12 +244,8 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
           queue.Enqueue(neighbor);
         }
       }
+      Print(connectedComponent.Count.ToString());
       Curve[] joinedConnectedComponent = Curve.JoinCurves(connectedComponent, JOIN_TOL);
-      if (joinedConnectedComponent.Length > 1)
-      {
-        JoinedCurves = joinedConnectedComponent;
-        break;
-      }
       joinedSegments.AddRange(joinedConnectedComponent);
     }
     BranchPointDelimitedCurvesList = joinedSegments;

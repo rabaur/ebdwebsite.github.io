@@ -54,16 +54,65 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, int idx, ref object BranchPointList, ref object BranchPointDelimitedCurveList, ref object SelectedCurves, ref object SelectedAngles)
+  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, ref object BranchPointList, ref object BranchPointDelimitedCurveList)
   {
     List<List<Curve>> contiguousSegmentList = PartitionSegmentsByAdjacencyParallel(SegmentCurveList); // Empirically, parallel method was substantially faster.
 
-    // Split the first segment in each list of contiguous segment, to avoid that second segment is directly after branchpoint, which would not be detected in this case.
-    SelectedCurves = contiguousSegmentList[idx];
-    SelectedAngles = CalculateAngles(contiguousSegmentList[idx]);
-
-    // Find branchpoints first, then split segments.
+    // If a branchpoint is exactly at the start/end of a contiguous segment, we can only detect it by comparing to other starts or end of segments.
     List<Point3d> branchPoints = new List<Point3d>();
+    for (int i = 0; i < contiguousSegmentList.Count; i++)
+    {
+      List<Curve> contiguous0 = contiguousSegmentList[i];
+      Curve start0 = contiguous0[0];
+      Curve end0 = contiguous0[contiguous0.Count - 1];
+      for (int j = i + 1; j < contiguousSegmentList.Count; j++)
+      {
+        List<Curve> contiguous1 = contiguousSegmentList[j];
+        Curve start1 = contiguous1[0];
+        Curve end1 = contiguous1[contiguous1.Count - 1];
+        CurveIntersections intersects0 = Intersection.CurveCurve(start0, start1, 0.1, 0.1);
+        if (intersects0.Count != 0)
+        {
+          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double diff = Math.Abs(angles[0]);
+          if (LowerTolerance <= diff && diff <= UpperTolerance)
+          {
+            branchPoints.Add(intersects0[0].PointA);
+          }
+        }
+        CurveIntersections intersects1 = Intersection.CurveCurve(start0, end1, 0.1, 0.1);
+        if (intersects1.Count != 0)
+        {
+          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double diff = Math.Abs(angles[0]);
+          if (LowerTolerance <= diff && diff <= UpperTolerance)
+          {
+            branchPoints.Add(intersects1[0].PointA);
+          }
+        }
+        CurveIntersections intersects2 = Intersection.CurveCurve(end0, start1, 0.1, 0.1);
+        if (intersects2.Count != 0)
+        {
+          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double diff = Math.Abs(angles[0]);
+          if (LowerTolerance <= diff && diff <= UpperTolerance)
+          {
+            branchPoints.Add(intersects2[0].PointA);
+          }
+        }
+        CurveIntersections intersects3 = Intersection.CurveCurve(end0, end1, 0.1, 0.1);
+        if (intersects3.Count != 0)
+        {
+          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double diff = Math.Abs(angles[0]);
+          if (LowerTolerance <= diff && diff <= UpperTolerance)
+          {
+            branchPoints.Add(intersects3[0].PointA);
+          }
+        }
+      }
+    }
+
     foreach (List<Curve> contiguousSegments in contiguousSegmentList)
     {
       double[] angles = CalculateAngles(contiguousSegments);
@@ -80,8 +129,6 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
         }
       }
     }
-
-    Print("Number of branchpoints: " + branchPoints.Count);
 
     // Find branchpoints for each list of contiguous segments.
     List<Curve> branchPointDelimitedSegments = new List<Curve>();
