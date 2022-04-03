@@ -54,12 +54,13 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, ref object BranchPointList, ref object BranchPointDelimitedCurveList)
+  private void RunScript(List<Curve> SegmentCurveList, double LowerTolerance, double UpperTolerance, ref object BranchPointList, ref object BranchPointDelimitedCurveList, ref object NewBranchPoints)
   {
     List<List<Curve>> contiguousSegmentList = PartitionSegmentsByAdjacencyParallel(SegmentCurveList); // Empirically, parallel method was substantially faster.
 
     // If a branchpoint is exactly at the start/end of a contiguous segment, we can only detect it by comparing to other starts or end of segments.
     List<Point3d> branchPoints = new List<Point3d>();
+    List<Point3d> newBranchPoints = new List<Point3d>();
     for (int i = 0; i < contiguousSegmentList.Count; i++)
     {
       List<Curve> contiguous0 = contiguousSegmentList[i];
@@ -71,6 +72,9 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
         Curve start1 = contiguous1[0];
         Curve end1 = contiguous1[contiguous1.Count - 1];
         CurveIntersections intersects0 = Intersection.CurveCurve(start0, start1, 0.1, 0.1);
+        CurveIntersections intersects1 = Intersection.CurveCurve(start0, end1, 0.1, 0.1);
+        CurveIntersections intersects2 = Intersection.CurveCurve(end0, start1, 0.1, 0.1);
+        CurveIntersections intersects3 = Intersection.CurveCurve(end0, end1, 0.1, 0.1);
         if (intersects0.Count != 0)
         {
           double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
@@ -78,40 +82,42 @@ public abstract class Script_Instance_fb23b : GH_ScriptInstance
           if (LowerTolerance <= diff && diff <= UpperTolerance)
           {
             branchPoints.Add(intersects0[0].PointA);
+            newBranchPoints.Add(intersects0[0].PointA);
           }
         }
-        CurveIntersections intersects1 = Intersection.CurveCurve(start0, end1, 0.1, 0.1);
-        if (intersects1.Count != 0)
+        else if (intersects1.Count != 0)
         {
-          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double[] angles = CalculateAngles(new List<Curve>() { start0, end1 });
           double diff = Math.Abs(angles[0]);
           if (LowerTolerance <= diff && diff <= UpperTolerance)
           {
             branchPoints.Add(intersects1[0].PointA);
+            newBranchPoints.Add(intersects1[0].PointA);
           }
         }
-        CurveIntersections intersects2 = Intersection.CurveCurve(end0, start1, 0.1, 0.1);
-        if (intersects2.Count != 0)
+        else if (intersects2.Count != 0)
         {
-          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double[] angles = CalculateAngles(new List<Curve>() { end0, start1 });
           double diff = Math.Abs(angles[0]);
           if (LowerTolerance <= diff && diff <= UpperTolerance)
           {
             branchPoints.Add(intersects2[0].PointA);
+            newBranchPoints.Add(intersects2[0].PointA);
           }
         }
-        CurveIntersections intersects3 = Intersection.CurveCurve(end0, end1, 0.1, 0.1);
-        if (intersects3.Count != 0)
+        else if (intersects3.Count != 0)
         {
-          double[] angles = CalculateAngles(new List<Curve>() { start0, start1 });
+          double[] angles = CalculateAngles(new List<Curve>() { end0, end1 });
           double diff = Math.Abs(angles[0]);
           if (LowerTolerance <= diff && diff <= UpperTolerance)
           {
             branchPoints.Add(intersects3[0].PointA);
+            newBranchPoints.Add(intersects3[0].PointA);
           }
         }
       }
     }
+    NewBranchPoints = newBranchPoints;
 
     foreach (List<Curve> contiguousSegments in contiguousSegmentList)
     {
