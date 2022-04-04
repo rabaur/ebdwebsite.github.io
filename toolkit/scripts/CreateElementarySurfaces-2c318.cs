@@ -689,6 +689,10 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       {
         startIdx = i;
       }
+      else if (points[i].X == points[startIdx].X && points[i].Y < points[startIdx].Y)
+      {
+        startIdx = i;
+      }
     }
 
     // Wrapping.
@@ -705,6 +709,13 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         {
           // The current segment is a right turn.
           next = i;
+        }
+        else if (Orientation(points[last], points[i], points[next]) == 0)
+        {
+          if (points[last].DistanceTo(points[i]) > points[last].DistanceTo(points[next]))
+          {
+            next = i;
+          }
         }
       }
       last = next;

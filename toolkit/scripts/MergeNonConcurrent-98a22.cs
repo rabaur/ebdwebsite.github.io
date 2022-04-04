@@ -570,6 +570,13 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
           // The current segment is a right turn.
           next = i;
         }
+        else if (Orientation(points[last], points[i], points[next]) == 0)
+        {
+          if (points[last].DistanceTo(points[i]) > points[last].DistanceTo(points[next]))
+          {
+            next = i;
+          }
+        }
       }
       last = next;
     }
