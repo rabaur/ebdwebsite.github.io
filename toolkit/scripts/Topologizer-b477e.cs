@@ -53,7 +53,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, int idx1, int idx2, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs, ref object pair, ref object OminousNeigbors, ref object JoinedCurves)
+  private void RunScript(List<Curve> SegmentCurveList, List<Point3d> BranchPointList, List<Point3d> CornerPointList, double CornerTol, ref object BranchPointDelimitedCurvesList, ref object SplitSegments, ref object crv1, ref object crv2, ref object specialIntersects, ref object A, ref object B, ref object step1Segs, ref object pair, ref object OminousNeigbors, ref object JoinedCurves)
   {
 
     const double INTERSECTION_TOL = 0.1;
