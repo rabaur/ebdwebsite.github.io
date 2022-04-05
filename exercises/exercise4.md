@@ -1,15 +1,9 @@
 ---
 layout: default
-title: Exercise2
+title: Exercise4
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link HS21/exercises/exercise1.md %})\
-[Exercise 2]({{ site.baseurl }}{% link HS21/exercises/exercise2.md %})\
-[Exercise 3]({{ site.baseurl }}{% link HS21/exercises/exercise3.md %})\
-[Lecture Slides]({{ site.baseurl }}{% link HS21/ebd_lectureslides.md %})\
-[Software]({{ site.baseurl }}{% link HS21/software.md %})\
-[Past Courses]({{ site.baseurl }}{% link past_courses.md %})\
-[Main Page HS21]({{ site.baseurl }}{% link HS21/index_hs21.md %})
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %}) | [Exercise 4]({{ site.baseurl }}{% link exercises/exercise4.md %}) | [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) | [Software]({{ site.baseurl }}{% link software.md %})
 
 #  Analyzing behavioral differences across hospital typologies (submission: 29.04, in class)
 Following the tutorial steps, compare the two hospital typologies you chose for the previous exercises for each of the following measures:
@@ -35,6 +29,10 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 **C. Submission files**
 * Upload the images and the Rhino file (.3dm file, name as StudentFirstNameLastName.3dm) to polybox to this [link](https://polybox.ethz.ch/index.php/s/7x411XMgtLQvHk1)
 
+[**D. DOWNLOAD LINK TOOLKIT AND EXAMPLE SCENE**](https://polybox.ethz.ch/index.php/s/1vsvOIQrjRRUXpv)
+- **Example.3dm** is the example project containing the reference geometry.
+- **metrics_new.gh** is the Grasshopper script you will use in Grasshopper.
+
 # Video Tutorial 
 ## 1. Preprocessing the Layout
 
@@ -50,7 +48,7 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 
 ## 3. Visualizing Measures
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/cmsKklp2qEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cvBViGg1eZY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 * * *
 
