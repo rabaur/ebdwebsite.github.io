@@ -22,7 +22,7 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 
 **B. For each typology:**
 * Export an image showing the analysis for each measure. 
-* Drag and drop these files to the Miro board (link is sent by email) and compare the two typologies across the three measures. 
+* Drag and drop these files to the Miro board (link is sent in email with header _[EBD FS22] Exercise 4_) and compare the two typologies across the three measures. 
 * Write a figure caption summarising your comparison. Your caption should be simple, and critical. What is the reason for the observed differences? Is it the configuration? The location of critical functions (e.g., the nurse station)? The size of the layout? 
 ![An example of the comparison matrix comparing both typologies across the three measures](/assets/images/ExampleMatrix.JPG)
 
