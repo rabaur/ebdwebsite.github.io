@@ -29,7 +29,8 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 **C. Submission files**
 * Upload the images and the Rhino file (.3dm file, name as StudentFirstNameLastName.3dm) to polybox to this [link](https://polybox.ethz.ch/index.php/s/7x411XMgtLQvHk1)
 
-[**D. DOWNLOAD LINK TOOLKIT AND EXAMPLE SCENE**](https://polybox.ethz.ch/index.php/s/1vsvOIQrjRRUXpv)
+[**D. DOWNLOAD LINK TOOLKIT AND EXAMPLE SCENE**](https://polybox.ethz.ch/index.php/s/1vsvOIQrjRRUXpv) (Password protected)
+You will receive the password in the email with the header _[EBD FS22] Exercise 4_.
 - **Example.3dm** is the example project containing the reference geometry.
 - **metrics_new.gh** is the Grasshopper script you will use in Grasshopper.
 
