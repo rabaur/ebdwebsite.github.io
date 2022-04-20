@@ -364,9 +364,10 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
         }
       }
     }
+    Print("Duplicate breps: "  + duplicateBreps.Count.ToString());
 
     // Remove duplicates. Since we have only identified duplicate breps, we also need to search which nodes these duplicate breps correspond to.
-    List<Node> toRemove = new List<Node>();  // We can not remove while iterating over the graph, that is why I save the nodes here and delete them later.
+    List<Node> toDelete = new List<Node>();  // We can not remove while iterating over the graph, that is why I save the nodes here and delete them later.
     for (int i = 0; i < duplicate.Count; i++)
     {
       if (!duplicate[i])
@@ -377,15 +378,24 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       {
         if (ComputePolyCenter(keyVal.Key.brep).DistanceTo(ComputePolyCenter(elementaryBreps[i])) < 0.1)
         {
-          toRemove.Add(keyVal.Key);
+          if (toDelete.Contains(keyVal.Key))
+          {
+            Print("here");
+            continue;
+          }
+          toDelete.Add(keyVal.Key);
           break;
         }
       }
     }
 
-    Print(toRemove.Count.ToString());
-    foreach (Node remove in toRemove)
+    Print(toDelete.Count.ToString());
+    foreach (Node remove in toDelete)
     {
+      if (graph.ContainsKey(remove))
+      {
+
+      }
       DeleteNode(graph, remove);
     }
 

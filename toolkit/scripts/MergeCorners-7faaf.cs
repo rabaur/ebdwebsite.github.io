@@ -404,10 +404,12 @@ public abstract class Script_Instance_7faaf : GH_ScriptInstance
       }
       throw new Exception("Merged surface was null");
     }
+    /*
     if (res.Length != 1)
     {
       throw new Exception("Too few or too many breps resulted from merging: " + res.Length);
     }
+    */
     return res[0];
   }
 
