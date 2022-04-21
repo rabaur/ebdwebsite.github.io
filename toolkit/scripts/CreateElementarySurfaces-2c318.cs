@@ -54,7 +54,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
   /// they will have a default value.
   /// </summary>
   #region Runscript
-  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix)
+  private void RunScript(List<int> SwitchPointMedialAxisCurveIdx, List<double> SwitchPointParameters, List<int> SwitchPointPreviousTypes, List<int> SwitchPointNextTypes, List<Curve> BoundaryCurveList, List<Point3d> BranchPointList, List<Curve> MedialAxisCurveList, ref object ElementarySurfacesList, ref object ElementarySurfaceTypeList, ref object NodeLocations, ref object Edges, ref object OutBreps, ref object OutTypes, ref object OutLocations, ref object OutDelimitingPoints, ref object OutAdjacencyMatrix, ref object Before, ref object After)
   {
     // Reassemble input into mapping from medial axis curves to switchpoints.
     Dictionary<Curve, List<SwitchPoint>> medax2SwitchPoint = ReassembleInput(MedialAxisCurveList, SwitchPointMedialAxisCurveIdx, SwitchPointParameters, SwitchPointPreviousTypes, SwitchPointNextTypes);
@@ -233,7 +233,12 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       }
 
       // Determine convex hull in order to get points in correct order to generate boundary.
-      List<Point3d> hull = ConvexHullXY(uniqueChordEnds);
+      List<Point3d> hull = ConvexHull(uniqueChordEnds);
+      PointComparer pCompare = new PointComparer
+      {
+        center = hull[0]
+      };
+      hull.Sort(pCompare);
 
       // Generate the boundary edges.
       List<LineCurve> edges = new List<LineCurve>();
@@ -243,7 +248,7 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       }
       if (edges.Count == 2)
       {
-        Print("here");
+        Print("Only two edges.");
         continue;
       }
 
@@ -255,7 +260,9 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
       }
       if (currBreps.Length != 1)
       {
-        throw new Exception("Too little or too many surfaces generated");
+        After = currBreps;
+        Print("Too little or too many surfaces generated " + currBreps.Length);
+        // throw new Exception("Too little or too many surfaces generated " + currBreps.Length);
       }
       Brep currBrep = currBreps[0];
       elementaryBreps.Add(currBrep);
@@ -683,66 +690,141 @@ public abstract class Script_Instance_2c318 : GH_ScriptInstance
     return corners;
   }
 
-  private List<Point3d> ConvexHullXY(List<Point3d> points)
+  class PointComparer : Comparer<Point3d>
   {
-    // If we have less than 4 points, the hull is trivially convex.
-    if (points.Count <= 3)
+    public Point3d center;
+
+    private int Orientation(Point3d p1, Point3d p2, Point3d p3)
+    {
+      double area = (p2.Y - p1.Y) * (p3.X - p2.X) - (p2.X - p1.X) * (p3.Y - p2.Y);
+
+      if (area > 0.0)
+      {
+        return 1; // collinear
+      }
+      if (area < 0.0)
+      {
+        return -1;
+      }
+      return 0;
+    }
+
+    public override int Compare(Point3d x, Point3d y)
+    {
+      int orientation = Orientation(center, x, y);
+      if (orientation == 0)
+      {
+        // Points are collinear.
+        if (center.DistanceTo(y) >= center.DistanceTo(x))
+        {
+          return -1;  // Second element is greater than first one.
+        }
+        return 1;  // First element is greater than second one.
+      }
+      return orientation;
+    }
+  }
+
+  // Diese Methode gibt das zweitoberste Element im Stack der Punkte zuruck
+  private Point3d GetNextToTopElement(Stack<Point3d> points)
+  {
+    Point3d topElement = points.Peek();
+    points.Pop();
+    Point3d nextToTopElement = points.Peek();
+    points.Push(topElement);
+    return nextToTopElement;
+  }
+
+  List<Point3d> ConvexHull(List<Point3d> points)
+  {
+    List<Point3d> convexHull = new List<Point3d>();
+    double minY = points[0].Y;
+    int minIndex = 0;
+    int nPoints = points.Count;
+
+    // Determines the most left, and for ties most bottom, point in the input list.
+    for (int i = 1; i < nPoints; i++)
+    {
+      double y = points[i].Y;
+      if (y < minY || y == minY && points[i].X < points[minIndex].X)
+      {
+        minY = points[i].Y;
+        minIndex = i;
+      }
+    }
+
+    // Put minimum element at first position.
+    Point3d temp = points[0];
+    points[0] = points[minIndex];
+    points[minIndex] = temp;
+
+    // Initialise comparer.
+    PointComparer pComparer = new PointComparer
+    {
+      center = points[0]  // Set to minimum element.
+    };
+
+    // Sort points.
+    points.Sort(pComparer);
+
+    // If there are at least two points with equal angle to minimum element, remove all except the one that is furthest away.
+    int nPointsRed = 1;  // Number of points that are not collinear with the first point.
+    for (int i = 1; i < nPoints; i++)
+    {
+      // Remove points as long as they are collinear.
+      while (i < nPoints - 1 && Orientation(pComparer.center, points[i], points[i + 1]) == 0)
+      {
+        i++;
+      }
+      points[nPointsRed] = points[i];
+      nPointsRed++;
+    }
+
+    // If there are less than three points, the hull is trivially convex.
+    if (nPointsRed < 3)
     {
       return points;
     }
 
-    // Find most left point.
-    int startIdx = 0;
-    for (int i = 1; i < points.Count; i++)
+    // Create stack and add first three points.
+    Stack<Point3d> pointStack = new Stack<Point3d>();
+    pointStack.Push(points[0]);
+    pointStack.Push(points[1]);
+    pointStack.Push(points[2]);
+
+    // Go through the remaining points.
+    for (int i = 3; i < nPointsRed; i++)
     {
-      if (points[i].X < points[startIdx].X)
+      while (pointStack.Count > 1 && Orientation(GetNextToTopElement(pointStack), pointStack.Peek(), points[i]) != -1)
       {
-        startIdx = i;
+        pointStack.Pop();
       }
-      else if (points[i].X == points[startIdx].X && points[i].Y < points[startIdx].Y)
-      {
-        startIdx = i;
-      }
+      pointStack.Push(points[i]);
     }
 
-    // Wrapping.
-    List<Point3d> hull = new List<Point3d>();
-    int last = startIdx;
-    int next;
-    do
+    // Add points from stack to convex hull.
+    while (pointStack.Count != 0)
     {
-      hull.Add(points[last]);
-      next = (last + 1) % points.Count;
-      for (int i = 0; i < points.Count; i++)
-      {
-        if (Orientation(points[last], points[i], points[next]) == 2)
-        {
-          // The current segment is a right turn.
-          next = i;
-        }
-        else if (Orientation(points[last], points[i], points[next]) == 0)
-        {
-          if (points[last].DistanceTo(points[i]) > points[last].DistanceTo(points[next]))
-          {
-            next = i;
-          }
-        }
-      }
-      last = next;
+      convexHull.Add(pointStack.Peek());
+      pointStack.Pop();
     }
-    while (last != startIdx);
-    return hull;
+
+    return convexHull;
   }
 
-  private int Orientation(Point3d p, Point3d q, Point3d r)
+  private int Orientation(Point3d p1, Point3d p2, Point3d p3)
   {
-    double val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+    double area = (p2.Y - p1.Y) * (p3.X - p2.X) - (p2.X - p1.X) * (p3.Y - p2.Y);
 
-    if (val == 0.0)
+    if (area > 0.0)
     {
-      return 0; // collinear
+      return 1; // collinear
     }
-    return (val > 0) ? 1 : 2; // clock or counterclock wise
+    if (area < 0.0)
+    {
+      return -1;
+    }
+    return 0;
   }
 
   // Returns old neighborhood if successful.
