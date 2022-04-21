@@ -34,6 +34,27 @@ You will receive the password in the email with the header _[EBD FS22] Exercise 
 - **Example.3dm** is the example project containing the reference geometry.
 - **metrics_new.gh** is the Grasshopper script you will use in Grasshopper.
 
+**Update: Script Version of 21.04.2022**
+There is a new version of the script and example project. With your feedback, we were able to further improve the tool.
+Here is a summary of the changes:
+- **Better Stability and Speed**: We have eliminated a few bugs that lead to faulty behaviour and improved execution speed.
+- **Support for "holes" in Layout**: Previously, the graph was generated in the whole area that was enclosed by the curves of your layout. Now, you need to     delimit the areas that define boundaries (to the inside as well as the outside of the layout) as _closed curves_. To do so, break up the boundaries in straight segments and join them. The result should look something like this:
+    <p float="left">
+    <img src="/assets/images/outer_boundary.JPG" width="100" />
+    <img src="/assets/images/inner_boundaries.JPG" width="100" /> 
+    </p>
+    This will speed up calculation and give you more representative values for the ICD.
+- **Configurable Graph Visualization**: We exposed some parameters to adapt the scale and position of the GraphBuilder visualization. This can be helpful if your graph is particularly large or small:
+    <p float="left">
+    <img src="/assets/images/graphbuilder_vis.JPG" width="100" />
+    <img src="/assets/images/graphbuilder.png" width="100" /> 
+    </p>
+- **Configurable Position**: We exposed some parameters to adapt the placement of the numbers corresponding to each measure (SCI: XXX, YTI: YYY, ICD: ZZZ). To set it, right click > set point / set vector > and then choose the corresponding point / draw the vector on the Rhino screen. It will displace the measures from point "Measures Position" by "Measures Displacement.
+    <p float="left">
+    <img src="/assets/images/measure_positioning.JPG" width="100" />
+    </p>
+
+
 # Video Tutorial 
 ## 1. Preprocessing the Layout
 
