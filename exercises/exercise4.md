@@ -47,12 +47,12 @@ Here is a summary of the changes:
     This will speed up calculation and give you more representative values for the ICD.
 - **Configurable Graph Visualization**: We exposed some parameters to adapt the scale and position of the GraphBuilder visualization. This can be helpful if your graph is particularly large or small:
     <p float="left">
-    <img src="/assets/images/graphbuilder_vis.JPG" width="100" />
-    <img src="/assets/images/graphbuilder.png" width="100" /> 
+    <img src="/assets/images/exercise4/graphbuilder_vis.JPG" width="100" />
+    <img src="/assets/images/exercise4/graphbuilder.png" width="100" /> 
     </p>
 - **Configurable Position**: We exposed some parameters to adapt the placement of the numbers corresponding to each measure (SCI: XXX, YTI: YYY, ICD: ZZZ). To set it, right click > set point / set vector > and then choose the corresponding point / draw the vector on the Rhino screen. It will displace the measures from point "Measures Position" by "Measures Displacement.
     <p float="left">
-    <img src="/assets/images/measure_positioning.JPG" width="100" />
+    <img src="/assets/images/exercise4/measure_positioning.JPG" width="100" />
     </p>
 
 
