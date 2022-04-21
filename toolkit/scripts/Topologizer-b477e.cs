@@ -99,7 +99,7 @@ public abstract class Script_Instance_b477e : GH_ScriptInstance
               splitSegments.Add(longerSeg0);
               seg0 = longerSeg0;
             }
-            if (!IsCurveEndPoint(seg1, intersect.ParameterB, RhinoMath.SqrtEpsilon))
+            if (!IsCurveEndPoint(seg1, intersect.ParameterB, INTERSECTION_TOL))
             {
               Curve[] split1 = seg1.Split(intersect.ParameterB);
               Curve longerSeg1 = split1[0].GetLength() > split1[1].GetLength() ? split1[0] : split1[1];
