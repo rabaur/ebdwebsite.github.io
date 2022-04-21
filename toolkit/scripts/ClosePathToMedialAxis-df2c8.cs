@@ -54,6 +54,7 @@ public abstract class Script_Instance_df2c8 : GH_ScriptInstance
   #region Runscript
   private void RunScript(List<Curve> medialAxisCurveList, List<Point3d> nodePoint3dList, ref object connectingCurveList)
   {
+    // Check.
     List<Curve> result = new List<Curve>();
     foreach (Point3d node in nodePoint3dList)
     {

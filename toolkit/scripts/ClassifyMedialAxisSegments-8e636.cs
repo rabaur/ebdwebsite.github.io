@@ -85,9 +85,9 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
     }
     int[] types = new int[queryPoints.Count];
     System.Threading.Tasks.Parallel.For(0, queryPoints.Count, i =>
-    {
+      {
       types[i] = ClassifyMedialAxisPoint(queryPoints[i], CornerPointList, BoundaryCurveList);
-    });
+      });
 
     List<int> typeList = types.ToList();
 
@@ -306,7 +306,7 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
         return FindSwitchPoint(medialAxisCurve, cornerPointList, boundaryCurveList, prevParam, queryParam, prevType);
       }
 
-      // If the queryType is equal to the lowerType, we sample in the upper interval.
+        // If the queryType is equal to the lowerType, we sample in the upper interval.
       else
       {
         return FindSwitchPoint(medialAxisCurve, cornerPointList, boundaryCurveList, queryParam, nextParam, prevType);
@@ -315,12 +315,12 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   }
 
   private double FindStartSwitchPoint(
-    Curve medialAxisCurve, 
-    List<Point3d> cornerPointList, 
-    List<Curve> boundaryCurveList, 
-    double prevParam, 
-    double nextParam, 
-    int nextType, 
+    Curve medialAxisCurve,
+    List<Point3d> cornerPointList,
+    List<Curve> boundaryCurveList,
+    double prevParam,
+    double nextParam,
+    int nextType,
     Chord oldChord)
   {
     // We test in the middle of the interval delimited by lowerParam and higherParam.
@@ -423,17 +423,17 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   {
     PointOnCurve[] closestPoints = new PointOnCurve[boundaryCurveList.Count];  // Holds closest point on each boundary-segment to point on medial axis.
     double[] distances = new double[boundaryCurveList.Count];  // Holds the distances to the closest points.
-    
+
     // Determine closest points on boundary segments and distances to them.
     System.Threading.Tasks.Parallel.For(0, boundaryCurveList.Count, i =>
-    {
+      {
       double closestParam = 0.0;
       boundaryCurveList[i].ClosestPoint(queryPoint, out closestParam);
       Point3d closestPoint = boundaryCurveList[i].PointAt(closestParam);
       distances[i] = queryPoint.DistanceTo(closestPoint);
       closestPoints[i] = new PointOnCurve(boundaryCurveList[i], closestParam, closestPoint);
-    });
-    
+      });
+
     Array.Sort(distances, closestPoints);
     Point3d c0 = closestPoints[0].point;
     int idx = 1;
@@ -454,9 +454,9 @@ public abstract class Script_Instance_8e636 : GH_ScriptInstance
   {
     bool[] isClose = new bool[pointList.Count];
     System.Threading.Tasks.Parallel.For(0, pointList.Count, i =>
-    {
+      {
       isClose[i] = queryPoint.DistanceTo(pointList[i]) < tol;
-    });
+      });
     for (int i = 0; i < isClose.Length; i++)
     {
       if (isClose[i])

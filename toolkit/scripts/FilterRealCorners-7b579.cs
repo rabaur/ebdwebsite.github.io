@@ -56,6 +56,7 @@ public abstract class Script_Instance_7b579 : GH_ScriptInstance
   {
     // Check for each corner point if it is adjacent to a line, but not to its endpoints.
     // That makes it not a real corner.
+    // Check.
     List<Point3d> realCorners = new List<Point3d>();
     foreach (Point3d corner in CornerPointList)
     {
