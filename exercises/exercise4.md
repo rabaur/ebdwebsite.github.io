@@ -39,10 +39,9 @@ There is a new version of the script and example project. With your feedback, we
 Here is a summary of the changes:
 - **Better Stability and Speed**: We have eliminated a few bugs that lead to faulty behaviour and improved execution speed.
 - **Support for "holes" in Layout**: Previously, the graph was generated in the whole area that was enclosed by the curves of your layout. Now, you need to     delimit the areas that define boundaries (to the inside as well as the outside of the layout) as _closed curves_. To do so, break up the boundaries in straight segments and join them. The result should look something like this:
-    <p float="left">
-    <img src="/assets/images/outer_boundary.JPG" width="100" />
-    <img src="/assets/images/inner_boundaries.JPG" width="100" /> 
-    </p>
+    Outer Boundaries                        | Inner Boundaries
+    :--------------------------------------:|:----------------------------------------:
+    ![](/assets/images/outer_boundary.JPG)  |  ![](/assets/images/inner_boundaries.JPG)
     This will speed up calculation and give you more representative values for the ICD.
 - **Configurable Graph Visualization**: We exposed some parameters to adapt the scale and position of the GraphBuilder visualization. This can be helpful if your graph is particularly large or small:
     <p float="left">
