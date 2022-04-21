@@ -39,20 +39,19 @@ There is a new version of the script and example project. With your feedback, we
 Here is a summary of the changes:
 - **Better Stability and Speed**: We have eliminated a few bugs that lead to faulty behaviour and improved execution speed.
 - **Support for "holes" in Layout**: Previously, the graph was generated in the whole area that was enclosed by the curves of your layout. Now, you need to     delimit the areas that define boundaries (to the inside as well as the outside of the layout) as _closed curves_. To do so, break up the boundaries in straight segments and join them. The result should look something like this:
-
-    Outer Boundaries                             | Inner Boundaries
-    :-------------------------------------------:|:----------------------------------------:
-    ![Outer](/assets/images/exercise4/outer_boundary.JPG)  |  ![Inner](/assets/images/exercise3/inner_boundaries.JPG)
-
+    <p float="left">
+    <img src="/assets/images/exercise4/outer_boundary.JPG" width="500" />
+    <img src="/assets/images/exercise4/inner_boundaries.JPG" width="500" /> 
+    </p>
     This will speed up calculation and give you more representative values for the ICD.
 - **Configurable Graph Visualization**: We exposed some parameters to adapt the scale and position of the GraphBuilder visualization. This can be helpful if your graph is particularly large or small:
     <p float="left">
-    <img src="/assets/images/exercise4/graphbuilder_vis.JPG" width="100" />
-    <img src="/assets/images/exercise4/graphbuilder.png" width="100" /> 
+    <img src="/assets/images/exercise4/graphbuilder_vis.JPG" width="500" />
+    <img src="/assets/images/exercise4/graphbuilder.png" width="500" /> 
     </p>
 - **Configurable Position**: We exposed some parameters to adapt the placement of the numbers corresponding to each measure (SCI: XXX, YTI: YYY, ICD: ZZZ). To set it, right click > set point / set vector > and then choose the corresponding point / draw the vector on the Rhino screen. It will displace the measures from point "Measures Position" by "Measures Displacement.
     <p float="left">
-    <img src="/assets/images/exercise4/measure_positioning.JPG" width="100" />
+    <img src="/assets/images/exercise4/measure_positioning.JPG" width="500" />
     </p>
 
 
