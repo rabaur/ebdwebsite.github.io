@@ -48,9 +48,7 @@ You will receive an email from _support@mcneel.com_ with the download link and a
 
 _DecodingSpaces_ is a plugin for Grasshopper.
 
-Visit [https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/](https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/) and download the .zip file. Make sure you have made the plugin runnable by following the steps on this website.
-
-Follow the instructions of this blog [https://www.giancadm.com/plugins-install/](https://www.giancadm.com/plugins-install/) to install the plugin.
+Visit [https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/](https://toolbox.decodingspaces.net/download-decodingspaces-toolbox/). **IMPORTANT**: Choose the version 2020.07. Install according to the instructions on the website.
 
 * * *
 
