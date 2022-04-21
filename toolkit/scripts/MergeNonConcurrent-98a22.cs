@@ -99,7 +99,16 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
           }
           potentialBreps.Add(neighbor.brep);
           //---------------- BUGGY --------------------//
-          bool isConvex = IsConvex(GetUniqueCorners(potentialBreps));
+          bool isConvex = false;
+          try
+          {
+            isConvex = IsConvex(GetUniqueCorners(potentialBreps));
+          }
+          catch
+          {
+            isConvex = true;
+            Weird = GetUniqueCorners(potentialBreps);
+          }
           bool isSmall = false;
           try
           {
@@ -134,7 +143,6 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
       }
       ContractNodes(graphCopy, joinable, 2);
     }
-    Weird = toJoin;
     ToJoinNeighCount = toJoinNeighCount;
     // Deconstruct graph.
     List<Brep> outBreps = new List<Brep>();
@@ -559,10 +567,35 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     List<Point3d> hull = new List<Point3d>();
     int last = startIdx;
     int next;
+    int cnt = 0;
+    List<int> indices = new List<int>();
+    List<string> debugStrings = new List<string>();
     do
     {
+      cnt++;
+      if (cnt == 1000)
+      {
+        Print("except " + startIdx);
+        foreach (int index in indices)
+        {
+          Print(index.ToString());
+        }
+        foreach (string debugString in debugStrings)
+        {
+          Print(debugString);
+        }
+        throw new Exception("Probably stuck in a while loop." + startIdx);
+      }
       hull.Add(points[last]);
       next = (last + 1) % points.Count;
+
+      // Compute center of orientability.
+      Point3d center = Point3d.Origin;
+      for (int i = 0; i < points.Count; i++)
+      {
+        center += points[i];
+      }
+      center /= points.Count;
       for (int i = 0; i < points.Count; i++)
       {
         if (Orientation(points[last], points[i], points[next]) == 2)
@@ -572,21 +605,155 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
         }
         else if (Orientation(points[last], points[i], points[next]) == 0)
         {
-          if (points[last].DistanceTo(points[i]) > points[last].DistanceTo(points[next]))
+          // Need signed distance along line that points are collinear on.
+          double angleI = Vector3d.VectorAngle(Vector3d.XAxis, points[i] - center);
+          double angleLast = Vector3d.VectorAngle(Vector3d.XAxis, points[last] - center);
+          double angleNext = Vector3d.VectorAngle(Vector3d.XAxis, points[next] - center);
+          double minAngle = Math.Min(Math.Min(angleI, angleLast), angleNext);
+          angleI -= minAngle;
+          angleLast -= minAngle;
+          angleNext -= minAngle;
+          int signLast2I = Math.Sign(angleI - angleLast);
+          int signLast2Next = Math.Sign(angleNext - angleLast);
+          if (signLast2I * points[last].DistanceTo(points[i]) > signLast2Next * points[last].DistanceTo(points[next]))
           {
+            debugStrings.Add("Changed " + next + " to " + i + " from " + last);
             next = i;
           }
         }
       }
+      indices.Add(last);
       last = next;
     }
     while (last != startIdx);
     return hull;
   }
 
+  class PointComparer : Comparer<Point3d>
+  {
+    public Point3d center;
+
+    private int Orientation(Point3d p1, Point3d p2, Point3d p3)
+    {
+      double area = (p2.Y - p1.Y) * (p3.X - p2.X) - (p2.X - p1.X) * (p3.Y - p2.Y);
+
+      if (area > 0.0)
+      {
+        return 1; // collinear
+      }
+      if (area < 0.0)
+      {
+        return -1;
+      }
+      return 0;
+    }
+
+    public override int Compare(Point3d x, Point3d y)
+    {
+      int orientation = Orientation(center, x, y);
+      if (orientation == 0)
+      {
+        // Points are collinear.
+        if (center.DistanceTo(y) >= center.DistanceTo(x))
+        {
+          return -1;  // Second element is greater than first one.
+        }
+        return 1;  // First element is greater than second one.
+      }
+      return orientation;
+    }
+  }
+
+  // Diese Methode gibt das zweitoberste Element im Stack der Punkte zur�ck
+  private Point3d GetNextToTopElement(Stack<Point3d> points)
+  {
+    Point3d topElement = points.Peek();
+    points.Pop();
+    Point3d nextToTopElement = points.Peek();
+    points.Push(topElement);
+    return nextToTopElement;
+  }
+
+  List<Point3d> ConvexHull(List<Point3d> points)
+  {
+    List<Point3d> convexHull = new List<Point3d>();
+    double minY = points[0].Y;
+    int minIndex = 0;
+    int nPoints = points.Count;
+
+    // Determines the most left, and for ties most bottom, point in the input list.
+    for (int i = 1; i < nPoints; i++)
+    {
+      double y = points[i].Y;
+      if (y < minY || y == minY && points[i].X < points[minIndex].X)
+      {
+        minY = points[i].Y;
+        minIndex = i;
+      }
+    }
+
+    // Put minimum element at first position.
+    Point3d temp = points[0];
+    points[0] = points[minIndex];
+    points[minIndex] = temp;
+
+    // Initialise comparer.
+    PointComparer pComparer = new PointComparer
+    {
+      center = points[0]  // Set to minimum element.
+    };
+
+    // Sort points.
+    points.Sort(pComparer);
+
+    // If there are at least two points with equal angle to minimum element, remove all except the one that is furthest away.
+    int nPointsRed = 1;  // Number of points that are not collinear with the first point.
+    for (int i = 1; i < nPoints; i++)
+    {
+      // Remove points as long as they are collinear.
+      while (i < nPoints - 1 && Orientation(pComparer.center, points[i], points[i + 1]) == 0)
+      {
+        i++;
+      }
+      points[nPointsRed] = points[i];
+      nPointsRed++;
+    }
+
+    // If there are less than three points, the hull is trivially convex.
+    if (nPointsRed < 3)
+    {
+      return points;
+    }
+
+    // Create stack and add first three points.
+    Stack<Point3d> pointStack = new Stack<Point3d>();
+    pointStack.Push(points[0]);
+    pointStack.Push(points[1]);
+    pointStack.Push(points[2]);
+
+    // Go through the remaining points.
+    for (int i = 3; i < nPointsRed; i++)
+    {
+      while (pointStack.Count > 1 && Orientation(GetNextToTopElement(pointStack), pointStack.Peek(), points[i]) != -1)
+      {
+        pointStack.Pop();
+      }
+      pointStack.Push(points[i]);
+    }
+
+    // Add points from stack to convex hull.
+    while (pointStack.Count != 0)
+    {
+      convexHull.Add(pointStack.Peek());
+      pointStack.Pop();
+    }
+
+    return convexHull;
+  }
+
   private bool IsConvex(List<Point3d> points)
   {
-    List<Point3d> hull = ConvexHullXY(points);
+    List<Point3d> hull = ConvexHull(points);
     Point3d center = Point3d.Origin;
     foreach (Point3d point in hull)
     {
@@ -623,15 +790,19 @@ public abstract class Script_Instance_98a22 : GH_ScriptInstance
     return true;
   }
 
-  private int Orientation(Point3d p, Point3d q, Point3d r)
+  private int Orientation(Point3d p1, Point3d p2, Point3d p3)
   {
-    double val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+    double area = (p2.Y - p1.Y) * (p3.X - p2.X) - (p2.X - p1.X) * (p3.Y - p2.Y);
 
-    if (val == 0.0)
+    if (area > 0.0)
     {
-      return 0; // collinear
+      return 1; // collinear
     }
-    return (val > 0) ? 1 : 2; // clock or counterclock wise
+    if (area < 0.0)
+    {
+      return -1;
+    }
+    return 0;
   }
   #endregion
 }
