@@ -64,13 +64,13 @@ Finally, restart Rhino and Grasshopper to activate the plugin.
 
 * * *
 
-## 6. Installing Human
+## 6. Installing Human UI
 
-_Human_ is a plugin for Grasshopper.
+_Human UI_ is a plugin for Grasshopper.
 
-Visit [https://www.food4rhino.com/en/app/human](https://www.food4rhino.com/en/app/human) and download _Human for Rhino 6_. 
+Visit [https://www.food4rhino.com/en/app/human-ui](https://www.food4rhino.com/en/app/human) and download _Human UI 0.8.1.3_. 
 
-To install the plugin, open Rhino and then open Grasshopper by typing "Grasshopper" in the command-line of Rhino. In Grasshopper, choose _File_ - _Special Folders_ - _Components Folder_ and drag and drop the downloaded file into the folder that just opened. 
+You will download an executable file, which no need to double-click on to proceed with the installation.
 
 Finally, restart Rhino and Grasshopper to activate the plugin.
 
