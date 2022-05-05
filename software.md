@@ -68,7 +68,7 @@ Finally, restart Rhino and Grasshopper to activate the plugin.
 
 _Human UI_ is a plugin for Grasshopper.
 
-Visit [https://www.food4rhino.com/en/app/human-ui](https://www.food4rhino.com/en/app/human) and download _Human UI 0.8.1.3_. 
+Visit [https://www.food4rhino.com/en/app/human-ui](https://www.food4rhino.com/en/app/human-ui) and download _Human UI 0.8.1.3_. 
 
 You will download an executable file, which no need to double-click on to proceed with the installation.
 
