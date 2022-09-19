@@ -1,13 +1,13 @@
 - selector: example_slider
   captions: true
   images:
-    - src: "/assets/images/EBDposter22 - Poster1.jpeg"
+    - src: "/assets/images/EBDposter_HS22_P1.jpeg"
       alt: image one
-    - src: "/assets/images/EBDposter22 - Poster2.jpeg"
+    - src: "/assets/images/EBDposter_HS22_P2.jpeg"
       alt: image two
-    - src: "/assets/images/EBDposter22 - Poster3.jpeg"
+    - src: "/assets/images/EBDposter_HS22_P3.jpeg"
       alt: image three
-    - src: "/assets/images/EBDposter22 - Poster4.jpeg"
+    - src: "/assets/images/EBDposter_HS22_P4.jpeg"
       alt: image four
   settings:
     height: "'auto'"
