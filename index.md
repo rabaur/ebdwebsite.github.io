@@ -37,22 +37,22 @@ At the same time, the field of cognitive science, supported by empirical methods
 
 ## Course Schedule
 
-| C# | Date   | Description                                                                                                            | Exercise            |
-| -- | ------ | ---------------------------------------------------------------------------------------------------------------------  | ------------------- |
-| #1  | 21.09. | **Semester Kickoff - Introduction Class** | _Handout: EXC1 (in pairs)_ |
-| #2  | 28.09. | **Part 1:** Students present EXC1 **Part 2:** Student+Caregivers working groups |  |
-| #3  | 05.10. | **Agent-Based Simulations** to analyze design tradeoffs | _Handout: EXC2 (in pairs)_ |
-| #4  | 12.10. | **Part 1:** Students present EXC2 **Part 2:** Student working groups |  |
-| #5  | 19.10. | **Topological Analysis** of hospital typologies to predict quality of care, nursing efficiency and wayfinding difficulties | _Handout: EXC3 (in pairs)_ | 
+| C# | Date | Description | Exercise | Recording |
+| -- | -- | --  | -- | -- |
+| #1  | 21.09. | **Semester Kickoff - Introduction Class** | _Handout: EXC1 (in pairs)_ | [Link](https://polybox.ethz.ch/index.php/s/20V7kfSwGrfxN7v) |
+| #2  | 28.09. | **Part 1:** Students present EXC1 **Part 2:** Student+Caregivers working groups |  | |
+| #3  | 05.10. | **Agent-Based Simulations** to analyze design tradeoffs | _Handout: EXC2 (in pairs)_ | |
+| #4  | 12.10. | **Part 1:** Students present EXC2 **Part 2:** Student working groups |  | |
+| #5  | 19.10. | **Topological Analysis** of hospital typologies to predict quality of care, nursing efficiency and wayfinding difficulties | _Handout: EXC3 (in pairs)_ | |
 | #6  | ~~26.10~~ | D-ARCH seminar week **no class** | |
-| #7  | 02.11. | **Part 1:** Students present EXC3 (Topological analysis) **Part 2:** Student working groups | |   
-| #8  | 09.11. | **Virtual Reality** to analyse patient and caregivers' experience in Emergency Departments | _Handout: EXC 4 (in pairs)_ |
-| #9  | 16.11. | **Part 1:** Students present EXC4 (VR) **Part 2:** Student working groups | |
-| #10  | 23.11. | **Student working groups:** Mirror Mirror on the wall - which emergency department typology is the “best” of them all? How is it better? How to interpret results and communicate it as evidence in the design process?  | |
-| #11 | 30.11. | **Interactive poster** design session | |
-| #12 | 07.12. | **Final Presentations Poster Session (in person) including a best poster award competition!** | _(in pairs)_ |
-| #13 | ~~14.12.~~ | Design studio - **no class** | |
-| #14 | ~~21.12.~~ | Design studio - **no class** | |
+| #7  | 02.11. | **Part 1:** Students present EXC3 (Topological analysis) **Part 2:** Student working groups | | |
+| #8  | 09.11. | **Virtual Reality** to analyse patient and caregivers' experience in Emergency Departments | _Handout: EXC 4 (in pairs)_ | |
+| #9  | 16.11. | **Part 1:** Students present EXC4 (VR) **Part 2:** Student working groups | | |
+| #10  | 23.11. | **Student working groups:** Mirror Mirror on the wall - which emergency department typology is the “best” of them all? How is it better? How to interpret results and communicate it as evidence in the design process?  | | |
+| #11 | 30.11. | **Interactive poster** design session | | |
+| #12 | 07.12. | **Final Presentations Poster Session (in person) including a best poster award competition!** | _(in pairs)_ | |
+| #13 | ~~14.12.~~ | Design studio - **no class** | | |
+| #14 | ~~21.12.~~ | Design studio - **no class** | | |
 
 * * *
 
