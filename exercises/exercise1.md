@@ -4,18 +4,15 @@ title: Exercise1
 permalink: /exercise1/
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Software]({{ site.baseurl }}{% link software.md %}) 
+[Software]({{ site.baseurl }}{% link software.md %}) | [Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})
 
 # Exercise 1: Reading on Evidence-Based Design for Healthcare (in pairs or groups of up to 3 students) 
 
 ## Submission Details 
-**Submission date**: Online: 27.09.2022 (23:59 Zurich time)
-
-**Submission format**: A presenation (A presentation (10 slides,5 minutes max) + Evidence-Based Design cards (template provided on Miro, link provided in email) 
-
-**Presentation date**: 28.09.2022 in class, 5 minutes per group
-
-**Miro link (for the cards)**: provided via email
+- **Submission date**: Online: 27.09.2022 (23:59 Zurich time)
+- **Submission format**: A presenation (A presentation (10 slides,5 minutes max) + Evidence-Based Design cards (template provided on Miro, link provided in email) 
+- **Presentation date**: 28.09.2022 in class, 5 minutes per group
+- **Miro link (for the cards)**: provided via email
 
 
 ## Reading Assignment Instructions 
@@ -25,13 +22,9 @@ Choose one of the papers in the list, read it and answer the following questions
 **IMPORTANT: submissions are individual and each paper can only be chosen once by one student, please register your choice of paper here: [Reading List](https://docs.google.com/spreadsheets/d/1rc-Cqsg77d6jgiE8nTF9AUOyNM0h71KzvZEkXmHIEQo/edit?usp=sharing) .**
 
   * Who are the authors?
-
   * What **questions** does the paper try to answer? 
-
   * Which **methods** are used to answer the question?
-
   * What are the **key results** reported? How does it address the initial question?
-
   * What are the **key design take away messages** from this paper? 
 
   * **Be critical! What arguments in the paper require more evidence?  Do you agree with the interpretation of the results, do you find the paper    relevant for architectural design?** 

@@ -15,11 +15,11 @@ image_sliders:
 
 ## Course Lecturers
 Dr.Michal Gath-Morad, michal.gath@gess.ethz.ch, 
-Prof.Dr.Christoph Hölscher 
+Prof. Dr. Christoph Hölscher 
 ## Guest Lecturers
 Christian Veddeler,
-Dr.Laura Narvaez Zertuche,
-Dr.Leonel Aguilar
+Dr. Laura Narvaez Zertuche,
+Dr. Leonel Aguilar
 ## Teaching Assistant 
 Raphaël Baur, rabaur@student.ethz.ch
 
