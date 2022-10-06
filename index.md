@@ -4,7 +4,8 @@ image_sliders:
   - example_slider
 ---
 
-[Software]({{ site.baseurl }}{% link software.md %}) | [Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %})
+[Software]({{ site.baseurl }}{% link software.md %}) | [Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %})
+
 <!--
 [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %}) | [Exercise 4]({{ site.baseurl }}{% link exercises/exercise4.md %}) | [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) | [Software]({{ site.baseurl }}{% link software.md %}) | [Final Project]({{ site.baseurl }}{% link final_project.md %})
 -->
@@ -14,14 +15,14 @@ image_sliders:
 * * *
 
 ## Course Lecturers
-Dr.Michal Gath-Morad, michal.gath@gess.ethz.ch, 
+Dr. Michal Gath-Morad, _michal.gath@gess.ethz.ch_, 
 Prof. Dr. Christoph Hölscher 
 ## Guest Lecturers
 Christian Veddeler,
 Dr. Laura Narvaez Zertuche,
 Dr. Leonel Aguilar
 ## Teaching Assistant 
-Raphaël Baur, rabaur@student.ethz.ch
+Raphaël Baur, _rabaur@student.ethz.ch_
 
 * * *
 
