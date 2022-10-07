@@ -42,7 +42,7 @@ At the same time, the field of cognitive science, supported by empirical methods
 | -- | -- | --  | -- | -- |
 | #1  | 21.09. | **Semester Kickoff - Introduction Class** | _Handout: EXC1 (in pairs)_ | [Link](https://polybox.ethz.ch/index.php/s/20V7kfSwGrfxN7v) |
 | #2  | 28.09. | **Part 1:** Students present EXC1 **Part 2:** Student+Caregivers working groups |  | |
-| #3  | 05.10. | **Agent-Based Simulations** to analyze design tradeoffs | _Handout: EXC2 (in pairs)_ | |
+| #3  | 05.10. | **Agent-Based Simulations** to analyze design tradeoffs | _Handout: EXC2 (in pairs)_ | [Link](https://polybox.ethz.ch/index.php/s/vdQBiz11VJCI3IJ) |
 | #4  | 12.10. | **Part 1:** Students present EXC2 **Part 2:** Student working groups |  | |
 | #5  | 19.10. | **Topological Analysis** of hospital typologies to predict quality of care, nursing efficiency and wayfinding difficulties | _Handout: EXC3 (in pairs)_ | |
 | #6  | ~~26.10~~ | D-ARCH seminar week **no class** | |
