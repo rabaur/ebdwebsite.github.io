@@ -74,5 +74,7 @@ The UnityProject (to get accustomed with the setting) and tutorial videos:
         <figcaption>An example of how to set up the new EngineScript</figcaption>
     </figure>
 - [Video 4](https://polybox.ethz.ch/index.php/s/ubLAQQ0NZtmjwKy): Visualization
+
     Update: Previous video showed an outdated version of the script. Created new video.
+
 - [Video 5](https://polybox.ethz.ch/index.php/s/kHqzedOnTPVJEz7): Recording Footage
