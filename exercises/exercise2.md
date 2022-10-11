@@ -50,6 +50,9 @@ What will you need to do?
 ## Unity tutorial: Running the simulation in Unity3D
 The UnityProject (to get accustomed with the setting) and tutorial videos:
 - [UnityProject](https://polybox.ethz.ch/index.php/s/xT5jVl4cjD3IidW) of the tutorial (you can either build upon this project or make one from scratch).
+
+    _Update 11.10.2020, 17:26_ : TaskScript.cs and NewVisualizer.cs now remove leading and trailing whitespace for ```Task Name``` and ``Àgent Type``
+    
 - [Video 1](https://polybox.ethz.ch/index.php/s/uMOz8s2afNEMUDO): Import and setup of the scene
 - [Video 2](https://polybox.ethz.ch/index.php/s/dI1hflUU9iJ4j02): Setting up points of interest
 - [Video 3](https://polybox.ethz.ch/index.php/s/7I2T8U6SWxjZmEm): Defining task
@@ -75,6 +78,6 @@ The UnityProject (to get accustomed with the setting) and tutorial videos:
     </figure>
 - [Video 4](https://polybox.ethz.ch/index.php/s/ubLAQQ0NZtmjwKy): Visualization
 
-    Update: Previous video showed an outdated version of the script. Created new video.
+    _Update_: Previous video showed an outdated version of the script. Created new video.
 
 - [Video 5](https://polybox.ethz.ch/index.php/s/kHqzedOnTPVJEz7): Recording Footage
