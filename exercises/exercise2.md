@@ -52,6 +52,26 @@ The UnityProject (to get accustomed with the setting) and tutorial videos:
 - [UnityProject](https://polybox.ethz.ch/index.php/s/xT5jVl4cjD3IidW) of the tutorial (you can either build upon this project or make one from scratch).
 - [Video 1](https://polybox.ethz.ch/index.php/s/uMOz8s2afNEMUDO): Import and setup of the scene
 - [Video 2](https://polybox.ethz.ch/index.php/s/dI1hflUU9iJ4j02): Setting up points of interest
-- [Video 3](https://polybox.ethz.ch/index.php/s/7I2T8U6SWxjZmEm): Analysis: Defining task
+- [Video 3](https://polybox.ethz.ch/index.php/s/7I2T8U6SWxjZmEm): Defining task
+
+    The provided video shows an older version of _EngineScript.cs_. The new version also requires you to set the **Data Folder**=_your_data_folder_name_ and **File Name**=_your_file_name_ parameters. The **Data Folder** indicates the folder _within_ your Unity project folder where the experimental data is saved to. Once a simulation is run, your data will be saved in this folder. It is a the top level of your Unity Project directory, which you can find via the Unity Hub.
+
+    <figure>
+        <img src="/assets/images/exercise2/where.png" style="max-width: 500px;"
+            alt="Jekyll logo" />
+        <figcaption>This is the Jekyll logo</figcaption>
+    </figure>
+
+    <figure>
+        <img src="/assets/images/exercise2/unity_folder.png" style="max-height: 300px;"
+            alt="Jekyll logo" />
+        <figcaption>Where the data is saved to</figcaption>
+    </figure>
+
+    <figure>
+        <img src="/assets/images/exercise2/engine_config.png" style="max-width: 500px;"
+            alt="Jekyll logo" />
+        <figcaption>An example of how to set up the new EngineScript</figcaption>
+    </figure>
 - [Video 4](https://polybox.ethz.ch/index.php/s/ubLAQQ0NZtmjwKy): Visualization
 - [Video 5](https://polybox.ethz.ch/index.php/s/kHqzedOnTPVJEz7): Recording Footage
