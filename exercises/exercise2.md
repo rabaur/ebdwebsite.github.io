@@ -21,7 +21,9 @@ permalink: /exercise2/
     - Average activity duration per occupant group or individual occupant/agent
     - Interactions between agents/collisions (can reflect potential for social interactions or interruptions)
 
-**Submission date:** 12.10.2022, 16:00
+**Submission date:** ~~12.10.2022, 16:00~~ 19.10.2022, 16:00
+
+**Team tutorials:** 12.10.2022, startin at 18:00. Please inscribe for a slot [here](https://doodle.com/meeting/participate/id/epQx2Lpa).
 
 **Presentation:** 12.10.2022, in class. Each team will get up to 10 minutes to present the results of their exercise
 
