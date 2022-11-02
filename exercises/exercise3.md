@@ -9,7 +9,7 @@ permalink: /exercise3/
 #  Exc3: Comparing users’ spatial experience across Emergency Department Layouts 
 
 
-![Comparing users’ spatial experience across Emergency Department Layouts ](Exc3.png)
+![Comparing users’ spatial experience across Emergency Department Layouts ](/assets/images/Exc3.png)
 
 
 
