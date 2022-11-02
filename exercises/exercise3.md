@@ -4,27 +4,33 @@ title: Exercise3
 permalink: /exercise3/
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %}) | [Exercise 4]({{ site.baseurl }}{% link exercises/exercise4.md %}) | [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) | [Software]({{ site.baseurl }}{% link software.md %}) | [Final Project]({{ site.baseurl }}{% link final_project.md %})
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %})  | [Software]({{ site.baseurl }}{% link software.md %}) 
 
-#  Exercise 2: Comparing Users’ Wayfinding across Hospital Typologies
+#  Exc3: Comparing users’ spatial experience across Emergency Department Layouts 
+
+
+![Comparing users’ spatial experience across Emergency Department Layouts ](Exc3.png)
+
+
 
 ## Overview
 
-- The **goal** of this exercise is to analyze **how** the **configuration** of different hospital typologies **affects wayfinding performance** and experience.
-- To complete the exercise you need to:
-    - Choose two hospital layouts
-    - Hypothesize (based on your intuition): Which layout  would support more efficient wayfinding? Why?
-    - Complete Part 1: Generate a 3D model for each typology (Rhino, VisualARQ) and import it into Unity3D
-    - Complete Part 2: Conduct a small scall behavioural experiment to assess differences in wayfinding between the two typologies
-    - Complete Part 3: Critically analyse participants’ wayfinding behaviour using the data collected and try to relate the observed differences/similarities between typologies to the configuration of the environment
+Exc3: compare users’ experience for the same task/s across typologies (in pairs) , 
+Team tutorials: 9.11.22 Final submission in class: 16.11.22
 
-## Part 1: Generate a 3D Model for each Typology and Import it into Unity
-### Due date: 17.02.2022, 23:59
-- Choose and model 2 hospital typologies
-- To model the layouts we will use VisualArq for Rhino. If you prefer to use another modelling software, you can do so.
-However, note that you will need to use Rhino in future exercises, so some early experience might be beneficial.
-- A tutorial showing how to model a floor plan from an image using visualarq can be found [here](https://drive.google.com/file/d/1NVp7wVHzlMYqUnkfs7qSa9iyu5t3iO9D/view)
-- For additional VisualARQ tutorials, please visit [this link](https://www.visualarq.com/learn/videos/)
+Stages of the exercise: 
+
+1. Define 1-2 tasks and ask 5 different participants to perform these tasks in each of the ED layouts you have modelled (do consider giving them a brief training on how to move in VR before you start, but not in the layout that you're testing). 
+
+2. Analyse the results (as you learned in class) using the data collected in each trial performed by a single participant in each layout – did participants in each layout behave similarly? 
+
+3. Calculate the average experience for all participants in each layout. 
+How is the user experience afforded by each layout different?
+
+4. Link your findings with scientific evidence:  can this type of individual experience (e.g., wayfinding efficiency) affect organisational outcomes (e.g., costs, medical errors)   
+
+5. The step-by-step tutorial is recorded in the following videos, instricting you on how to setup your scene and run the experiment: 
+
 - Export both typologies from Rhino as .fbx files (or another format that is accepted by Unity3D) by following these steps:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/XsIkjZUcI-U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -37,25 +43,25 @@ However, note that you will need to use Rhino in future exercises, so some early
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/FNdLj3VyhZ0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-- Drag and drop the layouts into the scene and take a screenshot from the resulting scene.
+- Drag and drop the layouts into the scene and take a screenshot from the resulting scene (make sure you have the background set to white).
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/uPNTZLxRLtI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Submission Materials
-- Upload screenshot of Unity3D scene to Miro board (link will be sent via email).
+A 10 slide presentation including your experiment setup, instruction for participants, video capture of selected trials, analysis of results using the visualisation and summary data including legends, comparison of experience across layouts, a critical slide linking your findings back to scientific evidence (how does this individual experience may contribute to organisational outcomes)
 
 # Part 2 & 3: VR Experiment
 **_Due date (extended) 01.04.2022, 23:59_**
 
-Please find the Unity Project [here](https://drive.google.com/file/d/1xdkZAqEDyKXFjrkE_1Gnuf3OTm1wHX4n/view?usp=sharing)
+Please find the Unity Project [here](https://polybox.ethz.ch/index.php/s/zfszG6nJkxDiscZ)
 
 Then, follow these steps:
 - Download the Unity Project
-- Unzip it (3.6 GB)
+- Unzip it 
 - Open Unity Hub
 - In the tab "Project", select "Add"
 - Search the project you have just downloaded and indicate its location
-- Open the project. It will run the setup. If you are on a Mac, agree to "Switch Target"
+- Open the project. It will run the setup. If you are on a Windows, agree to "Switch Target"
 
 ## Setting Up the Unity Scene
 
@@ -72,6 +78,7 @@ Then, follow these steps:
 ## Summarizing the VR-Experiment Data
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ezfUbiOHhp8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 
 
