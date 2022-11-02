@@ -33,7 +33,7 @@ How is the user experience afforded by each layout different?
 
 
 ### Submission Materials
-A 10 slide presentation including your experiment setup, instruction for participants, video capture of selected trials, analysis of results using the visualisation and summary data including legends, comparison of experience across layouts, a critical slide linking your findings back to scientific evidence (how does this individual experience may contribute to organisational outcomes)
+A 10 slide presentation including your experiment setup, instruction for participants, video capture of selected trials, analysis of results using the visualisation and summary data including legends, comparison of experience across layouts, a critical slide linking your findings back to scientific evidence (how does this individual experience may contribute to organisational outcomes).
 
 # Step-by-step Tutorial
 
