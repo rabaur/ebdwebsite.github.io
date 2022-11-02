@@ -31,27 +31,11 @@ How is the user experience afforded by each layout different?
 
 5. The step-by-step tutorial is recorded in the following videos, instricting you on how to setup your scene and run the experiment: 
 
-- Export both typologies from Rhino as .fbx files (or another format that is accepted by Unity3D) by following these steps:
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/XsIkjZUcI-U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-- Create a fresh Unity project by following these steps:
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/YUZENcNaEMY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-- Import the .fbx files (or the other format you have chosen) into the new Unity project by following these steps.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/FNdLj3VyhZ0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-- Drag and drop the layouts into the scene and take a screenshot from the resulting scene (make sure you have the background set to white).
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/uPNTZLxRLtI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Submission Materials
 A 10 slide presentation including your experiment setup, instruction for participants, video capture of selected trials, analysis of results using the visualisation and summary data including legends, comparison of experience across layouts, a critical slide linking your findings back to scientific evidence (how does this individual experience may contribute to organisational outcomes)
 
-# Part 2 & 3: VR Experiment
-**_Due date (extended) 01.04.2022, 23:59_**
+# Step-by-step Tutorial
 
 Please find the Unity Project [here](https://polybox.ethz.ch/index.php/s/zfszG6nJkxDiscZ)
 
@@ -62,8 +46,10 @@ Then, follow these steps:
 - In the tab "Project", select "Add"
 - Search the project you have just downloaded and indicate its location
 - Open the project. It will run the setup. If you are on a Windows, agree to "Switch Target"
+- The Unity version of this example project (as shown in class) is 2021.3.11f1 so make sure you install it on Unity hub
+- To see the scence that was shown in class navigate to Assets/Scenes/Scene_EBD_21022.unity
 
-## Setting Up the Unity Scene
+## Setting Up your own Unity Scene
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/B8-yWv6ArTA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
