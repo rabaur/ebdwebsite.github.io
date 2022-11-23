@@ -3,7 +3,7 @@ layout: default
 title: Exercise4
 ---
 
-[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %}) | [Exercise 4]({{ site.baseurl }}{% link exercises/exercise4.md %}) | [Lecture Slides]({{ site.baseurl }}{% link ebd_lectureslides.md %}) | [Software]({{ site.baseurl }}{% link software.md %}) 
+[Exercise 1]({{ site.baseurl }}{% link exercises/exercise1.md %}) | [Exercise 2]({{ site.baseurl }}{% link exercises/exercise2.md %}) | [Exercise 3]({{ site.baseurl }}{% link exercises/exercise3.md %}) | [Exercise 4]({{ site.baseurl }}{% link exercises/exercise4.md %}) | [Software]({{ site.baseurl }}{% link software.md %}) 
 
 #  Analyzing behavioral differences across hospital typologies (submission: 7.12.2023, done in pairs)
 Following the tutorial steps, pairs of students are asked to compare two ED typologies (chosen in previous exercises) for each of the following measures:
