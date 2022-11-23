@@ -27,7 +27,7 @@ The relative trip frequencies of selected traffic links multiplied by the distan
 ![An example of the comparison matrix comparing both typologies across the three measures](/assets/images/ExampleMatrix.JPG)
 
 **C. Submission files**
-* Upload the images and the Rhino file (.3dm file, name as StudentFirstNameLastName.3dm) to polybox to this [link]([https://polybox.ethz.ch/index.php/s/7x411XMgtLQvHk1](https://polybox.ethz.ch/index.php/s/JZXRI0ZVolZjvy0))
+* Upload the images and the Rhino file (.3dm file, name as StudentFirstNameLastName.3dm) to polybox to this [link](https://polybox.ethz.ch/index.php/s/JZXRI0ZVolZjvy0)
 
 [**D. DOWNLOAD LINK TOOLKIT AND EXAMPLE SCENE**](https://polybox.ethz.ch/index.php/s/1vsvOIQrjRRUXpv) (Password protected)
 You will receive the password via email.
